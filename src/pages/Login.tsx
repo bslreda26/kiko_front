@@ -114,49 +114,6 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Demo Credentials Info */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            style={{
-              padding: "1rem",
-              background: "rgba(59, 130, 246, 0.05)",
-              borderRadius: "12px",
-              border: "1px solid rgba(59, 130, 246, 0.1)",
-              marginBottom: "1.5rem",
-            }}
-          >
-            <h4
-              style={{
-                fontSize: "0.875rem",
-                fontWeight: "600",
-                color: "#3b82f6",
-                margin: "0 0 0.5rem 0",
-              }}
-            >
-              Demo Credentials
-            </h4>
-            <p
-              style={{
-                fontSize: "0.8rem",
-                color: "#64748b",
-                margin: "0 0 0.25rem 0",
-              }}
-            >
-              Email: admin@kikoplume.com
-            </p>
-            <p
-              style={{
-                fontSize: "0.8rem",
-                color: "#64748b",
-                margin: 0,
-              }}
-            >
-              Password: admin123
-            </p>
-          </motion.div>
-
           {/* Form */}
           <form onSubmit={handleSubmit}>
             {/* Email Field */}
