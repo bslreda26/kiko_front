@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, ArrowRight, Instagram, Mail, Heart, ArrowUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization";
+// import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization";
 import ProductService, { getLatestProducts } from "../services/productService";
 import type { Product, ApiError } from "../types/api";
 
@@ -56,9 +56,8 @@ const Home: React.FC = () => {
   const artistRef = useRef<HTMLDivElement>(null);
   const workRef = useRef<HTMLDivElement>(null);
 
-  // Performance optimization
-  const { getOptimizedTransition, shouldReduceAnimations } =
-    usePerformanceOptimization();
+  // Performance optimization hook (unused in simplified version)
+  // const { getOptimizedTransition, shouldReduceAnimations } = usePerformanceOptimization();
 
   // Load latest products
   const loadLatestProducts = async () => {
@@ -84,15 +83,15 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    // Header background image carousel - increased interval for better performance
+    // Header background image carousel - longer intervals for better performance
     const headerInterval = setInterval(() => {
       setCurrentHeaderImage((prev) => (prev + 1) % headerImages.length);
-    }, 8000);
+    }, 12000);
 
-    // Artist image carousel - increased interval for better performance
+    // Artist image carousel - longer intervals for better performance
     const artistInterval = setInterval(() => {
       setCurrentArtistImage((prev) => (prev + 1) % artistImages.length);
-    }, 15000);
+    }, 20000);
 
     // Load latest products
     loadLatestProducts();
@@ -127,10 +126,10 @@ const Home: React.FC = () => {
             <motion.div
               key={currentHeaderImage}
               className="header-background-image"
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, ease: "easeInOut" }}
               style={{
                 backgroundImage: `url(${headerImages[currentHeaderImage]})`,
               }}
@@ -138,58 +137,42 @@ const Home: React.FC = () => {
           </AnimatePresence>
 
           <motion.div
-            className="floating-eye eye-2"
-            animate={{
-              y: [0, -10, 0],
-              scale: [1, 1.02, 1],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-
-          <motion.div
             className="floating-particles"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 2, delay: 1 }}
+            animate={{ opacity: 0.3 }}
+            transition={{ duration: 1.5 }}
           />
         </div>
 
         <div className="hero-content">
           <motion.div
             className="hero-title-container"
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{
-              ...getOptimizedTransition(1.2, 0.5),
-              ease: [0.25, 0.46, 0.45, 0.94],
-            }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <div className="hero-title">
               <motion.span
                 className="title-word"
-                initial={{ opacity: 0, rotateX: -90 }}
-                animate={{ opacity: 1, rotateX: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
               >
                 Kiko
               </motion.span>
               <motion.span
                 className="title-separator"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.6 }}
               >
-                ×
+                .
               </motion.span>
               <motion.span
                 className="title-word"
-                initial={{ opacity: 0, rotateX: 90 }}
-                animate={{ opacity: 1, rotateX: 0 }}
-                transition={{ duration: 0.8, delay: 1.4 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.9 }}
               >
                 Plume
               </motion.span>
@@ -198,32 +181,23 @@ const Home: React.FC = () => {
 
           <motion.p
             className="hero-subtitle"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              ...getOptimizedTransition(1, 1.8),
-              ease: "easeOut",
-            }}
+            transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
           >
-            Where creativity flows and emotions bloom through contemporary art
+            Where art touches the soul{" "}
           </motion.p>
 
           <motion.div
             className="hero-buttons"
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              ...getOptimizedTransition(1, 2.2),
-              ease: "easeOut",
-            }}
+            transition={{ duration: 0.6, delay: 1.5, ease: "easeOut" }}
           >
             <motion.button
               className="cta-button primary"
-              whileHover={{
-                scale: shouldReduceAnimations() ? 1 : 1.05,
-                y: shouldReduceAnimations() ? 0 : -2,
-              }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => scrollToSection(artistRef)}
             >
               Discover Art
@@ -232,11 +206,8 @@ const Home: React.FC = () => {
 
             <motion.button
               className="cta-button secondary"
-              whileHover={{
-                scale: shouldReduceAnimations() ? 1 : 1.05,
-                y: shouldReduceAnimations() ? 0 : -2,
-              }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => navigate("/shop")}
             >
               View Gallery
@@ -262,9 +233,9 @@ const Home: React.FC = () => {
           <div className="artist-content">
             <motion.div
               className="artist-images"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
               <div className="image-carousel">
@@ -274,10 +245,10 @@ const Home: React.FC = () => {
                     src={artistImages[currentArtistImage]}
                     alt="Artist"
                     className="artist-image"
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 1.5 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1 }}
                   />
                 </AnimatePresence>
               </div>
@@ -285,9 +256,9 @@ const Home: React.FC = () => {
 
             <motion.div
               className="artist-story"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
             >
               <h3>The Artist's Journey</h3>
@@ -404,12 +375,9 @@ const Home: React.FC = () => {
                   <motion.div
                     key={`static-${index}`}
                     className="gallery-item"
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{
-                      ...getOptimizedTransition(0.8, index * 0.1),
-                      ease: [0.25, 0.46, 0.45, 0.94],
-                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     onClick={() => openImageModal(work.src)}
                     style={{ cursor: "pointer" }}
@@ -417,48 +385,22 @@ const Home: React.FC = () => {
                     <motion.img
                       src={work.src}
                       alt={work.title}
-                      whileHover={{
-                        scale: shouldReduceAnimations() ? 1 : 1.05,
-                        filter: "brightness(1.1) contrast(1.05)",
-                        transition: { duration: 0.3 },
-                      }}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
                     />
                     <motion.div
                       className="item-overlay"
-                      initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-                      whileHover={{
-                        opacity: 1,
-                        backdropFilter: "blur(8px)",
-                        transition: { duration: 0.4, ease: "easeOut" },
-                      }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
                     >
                       <div className="overlay-content">
-                        <motion.h4
-                          initial={{ opacity: 0, y: 20 }}
-                          whileHover={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: 0.1 }}
-                        >
-                          {work.title}
-                        </motion.h4>
-                        <motion.p
-                          initial={{ opacity: 0, y: 15 }}
-                          whileHover={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: 0.2 }}
-                        >
-                          {work.description}
-                        </motion.p>
+                        <h4>{work.title}</h4>
+                        <p>{work.description}</p>
                         <motion.button
                           className="view-button"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          whileHover={{
-                            opacity: 1,
-                            scale: 1.05,
-                            y: -2,
-                            boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
-                          }}
+                          whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          transition={{ duration: 0.3, delay: 0.3 }}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate("/shop");
@@ -478,12 +420,9 @@ const Home: React.FC = () => {
                   <motion.div
                     key={product.id}
                     className="gallery-item"
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{
-                      ...getOptimizedTransition(0.8, index * 0.1),
-                      ease: [0.25, 0.46, 0.45, 0.94],
-                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     onClick={() => openImageModal(product.image)}
                     style={{ cursor: "pointer" }}
@@ -491,48 +430,22 @@ const Home: React.FC = () => {
                     <motion.img
                       src={product.image}
                       alt={product.title}
-                      whileHover={{
-                        scale: shouldReduceAnimations() ? 1 : 1.05,
-                        filter: "brightness(1.1) contrast(1.05)",
-                        transition: { duration: 0.3 },
-                      }}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
                     />
                     <motion.div
                       className="item-overlay"
-                      initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-                      whileHover={{
-                        opacity: 1,
-                        backdropFilter: "blur(8px)",
-                        transition: { duration: 0.4, ease: "easeOut" },
-                      }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
                     >
                       <div className="overlay-content">
-                        <motion.h4
-                          initial={{ opacity: 0, y: 20 }}
-                          whileHover={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: 0.1 }}
-                        >
-                          {product.title}
-                        </motion.h4>
-                        <motion.p
-                          initial={{ opacity: 0, y: 15 }}
-                          whileHover={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: 0.2 }}
-                        >
-                          ${product.price}
-                        </motion.p>
+                        <h4>{product.title}</h4>
+                        <p>${product.price}</p>
                         <motion.button
                           className="view-button"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          whileHover={{
-                            opacity: 1,
-                            scale: 1.05,
-                            y: -2,
-                            boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
-                          }}
+                          whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          transition={{ duration: 0.3, delay: 0.3 }}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/product/${product.id}`);
@@ -559,10 +472,10 @@ const Home: React.FC = () => {
               className="explore-collection-btn"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => navigate("/shop")}
             >
               Explore Our Latest Work
@@ -614,8 +527,8 @@ const Home: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="footer-link"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Instagram size={20} />
                 <span>Instagram</span>
@@ -623,8 +536,8 @@ const Home: React.FC = () => {
               <motion.a
                 href="mailto:Karenhawa5@gmail.com"
                 className="footer-link"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Mail size={20} />
                 <span>Email</span>
@@ -644,19 +557,9 @@ const Home: React.FC = () => {
               Stay updated with our latest works, exhibitions, and artistic
               insights.
             </p>
-            <motion.div
-              className="footer-heart"
-              animate={{
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
+            <div className="footer-heart">
               <Heart size={24} fill="#e11d48" color="#e11d48" />
-            </motion.div>
+            </div>
           </motion.div>
         </div>
 
@@ -671,8 +574,8 @@ const Home: React.FC = () => {
           <motion.button
             className="scroll-to-top"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <ArrowUp size={20} />
           </motion.button>

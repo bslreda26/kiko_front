@@ -20,9 +20,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
           className="mobile-menu"
           style={{
             position: "absolute",
@@ -48,8 +49,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             }}
           >
             <motion.li
-              whileHover={{ x: 10 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ x: 5 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.15 }}
               style={{
                 marginBottom: "0.5rem",
                 borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
@@ -73,8 +75,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               </Link>
             </motion.li>
             <motion.li
-              whileHover={{ x: 10 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ x: 5 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.15 }}
               style={{
                 marginBottom: "0.5rem",
                 borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
@@ -98,8 +101,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               </a>
             </motion.li>
             <motion.li
-              whileHover={{ x: 10 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ x: 5 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.15 }}
               style={{
                 marginBottom: "0.5rem",
                 paddingBottom: "0.5rem",
