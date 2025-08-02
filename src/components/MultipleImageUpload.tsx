@@ -1,13 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Upload,
-  X,
-  Image as ImageIcon,
-  AlertCircle,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Upload, X, Image as ImageIcon, AlertCircle, Plus } from "lucide-react";
 
 interface MultipleImageUploadProps {
   values: string[];

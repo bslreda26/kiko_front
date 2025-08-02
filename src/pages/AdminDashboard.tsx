@@ -9,11 +9,6 @@ import {
   LogOut,
   Save,
   X,
-  Eye,
-  DollarSign,
-  Image,
-  FileText,
-  Calendar,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -654,9 +649,9 @@ const AdminDashboard: React.FC = () => {
                                 margin: 0,
                               }}
                             >
-                              {dimensions.width}" × {dimensions.height}"
+                              {dimensions.width}cm × {dimensions.height}cm
                               {dimensions.depth
-                                ? ` × ${dimensions.depth}"`
+                                ? ` × ${dimensions.depth}cm`
                                 : ""}
                             </p>
                           )}
@@ -1016,7 +1011,7 @@ const AdminDashboard: React.FC = () => {
                     <input
                       type="number"
                       step="0.01"
-                      value={productForm.price}
+                      value={productForm.price === 0 ? "" : productForm.price}
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
@@ -1030,7 +1025,7 @@ const AdminDashboard: React.FC = () => {
                         borderRadius: "8px",
                         fontSize: "0.9rem",
                       }}
-                      placeholder="0.00"
+                      placeholder="Enter price"
                     />
                   </div>
                   <div>
@@ -1076,7 +1071,7 @@ const AdminDashboard: React.FC = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Dimensions (inches)
+                    Dimensions (cm)
                   </label>
                   <div
                     style={{
@@ -1088,7 +1083,11 @@ const AdminDashboard: React.FC = () => {
                     <input
                       type="number"
                       step="0.1"
-                      value={productForm.dimensions.width}
+                      value={
+                        productForm.dimensions.width === 0
+                          ? ""
+                          : productForm.dimensions.width
+                      }
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
@@ -1104,12 +1103,16 @@ const AdminDashboard: React.FC = () => {
                         borderRadius: "8px",
                         fontSize: "0.9rem",
                       }}
-                      placeholder="Width"
+                      placeholder="Width (cm)"
                     />
                     <input
                       type="number"
                       step="0.1"
-                      value={productForm.dimensions.height}
+                      value={
+                        productForm.dimensions.height === 0
+                          ? ""
+                          : productForm.dimensions.height
+                      }
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
@@ -1125,12 +1128,16 @@ const AdminDashboard: React.FC = () => {
                         borderRadius: "8px",
                         fontSize: "0.9rem",
                       }}
-                      placeholder="Height"
+                      placeholder="Height (cm)"
                     />
                     <input
                       type="number"
                       step="0.1"
-                      value={productForm.dimensions.depth}
+                      value={
+                        productForm.dimensions.depth === 0
+                          ? ""
+                          : productForm.dimensions.depth
+                      }
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
@@ -1146,7 +1153,7 @@ const AdminDashboard: React.FC = () => {
                         borderRadius: "8px",
                         fontSize: "0.9rem",
                       }}
-                      placeholder="Depth"
+                      placeholder="Depth (cm)"
                     />
                   </div>
                 </div>

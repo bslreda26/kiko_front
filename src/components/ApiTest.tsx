@@ -12,12 +12,12 @@ const ApiTest: React.FC = () => {
     setLoading(true);
     try {
       const result = await testFn();
-      setTestResults((prev) => ({
+      setTestResults((prev: any) => ({
         ...prev,
         [testName]: { success: true, data: result },
       }));
     } catch (error: any) {
-      setTestResults((prev) => ({
+      setTestResults((prev: any) => ({
         ...prev,
         [testName]: { success: false, error: error.message },
       }));

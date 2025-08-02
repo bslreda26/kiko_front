@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
       <CartProvider>
-        <Router>
+        <Router basename="/kiko_front">
           <Navbar />
           <App />
         </Router>

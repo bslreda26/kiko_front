@@ -10,7 +10,6 @@ import {
   Eye,
   Package,
   Palette,
-  Calendar,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";

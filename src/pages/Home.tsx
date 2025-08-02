@@ -6,15 +6,42 @@ import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization"
 import ProductService, { getLatestProducts } from "../services/productService";
 import type { Product, ApiError } from "../types/api";
 
+// Import header background images
+import headerImage1 from "../assets/home/06h.jpg";
+import headerImage2 from "../assets/home/12h.jpg";
+import headerImage3 from "../assets/home/14h.jpg";
+
+// Import artist story images
+import artistImage1 from "../assets/karen/1k.jpg";
+import artistImage2 from "../assets/karen/2k.jpg";
+
+// Import work images for static gallery
+import workImage1 from "../assets/work/4.jpg";
+import workImage2 from "../assets/work/5.jpg";
+import workImage3 from "../assets/work/6.jpg";
+import workImage4 from "../assets/work/7.jpg";
+
 // Header background images
-const headerImages = [
-  "/src/assets/home/06h.jpg",
-  "/src/assets/home/12h.jpg",
-  "/src/assets/home/14h.jpg",
-];
+const headerImages = [headerImage1, headerImage2, headerImage3];
 
 // Artist story images
-const artistImages = ["/src/assets/karen/1k.jpg", "/src/assets/karen/2k.jpg"];
+const artistImages = [artistImage1, artistImage2];
+
+// Static work images for fallback
+const staticWorkImages = [
+  {
+    src: workImage1,
+    title: "Abstract Expression",
+    description: "Mixed media artwork",
+  },
+  {
+    src: workImage2,
+    title: "Urban Landscape",
+    description: "Contemporary painting",
+  },
+  { src: workImage3, title: "Color Study", description: "Digital art piece" },
+  { src: workImage4, title: "Modern Vision", description: "Acrylic on canvas" },
+];
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -371,13 +398,79 @@ const Home: React.FC = () => {
                 </motion.button>
               </div>
             ) : latestProducts.length === 0 ? (
-              <div
-                className="gallery-empty"
-                style={{ textAlign: "center", padding: "2rem" }}
-              >
-                <p style={{ color: "#64748b", fontSize: "1.1rem" }}>
-                  No artworks available yet. Check back soon!
-                </p>
+              // Show static work images when no API products are available
+              <div className="gallery-grid">
+                {staticWorkImages.map((work, index) => (
+                  <motion.div
+                    key={`static-${index}`}
+                    className="gallery-item"
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{
+                      ...getOptimizedTransition(0.8, index * 0.1),
+                      ease: [0.25, 0.46, 0.45, 0.94],
+                    }}
+                    viewport={{ once: true }}
+                    onClick={() => openImageModal(work.src)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <motion.img
+                      src={work.src}
+                      alt={work.title}
+                      whileHover={{
+                        scale: shouldReduceAnimations() ? 1 : 1.05,
+                        filter: "brightness(1.1) contrast(1.05)",
+                        transition: { duration: 0.3 },
+                      }}
+                    />
+                    <motion.div
+                      className="item-overlay"
+                      initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                      whileHover={{
+                        opacity: 1,
+                        backdropFilter: "blur(8px)",
+                        transition: { duration: 0.4, ease: "easeOut" },
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="overlay-content">
+                        <motion.h4
+                          initial={{ opacity: 0, y: 20 }}
+                          whileHover={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                        >
+                          {work.title}
+                        </motion.h4>
+                        <motion.p
+                          initial={{ opacity: 0, y: 15 }}
+                          whileHover={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.2 }}
+                        >
+                          {work.description}
+                        </motion.p>
+                        <motion.button
+                          className="view-button"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          whileHover={{
+                            opacity: 1,
+                            scale: 1.05,
+                            y: -2,
+                            boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
+                          }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{ duration: 0.3, delay: 0.3 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/shop");
+                          }}
+                        >
+                          <Eye size={16} style={{ marginRight: "0.5rem" }} />
+                          Explore
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                ))}
               </div>
             ) : (
               <div className="gallery-grid">

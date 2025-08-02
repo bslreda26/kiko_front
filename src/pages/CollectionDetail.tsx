@@ -24,7 +24,7 @@ const CollectionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [collection, setCollection] = useState<Collection | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
+
   const [collectionProducts, setCollectionProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +63,6 @@ const CollectionDetail: React.FC = () => {
       );
 
       setCollection(foundCollection);
-      setProducts(productsData);
       setCollectionProducts(productsInCollection);
     } catch (err) {
       const apiError = err as ApiError;
