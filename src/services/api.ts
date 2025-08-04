@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // API Configuration
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? process.env.VITE_API_URL || 'kikobackendmysql-production.up.railway.app'
-  : 'kikobackendmysql-production.up.railway.app';
+  ? process.env.VITE_API_URL || 'https://kikobackendmysql-production.up.railway.app'
+  : 'https://kikobackendmysql-production.up.railway.app';
 
 // Create axios instance
 const api = axios.create({
