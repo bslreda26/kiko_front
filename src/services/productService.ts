@@ -5,7 +5,6 @@ import type {
   CreateProductRequest,
   UpdateProductRequest,
   ProductSearchParams,
-  PriceRangeParams,
   ApiError
 } from '../types/api';
 
@@ -43,12 +42,6 @@ export class ProductService {
     try {
       const queryParams = new URLSearchParams();
       
-      if (params.minPrice !== undefined) {
-        queryParams.append('minPrice', params.minPrice.toString());
-      }
-      if (params.maxPrice !== undefined) {
-        queryParams.append('maxPrice', params.maxPrice.toString());
-      }
       if (params.collectionId !== undefined) {
         queryParams.append('collectionId', params.collectionId.toString());
       }
@@ -65,24 +58,7 @@ export class ProductService {
     }
   }
 
-  /**
-   * Get products by price range
-   */
-  static async getProductsByPriceRange(params: PriceRangeParams): Promise<Product[]> {
-    try {
-      const queryParams = new URLSearchParams({
-        minPrice: params.minPrice.toString(),
-        maxPrice: params.maxPrice.toString()
-      });
 
-      const response = await api.get<Product[]>(
-        `${ProductService.BASE_PATH}/by-price-range?${queryParams.toString()}`
-      );
-      return response.data;
-    } catch (error: any) {
-      throw ProductService.handleError(error);
-    }
-  }
 
   /**
    * Get products by collection ID
@@ -165,12 +141,7 @@ export class ProductService {
     }
   }
 
-  /**
-   * Get products with price range filters (helper function)
-   */
-  static async getProductsInPriceRange(minPrice: number, maxPrice: number): Promise<Product[]> {
-    return ProductService.getProductsByPriceRange({ minPrice, maxPrice });
-  }
+
 
   /**
    * Search products by title only (helper function)
@@ -212,12 +183,10 @@ export default ProductService;
 export const createProduct = ProductService.createProduct;
 export const getAllProducts = ProductService.getAllProducts;
 export const searchProducts = ProductService.searchProducts;
-export const getProductsByPriceRange = ProductService.getProductsByPriceRange;
 export const getProductsByCollection = ProductService.getProductsByCollection;
 export const getProductById = ProductService.getProductById;
 export const updateProduct = ProductService.updateProduct;
 export const deleteProduct = ProductService.deleteProduct;
 export const getFeaturedProducts = ProductService.getFeaturedProducts;
 export const getLatestProducts = ProductService.getLatestProducts;
-export const getProductsInPriceRange = ProductService.getProductsInPriceRange;
 export const searchProductsByTitle = ProductService.searchProductsByTitle;

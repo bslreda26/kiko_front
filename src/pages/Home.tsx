@@ -440,7 +440,15 @@ const Home: React.FC = () => {
                     >
                       <div className="overlay-content">
                         <h4>{product.title}</h4>
-                        <p>${product.price}</p>
+                        <p
+                          style={{
+                            color: product.available ? "#22c55e" : "#ef4444",
+                            fontWeight: "600",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          {product.available ? "Available" : "Not Available"}
+                        </p>
                         <motion.button
                           className="view-button"
                           whileHover={{ scale: 1.05 }}
@@ -569,7 +577,7 @@ const Home: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.9 }}
           viewport={{ once: true }}
         >
-          <p>&copy; 2024 Kikoplume. All rights reserved.</p>
+          <p>&copy; 2025 Kikoplume. All rights reserved. by BSL</p>
           <motion.button
             className="scroll-to-top"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

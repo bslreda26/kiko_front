@@ -58,7 +58,7 @@ export interface Product {
   description: string;
   image: string;
   dimensions: string; // JSON string of ProductDimensions
-  price: number;
+  available: boolean;
   collectionId: number;
   createdAt: string;
   updatedAt: string;
@@ -74,7 +74,7 @@ export interface CreateProductRequest {
   description: string;
   image: string;
   dimensions: string; // JSON string like "{\"width\": 10, \"height\": 15, \"depth\": 5}"
-  price: number;
+  available: boolean;
   collectionId: number;
 }
 
@@ -82,8 +82,6 @@ export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
 
 // Search Types
 export interface ProductSearchParams {
-  minPrice?: number;
-  maxPrice?: number;
   collectionId?: number;
   title?: string;
 }
@@ -92,10 +90,7 @@ export interface CollectionSearchParams {
   name?: string;
 }
 
-export interface PriceRangeParams {
-  minPrice: number;
-  maxPrice: number;
-}
+
 
 // Authentication Types
 export interface LoginRequest {

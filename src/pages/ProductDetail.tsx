@@ -62,11 +62,8 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
+  const getAvailabilityStatus = (available: boolean) => {
+    return available ? "Available" : "Not Available";
   };
 
   const getCollectionName = (collectionId: number) => {
@@ -322,7 +319,7 @@ const ProductDetail: React.FC = () => {
                 backdropFilter: "blur(20px)",
               }}
             >
-              {/* Title and Price */}
+              {/* Title and Availability */}
               <div style={{ marginBottom: "2rem" }}>
                 <h1
                   style={{
@@ -337,13 +334,19 @@ const ProductDetail: React.FC = () => {
                 </h1>
                 <p
                   style={{
-                    fontSize: "1.75rem",
-                    fontWeight: "700",
-                    color: "#3b82f6",
+                    fontSize: "1.125rem",
+                    fontWeight: "600",
+                    color: product.available ? "#22c55e" : "#ef4444",
                     margin: 0,
+                    padding: "8px 16px",
+                    background: product.available
+                      ? "rgba(34, 197, 94, 0.1)"
+                      : "rgba(239, 68, 68, 0.1)",
+                    borderRadius: "20px",
+                    display: "inline-block",
                   }}
                 >
-                  {formatPrice(product.price)}
+                  {getAvailabilityStatus(product.available)}
                 </p>
               </div>
 
@@ -476,13 +479,16 @@ const ProductDetail: React.FC = () => {
 
               {/* Add to Cart Button */}
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleAddToCart}
+                whileHover={{ scale: product.available ? 1.02 : 1 }}
+                whileTap={{ scale: product.available ? 0.98 : 1 }}
+                onClick={() => product.available && handleAddToCart()}
+                disabled={!product.available}
                 style={{
                   width: "100%",
                   padding: "1.25rem",
-                  background: addedToCart
+                  background: !product.available
+                    ? "linear-gradient(135deg, #6b7280, #4b5563)"
+                    : addedToCart
                     ? "linear-gradient(135deg, #22c55e, #16a34a)"
                     : isInCart(product.id)
                     ? "linear-gradient(135deg, #f59e0b, #d97706)"
@@ -490,7 +496,7 @@ const ProductDetail: React.FC = () => {
                   color: "white",
                   border: "none",
                   borderRadius: "16px",
-                  cursor: "pointer",
+                  cursor: product.available ? "pointer" : "not-allowed",
                   fontSize: "1.125rem",
                   fontWeight: "600",
                   display: "flex",
@@ -498,10 +504,18 @@ const ProductDetail: React.FC = () => {
                   justifyContent: "center",
                   gap: "0.75rem",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+                  boxShadow: !product.available
+                    ? "0 4px 16px rgba(107, 114, 128, 0.2)"
+                    : "0 4px 16px rgba(59, 130, 246, 0.3)",
+                  opacity: product.available ? 1 : 0.6,
                 }}
               >
-                {addedToCart ? (
+                {!product.available ? (
+                  <>
+                    <Eye size={24} />
+                    Not Available
+                  </>
+                ) : addedToCart ? (
                   <>
                     <Check size={24} />
                     Added to Cart!

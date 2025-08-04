@@ -72,11 +72,8 @@ const Shop: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
+  const getAvailabilityStatus = (available: boolean) => {
+    return available ? "Available" : "Not Available";
   };
 
   const getCollectionName = (collectionId: number) => {
@@ -893,14 +890,22 @@ const Shop: React.FC = () => {
                             >
                               <p
                                 style={{
-                                  fontSize: "1.375rem",
-                                  fontWeight: "800",
-                                  color: "#059669",
+                                  fontSize: "1rem",
+                                  fontWeight: "600",
+                                  color: product.available
+                                    ? "#22c55e"
+                                    : "#ef4444",
                                   margin: 0,
                                   letterSpacing: "-0.025em",
+                                  padding: "4px 12px",
+                                  background: product.available
+                                    ? "rgba(34, 197, 94, 0.1)"
+                                    : "rgba(239, 68, 68, 0.1)",
+                                  borderRadius: "20px",
+                                  display: "inline-block",
                                 }}
                               >
-                                {formatPrice(product.price)}
+                                {getAvailabilityStatus(product.available)}
                               </p>
                               {dimensions && (
                                 <div
@@ -943,19 +948,26 @@ const Shop: React.FC = () => {
                           {/* Add to Cart Button */}
                           <motion.button
                             whileHover={{
-                              scale: 1.02,
-                              boxShadow: addedToCartItems.has(product.id)
+                              scale: product.available ? 1.02 : 1,
+                              boxShadow: !product.available
+                                ? "0 8px 25px rgba(107, 114, 128, 0.2)"
+                                : addedToCartItems.has(product.id)
                                 ? "0 8px 25px rgba(34, 197, 94, 0.4)"
                                 : isInCart(product.id)
                                 ? "0 8px 25px rgba(245, 158, 11, 0.4)"
                                 : "0 8px 25px rgba(59, 130, 246, 0.4)",
                             }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => handleAddToCart(product)}
+                            whileTap={{ scale: product.available ? 0.98 : 1 }}
+                            onClick={() =>
+                              product.available && handleAddToCart(product)
+                            }
+                            disabled={!product.available}
                             style={{
                               width: "100%",
                               padding: "1rem",
-                              background: addedToCartItems.has(product.id)
+                              background: !product.available
+                                ? "linear-gradient(135deg, #6b7280, #4b5563)"
+                                : addedToCartItems.has(product.id)
                                 ? "linear-gradient(135deg, #22c55e, #16a34a)"
                                 : isInCart(product.id)
                                 ? "linear-gradient(135deg, #f59e0b, #d97706)"
@@ -963,7 +975,9 @@ const Shop: React.FC = () => {
                               color: "white",
                               border: "none",
                               borderRadius: "14px",
-                              cursor: "pointer",
+                              cursor: product.available
+                                ? "pointer"
+                                : "not-allowed",
                               fontSize: "0.95rem",
                               fontWeight: "700",
                               display: "flex",
@@ -973,16 +987,24 @@ const Shop: React.FC = () => {
                               transition:
                                 "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                               height: "48px",
-                              boxShadow: addedToCartItems.has(product.id)
+                              boxShadow: !product.available
+                                ? "0 4px 16px rgba(107, 114, 128, 0.2)"
+                                : addedToCartItems.has(product.id)
                                 ? "0 4px 16px rgba(34, 197, 94, 0.3)"
                                 : isInCart(product.id)
                                 ? "0 4px 16px rgba(245, 158, 11, 0.3)"
                                 : "0 4px 16px rgba(59, 130, 246, 0.3)",
                               letterSpacing: "0.025em",
                               textTransform: "uppercase" as const,
+                              opacity: product.available ? 1 : 0.6,
                             }}
                           >
-                            {addedToCartItems.has(product.id) ? (
+                            {!product.available ? (
+                              <>
+                                <Eye size={20} />
+                                Not Available
+                              </>
+                            ) : addedToCartItems.has(product.id) ? (
                               <>
                                 <Check size={20} />
                                 Added!

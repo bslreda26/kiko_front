@@ -45,7 +45,7 @@ interface ProductForm {
   title: string;
   description: string;
   image: string;
-  price: number;
+  available: boolean;
   dimensions: { width: number; height: number; depth: number };
   collectionId: number;
 }
@@ -79,7 +79,7 @@ const AdminDashboard: React.FC = () => {
     title: "",
     description: "",
     image: "",
-    price: 0,
+    available: true,
     dimensions: { width: 0, height: 0, depth: 0 },
     collectionId: 0,
   });
@@ -134,7 +134,7 @@ const AdminDashboard: React.FC = () => {
           title: product.title,
           description: product.description,
           image: product.image,
-          price: product.price,
+          available: product.available,
           dimensions,
           collectionId: product.collectionId,
         });
@@ -143,7 +143,7 @@ const AdminDashboard: React.FC = () => {
           title: "",
           description: "",
           image: "",
-          price: 0,
+          available: true,
           dimensions: { width: 0, height: 0, depth: 0 },
           collectionId: collections[0]?.id || 0,
         });
@@ -177,7 +177,6 @@ const AdminDashboard: React.FC = () => {
     if (!productForm.description.trim())
       return "Product description is required";
     if (!productForm.image.trim()) return "Product image URL is required";
-    if (productForm.price <= 0) return "Product price must be greater than 0";
     if (productForm.collectionId <= 0) return "Please select a collection";
     if (
       productForm.dimensions.width <= 0 ||
@@ -225,7 +224,7 @@ const AdminDashboard: React.FC = () => {
           title: productForm.title.trim(),
           description: productForm.description.trim(),
           image: productForm.image.trim(),
-          price: productForm.price,
+          available: productForm.available,
           dimensions: JSON.stringify(productForm.dimensions),
           collectionId: productForm.collectionId,
         };
@@ -311,13 +310,6 @@ const AdminDashboard: React.FC = () => {
       setError(apiError.message || `Failed to delete ${type.slice(0, -1)}`);
       console.error(`Error deleting ${type.slice(0, -1)}:`, err);
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
   };
 
   if (loading) {
@@ -624,13 +616,19 @@ const AdminDashboard: React.FC = () => {
                           </h3>
                           <p
                             style={{
-                              fontSize: "1.25rem",
-                              fontWeight: "700",
-                              color: "#3b82f6",
+                              fontSize: "1rem",
+                              fontWeight: "600",
+                              color: product.available ? "#22c55e" : "#ef4444",
                               margin: "0 0 0.5rem 0",
+                              padding: "4px 12px",
+                              background: product.available
+                                ? "rgba(34, 197, 94, 0.1)"
+                                : "rgba(239, 68, 68, 0.1)",
+                              borderRadius: "20px",
+                              display: "inline-block",
                             }}
                           >
-                            {formatPrice(product.price)}
+                            {product.available ? "Available" : "Not Available"}
                           </p>
                           <p
                             style={{
@@ -1006,16 +1004,14 @@ const AdminDashboard: React.FC = () => {
                         fontWeight: "500",
                       }}
                     >
-                      Price ($)
+                      Available
                     </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={productForm.price === 0 ? "" : productForm.price}
+                    <select
+                      value={productForm.available ? "true" : "false"}
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
-                          price: parseFloat(e.target.value) || 0,
+                          available: e.target.value === "true",
                         }))
                       }
                       style={{
@@ -1025,8 +1021,10 @@ const AdminDashboard: React.FC = () => {
                         borderRadius: "8px",
                         fontSize: "0.9rem",
                       }}
-                      placeholder="Enter price"
-                    />
+                    >
+                      <option value="true">Available</option>
+                      <option value="false">Not Available</option>
+                    </select>
                   </div>
                   <div>
                     <label

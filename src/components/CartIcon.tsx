@@ -5,20 +5,11 @@ import { useCart } from "../contexts/CartContext";
 
 const CartIcon: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    items,
-    totalItems,
-    totalPrice,
-    updateQuantity,
-    removeFromCart,
-    clearCart,
-  } = useCart();
+  const { items, totalItems, updateQuantity, removeFromCart, clearCart } =
+    useCart();
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
+  const getAvailabilityStatus = (available: boolean) => {
+    return available ? "Available" : "Not Available";
   };
 
   const handleCheckout = () => {
@@ -32,15 +23,13 @@ const CartIcon: React.FC = () => {
     items.forEach((item, index) => {
       message += `${index + 1}. ${item.title}\n`;
       message += `   Quantity: ${item.quantity}\n`;
-      message += `   Price: ${formatPrice(item.price)} each\n`;
-      message += `   Subtotal: ${formatPrice(item.price * item.quantity)}\n\n`;
+      message += `   Status: ${getAvailabilityStatus(item.available)}\n\n`;
     });
 
     // Add total
-    message += `Total Items: ${totalItems}\n`;
-    message += `Total Amount: ${formatPrice(totalPrice)}\n\n`;
+    message += `Total Items: ${totalItems}\n\n`;
     message +=
-      "Please let me know how to proceed with the payment and delivery. Thank you!";
+      "Please let me know how to proceed with the order and delivery. Thank you!";
 
     // Encode the message for URL
     const encodedMessage = encodeURIComponent(message);
@@ -281,12 +270,12 @@ const CartIcon: React.FC = () => {
                           <p
                             style={{
                               fontSize: "0.9rem",
-                              color: "#3b82f6",
+                              color: item.available ? "#22c55e" : "#ef4444",
                               margin: 0,
                               fontWeight: "600",
                             }}
                           >
-                            {formatPrice(item.price)}
+                            {getAvailabilityStatus(item.available)}
                           </p>
                         </div>
 
@@ -407,7 +396,7 @@ const CartIcon: React.FC = () => {
                         color: "#1e293b",
                       }}
                     >
-                      Total: {formatPrice(totalPrice)}
+                      Total Items: {totalItems}
                     </span>
                     <button
                       onClick={clearCart}
