@@ -359,7 +359,9 @@ body {
 .title-word {
   font-size: 4rem;
   font-weight: 300;
-  letter-spacing: 2px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
+  letter-spacing: 4px;
   text-transform: uppercase;
   opacity: 0;
   transform: translateY(30px) rotateX(90deg);
@@ -373,12 +375,33 @@ body {
 }
 
 .title-word:nth-child(1) {
-  animation-delay: 0.2s;
+  animation-delay: 0.1s;
 }
 .title-word:nth-child(3) {
-  animation-delay: 0.6s;
+  animation-delay: 0.2s;
 }
 .title-word:nth-child(5) {
+  animation-delay: 0.3s;
+}
+.title-word:nth-child(7) {
+  animation-delay: 0.4s;
+}
+.title-word:nth-child(9) {
+  animation-delay: 0.5s;
+}
+.title-word:nth-child(11) {
+  animation-delay: 0.6s;
+}
+.title-word:nth-child(13) {
+  animation-delay: 0.7s;
+}
+.title-word:nth-child(15) {
+  animation-delay: 0.8s;
+}
+.title-word:nth-child(17) {
+  animation-delay: 0.9s;
+}
+.title-word:nth-child(19) {
   animation-delay: 1s;
 }
 
@@ -393,10 +416,31 @@ body {
 }
 
 .title-separator:nth-child(2) {
-  animation-delay: 0.4s;
+  animation-delay: 0.15s;
 }
 .title-separator:nth-child(4) {
-  animation-delay: 0.8s;
+  animation-delay: 0.25s;
+}
+.title-separator:nth-child(6) {
+  animation-delay: 0.35s;
+}
+.title-separator:nth-child(8) {
+  animation-delay: 0.45s;
+}
+.title-separator:nth-child(10) {
+  animation-delay: 0.55s;
+}
+.title-separator:nth-child(12) {
+  animation-delay: 0.65s;
+}
+.title-separator:nth-child(14) {
+  animation-delay: 0.75s;
+}
+.title-separator:nth-child(16) {
+  animation-delay: 0.85s;
+}
+.title-separator:nth-child(18) {
+  animation-delay: 0.95s;
 }
 
 .hero-subtitle {
@@ -579,7 +623,7 @@ body {
 /* Artist Section */
 .artist-section {
   padding: 6rem 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
   position: relative;
   overflow: hidden;
 }
@@ -593,22 +637,15 @@ body {
   bottom: 0;
   background: radial-gradient(
       circle at 20% 80%,
-      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.9) 0%,
       transparent 50%
     ),
     radial-gradient(
       circle at 80% 20%,
-      rgba(255, 255, 255, 0.6) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 40% 40%,
-      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.7) 0%,
       transparent 50%
     );
-  animation: artistBackgroundFlow 30s ease-in-out infinite;
   z-index: 1;
-  will-change: transform;
 }
 
 .artist-section::after {
@@ -618,9 +655,8 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="artistGrain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.3)"/></pattern></defs><rect width="100" height="100" fill="url(%23artistGrain)"/></svg>');
-  opacity: 0.5;
-  animation: artistGrainMove 25s linear infinite;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="artistGrain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.2)"/></pattern></defs><rect width="100" height="100" fill="url(%23artistGrain)"/></svg>');
+  opacity: 0.3;
   z-index: 2;
 }
 
@@ -635,7 +671,6 @@ body {
 
 .artist-images {
   position: relative;
-  animation: artistImageFloat 6s ease-in-out infinite;
 }
 
 .artist-images::before {
@@ -647,13 +682,12 @@ body {
   bottom: -20px;
   background: linear-gradient(
     45deg,
-    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.4),
     transparent,
-    rgba(255, 255, 255, 0.6)
+    rgba(255, 255, 255, 0.4)
   );
   border-radius: 30px;
   z-index: -1;
-  animation: artistGlow 4s ease-in-out infinite;
 }
 
 .image-carousel {
@@ -700,14 +734,11 @@ body {
 
 .artist-story h3 {
   font-size: 2.5rem;
-  font-weight: 300;
+  font-weight: 700;
   margin-bottom: 2rem;
-  color: #1e293b;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #1a202c;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
   position: relative;
-  animation: titleReveal 1.5s ease forwards;
-  opacity: 0;
-  transform: translateY(30px);
 }
 
 .artist-story h3::before {
@@ -715,27 +746,20 @@ body {
   position: absolute;
   bottom: -10px;
   left: 0;
-  width: 0;
+  width: 60px;
   height: 3px;
   background: linear-gradient(90deg, #64748b, rgba(100, 116, 139, 0.5));
-  animation: titleUnderline 2s ease forwards 0.5s;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
 }
 
 .artist-story p {
   margin-bottom: 1.5rem;
-  color: #475569;
+  color: #2d3748;
   line-height: 1.8;
   font-size: 1.1rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  animation: paragraphReveal 1.8s ease forwards;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.artist-story p:nth-child(2) {
-  animation-delay: 0.4s;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+  font-weight: 400;
 }
 
 .artist-collections {
@@ -744,13 +768,10 @@ body {
 
 .artist-collections h4 {
   font-size: 1.4rem;
-  font-weight: 400;
+  font-weight: 600;
   margin-bottom: 1.5rem;
-  color: #334155;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  animation: collectionsTitleReveal 2s ease forwards 0.9s;
-  opacity: 0;
-  transform: translateY(20px);
+  color: #1a202c;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
 }
 
 .collection-tags {
@@ -761,29 +782,15 @@ body {
 
 .collection-tag {
   padding: 0.8rem 1.5rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(203, 213, 225, 0.3);
   border-radius: 30px;
   font-size: 1rem;
-  color: #475569;
+  color: #2d3748;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  animation: tagFloat 3s ease-in-out infinite;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.collection-tag:nth-child(1) {
-  animation-delay: 1.2s, 0s;
-}
-
-.collection-tag:nth-child(2) {
-  animation-delay: 1.4s, 0.5s;
-}
-
-.collection-tag:nth-child(3) {
-  animation-delay: 1.6s, 1s;
+  font-weight: 500;
 }
 
 .collection-tag:hover {
@@ -1612,10 +1619,12 @@ body {
   }
 
   .title-word {
-    font-size: 3rem;
+    font-size: 2.5rem;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Roboto", sans-serif;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15),
       0 0 15px rgba(255, 255, 255, 0.3);
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
   }
 
   .title-separator {
@@ -1744,8 +1753,10 @@ body {
   }
 
   .title-word {
-    font-size: 2.5rem;
-    letter-spacing: 1px;
+    font-size: 2rem;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Roboto", sans-serif;
+    letter-spacing: 1.5px;
   }
 
   .title-separator {
@@ -1897,7 +1908,7 @@ body {
 /* Mobile Performance Optimizations */
 @media (max-width: 768px) {
   .header-background-image {
-    animation: backgroundZoom 20s ease-in-out infinite alternate;
+    animation: none;
   }
 
   .floating-eye,
@@ -1923,6 +1934,22 @@ body {
 
   .artist-image:hover {
     transform: none;
+  }
+
+  /* Fix mobile text readability */
+  .artist-story h3 {
+    color: #1a202c;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+
+  .artist-story p {
+    color: #2d3748;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+  }
+
+  .artist-collections h4 {
+    color: #1a202c;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
   }
 }
 
@@ -1960,6 +1987,8 @@ body {
 
   .title-word {
     font-size: 2.5rem;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Roboto", sans-serif;
   }
 
   .artist-section,
@@ -2086,6 +2115,20 @@ body {
 
   .gallery-item {
     will-change: auto;
+  }
+
+  /* Disable complex animations on mobile */
+  .artist-section::before,
+  .artist-section::after {
+    animation: none;
+  }
+
+  .artist-images {
+    animation: none;
+  }
+
+  .artist-images::before {
+    animation: none;
   }
 }
 

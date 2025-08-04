@@ -88,10 +88,10 @@ const Home: React.FC = () => {
       setCurrentHeaderImage((prev) => (prev + 1) % headerImages.length);
     }, 12000);
 
-    // Artist image carousel - longer intervals for better performance
+    // Artist image carousel - smooth, elegant timing
     const artistInterval = setInterval(() => {
       setCurrentArtistImage((prev) => (prev + 1) % artistImages.length);
-    }, 20000);
+    }, 8000);
 
     // Load latest products
     loadLatestProducts();
@@ -100,7 +100,6 @@ const Home: React.FC = () => {
       clearInterval(headerInterval);
       clearInterval(artistInterval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scrollToSection = (ref: React.RefObject<HTMLElement | null>) => {
@@ -121,17 +120,25 @@ const Home: React.FC = () => {
     <div className="App">
       {/* Section 1: Header/Hero */}
       <section ref={heroRef} id="home" className="hero-section">
-        <div className="hero-background">
-          <AnimatePresence mode="wait">
+        <div className="hero-background" style={{ backgroundColor: "#000000" }}>
+          <AnimatePresence>
             <motion.div
               key={currentHeaderImage}
               className="header-background-image"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
               style={{
                 backgroundImage: `url(${headerImages[currentHeaderImage]})`,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
             />
           </AnimatePresence>
@@ -147,52 +154,45 @@ const Home: React.FC = () => {
         <div className="hero-content">
           <motion.div
             className="hero-title-container"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
           >
             <div className="hero-title">
-              <motion.span
-                className="title-word"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                Kiko
-              </motion.span>
-              <motion.span
-                className="title-separator"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.6 }}
-              >
-                .
-              </motion.span>
-              <motion.span
-                className="title-word"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.9 }}
-              >
-                Plume
-              </motion.span>
+              <span className="title-word">K</span>
+              <span className="title-separator"></span>
+              <span className="title-word">I</span>
+              <span className="title-separator"></span>
+              <span className="title-word">K</span>
+              <span className="title-separator"></span>
+              <span className="title-word">O</span>
+              <span className="title-separator"></span>
+              <span className="title-word">P</span>
+              <span className="title-separator"></span>
+              <span className="title-word">L</span>
+              <span className="title-separator"></span>
+              <span className="title-word">U</span>
+              <span className="title-separator"></span>
+              <span className="title-word">M</span>
+              <span className="title-separator"></span>
+              <span className="title-word">E</span>
             </div>
           </motion.div>
 
           <motion.p
             className="hero-subtitle"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
           >
             Where art touches the soul{" "}
           </motion.p>
 
           <motion.div
             className="hero-buttons"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.5, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.2, ease: "easeOut" }}
           >
             <motion.button
               className="cta-button primary"
@@ -224,50 +224,49 @@ const Home: React.FC = () => {
             className="artist-background-overlay"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
             viewport={{ once: true }}
           />
         </div>
 
         <div className="container">
-          <div className="artist-content">
-            <motion.div
-              className="artist-images"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
+          <motion.div
+            className="artist-content"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <div className="artist-images">
               <div className="image-carousel">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={currentArtistImage}
-                    src={artistImages[currentArtistImage]}
-                    alt="Artist"
-                    className="artist-image"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
-                  />
-                </AnimatePresence>
+                <motion.img
+                  key={currentArtistImage}
+                  src={artistImages[currentArtistImage]}
+                  alt="Artist"
+                  className="artist-image"
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 2, ease: "easeOut" }}
+                />
               </div>
-            </motion.div>
+            </div>
 
             <motion.div
               className="artist-story"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
               viewport={{ once: true }}
             >
               <h3>The Artist's Journey</h3>
+
               <p>
                 Born from a passion for contemporary expression, Kikoplume
                 represents the intersection of traditional artistry and modern
                 innovation. Each piece tells a story of emotion, creativity, and
                 the human experience.
               </p>
+
               <p>
                 Through bold colors, dynamic compositions, and thoughtful
                 symbolism, our work invites viewers to explore their own
@@ -283,7 +282,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
