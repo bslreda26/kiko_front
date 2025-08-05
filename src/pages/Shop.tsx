@@ -72,8 +72,14 @@ const Shop: React.FC = () => {
     });
   };
 
-  const getAvailabilityStatus = (available: boolean) => {
-    return available ? "Available" : "Not Available";
+  const getAvailabilityStatus = (isAvailable: boolean) => {
+    return isAvailable === true
+      ? "Available"
+      : "Not Available";
+  };
+
+  const isAvailable = (isAvailable: boolean) => {
+    return isAvailable === true;
   };
 
   const getCollectionName = (collectionId: number) => {
@@ -892,20 +898,20 @@ const Shop: React.FC = () => {
                                 style={{
                                   fontSize: "1rem",
                                   fontWeight: "600",
-                                  color: product.available
+                                  color: isAvailable(product.isAvailable)
                                     ? "#22c55e"
                                     : "#ef4444",
                                   margin: 0,
                                   letterSpacing: "-0.025em",
                                   padding: "4px 12px",
-                                  background: product.available
+                                  background: isAvailable(product.isAvailable)
                                     ? "rgba(34, 197, 94, 0.1)"
                                     : "rgba(239, 68, 68, 0.1)",
                                   borderRadius: "20px",
                                   display: "inline-block",
                                 }}
                               >
-                                {getAvailabilityStatus(product.available)}
+                                {getAvailabilityStatus(product.isAvailable)}
                               </p>
                               {dimensions && (
                                 <div
@@ -948,8 +954,8 @@ const Shop: React.FC = () => {
                           {/* Add to Cart Button */}
                           <motion.button
                             whileHover={{
-                              scale: product.available ? 1.02 : 1,
-                              boxShadow: !product.available
+                              scale: isAvailable(product.isAvailable) ? 1.02 : 1,
+                              boxShadow: !isAvailable(product.isAvailable)
                                 ? "0 8px 25px rgba(107, 114, 128, 0.2)"
                                 : addedToCartItems.has(product.id)
                                 ? "0 8px 25px rgba(34, 197, 94, 0.4)"
@@ -957,15 +963,18 @@ const Shop: React.FC = () => {
                                 ? "0 8px 25px rgba(245, 158, 11, 0.4)"
                                 : "0 8px 25px rgba(59, 130, 246, 0.4)",
                             }}
-                            whileTap={{ scale: product.available ? 0.98 : 1 }}
+                            whileTap={{
+                              scale: isAvailable(product.isAvailable) ? 0.98 : 1,
+                            }}
                             onClick={() =>
-                              product.available && handleAddToCart(product)
+                              isAvailable(product.isAvailable) &&
+                              handleAddToCart(product)
                             }
-                            disabled={!product.available}
+                            disabled={!isAvailable(product.isAvailable)}
                             style={{
                               width: "100%",
                               padding: "1rem",
-                              background: !product.available
+                              background: !isAvailable(product.isAvailable)
                                 ? "linear-gradient(135deg, #6b7280, #4b5563)"
                                 : addedToCartItems.has(product.id)
                                 ? "linear-gradient(135deg, #22c55e, #16a34a)"
@@ -975,7 +984,7 @@ const Shop: React.FC = () => {
                               color: "white",
                               border: "none",
                               borderRadius: "14px",
-                              cursor: product.available
+                              cursor: isAvailable(product.isAvailable)
                                 ? "pointer"
                                 : "not-allowed",
                               fontSize: "0.95rem",
@@ -987,7 +996,7 @@ const Shop: React.FC = () => {
                               transition:
                                 "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                               height: "48px",
-                              boxShadow: !product.available
+                              boxShadow: !isAvailable(product.isAvailable)
                                 ? "0 4px 16px rgba(107, 114, 128, 0.2)"
                                 : addedToCartItems.has(product.id)
                                 ? "0 4px 16px rgba(34, 197, 94, 0.3)"
@@ -996,10 +1005,10 @@ const Shop: React.FC = () => {
                                 : "0 4px 16px rgba(59, 130, 246, 0.3)",
                               letterSpacing: "0.025em",
                               textTransform: "uppercase" as const,
-                              opacity: product.available ? 1 : 0.6,
+                              opacity: isAvailable(product.isAvailable) ? 1 : 0.6,
                             }}
                           >
-                            {!product.available ? (
+                            {!isAvailable(product.isAvailable) ? (
                               <>
                                 <Eye size={20} />
                                 Not Available

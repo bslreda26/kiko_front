@@ -91,7 +91,13 @@ export class ProductService {
    */
   static async updateProduct(id: number, data: UpdateProductRequest): Promise<Product> {
     try {
-      const response = await api.put<Product>(`${ProductService.BASE_PATH}/${id}`, data);
+      // Ensure the payload matches the API requirements
+      const updatePayload = {
+        title: data.title,
+        isAvailable: data.isAvailable
+      };
+      
+      const response = await api.put<Product>(`${ProductService.BASE_PATH}/${id}`, updatePayload);
       return response.data;
     } catch (error: any) {
       throw ProductService.handleError(error);

@@ -73,8 +73,14 @@ const CollectionDetail: React.FC = () => {
     }
   };
 
-  const getAvailabilityStatus = (available: boolean) => {
-    return available ? "Available" : "Not Available";
+  const getAvailabilityStatus = (isAvailable: boolean) => {
+    return isAvailable === true
+      ? "Available"
+      : "Not Available";
+  };
+
+  const isAvailable = (isAvailable: boolean) => {
+    return isAvailable === true;
   };
 
   const handleAddToCart = (product: Product) => {
@@ -196,8 +202,8 @@ const CollectionDetail: React.FC = () => {
   }
 
   const images = getParsedImages(collection);
-  const availableProducts = collectionProducts.filter(
-    (product) => product.available
+  const availableProducts = collectionProducts.filter((product) =>
+    isAvailable(product.isAvailable)
   ).length;
 
   return (
@@ -651,19 +657,19 @@ const CollectionDetail: React.FC = () => {
                               style={{
                                 fontSize: "1rem",
                                 fontWeight: "600",
-                                color: product.available
+                                color: isAvailable(product.isAvailable)
                                   ? "#22c55e"
                                   : "#ef4444",
                                 margin: 0,
                                 padding: "4px 12px",
-                                background: product.available
+                                background: isAvailable(product.isAvailable)
                                   ? "rgba(34, 197, 94, 0.1)"
                                   : "rgba(239, 68, 68, 0.1)",
                                 borderRadius: "20px",
                                 display: "inline-block",
                               }}
                             >
-                              {getAvailabilityStatus(product.available)}
+                              {getAvailabilityStatus(product.isAvailable)}
                             </p>
                             {dimensions && (
                               <p
@@ -700,16 +706,21 @@ const CollectionDetail: React.FC = () => {
 
                         {/* Add to Cart Button */}
                         <motion.button
-                          whileHover={{ scale: product.available ? 1.02 : 1 }}
-                          whileTap={{ scale: product.available ? 0.98 : 1 }}
+                          whileHover={{
+                            scale: isAvailable(product.isAvailable) ? 1.02 : 1,
+                          }}
+                          whileTap={{
+                            scale: isAvailable(product.isAvailable) ? 0.98 : 1,
+                          }}
                           onClick={() =>
-                            product.available && handleAddToCart(product)
+                            isAvailable(product.isAvailable) &&
+                            handleAddToCart(product)
                           }
-                          disabled={!product.available}
+                          disabled={!isAvailable(product.isAvailable)}
                           style={{
                             width: "100%",
                             padding: "0.875rem 1rem",
-                            background: !product.available
+                            background: !isAvailable(product.isAvailable)
                               ? "linear-gradient(135deg, #6b7280, #4b5563)"
                               : addedToCartItems.has(product.id)
                               ? "linear-gradient(135deg, #22c55e, #16a34a)"
@@ -719,7 +730,7 @@ const CollectionDetail: React.FC = () => {
                             color: "white",
                             border: "none",
                             borderRadius: "10px",
-                            cursor: product.available
+                            cursor: isAvailable(product.isAvailable)
                               ? "pointer"
                               : "not-allowed",
                             fontSize: "0.9rem",
@@ -730,13 +741,13 @@ const CollectionDetail: React.FC = () => {
                             gap: "0.5rem",
                             transition: "all 0.3s ease",
                             height: "44px",
-                            boxShadow: !product.available
+                            boxShadow: !isAvailable(product.isAvailable)
                               ? "0 2px 8px rgba(107, 114, 128, 0.2)"
                               : "0 2px 8px rgba(59, 130, 246, 0.3)",
-                            opacity: product.available ? 1 : 0.6,
+                            opacity: isAvailable(product.isAvailable) ? 1 : 0.6,
                           }}
                         >
-                          {!product.available ? (
+                          {!isAvailable(product.isAvailable) ? (
                             <>
                               <Eye size={18} />
                               Not Available

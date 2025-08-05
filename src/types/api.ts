@@ -58,7 +58,8 @@ export interface Product {
   description: string;
   image: string;
   dimensions: string; // JSON string of ProductDimensions
-  available: boolean;
+  price?: string; // Price as optional string from API
+  isAvailable: boolean; // Correct field name for availability
   collectionId: number;
   createdAt: string;
   updatedAt: string;
@@ -74,7 +75,8 @@ export interface CreateProductRequest {
   description: string;
   image: string;
   dimensions: string; // JSON string like "{\"width\": 10, \"height\": 15, \"depth\": 5}"
-  available: boolean;
+  price?: string; // Price as optional string
+  isAvailable: boolean; // Correct field name for availability
   collectionId: number;
 }
 
