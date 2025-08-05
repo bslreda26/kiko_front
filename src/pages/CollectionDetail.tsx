@@ -34,6 +34,8 @@ const CollectionDetail: React.FC = () => {
   const [addedToCartItems, setAddedToCartItems] = useState<Set<number>>(
     new Set()
   );
+  const [loadingMessage, setLoadingMessage] = useState("Loading collection...");
+  const [retryCount, setRetryCount] = useState(0);
 
   const { addToCart, isInCart } = useCart();
 
@@ -42,36 +44,99 @@ const CollectionDetail: React.FC = () => {
   }, [id]);
 
   const loadCollectionData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    const maxRetries = 3;
+    let currentRetryCount = 0;
 
-      const [productsData, collectionsData] = await Promise.all([
-        getAllProducts(),
-        getAllCollections(),
-      ]);
+    const attemptLoad = async (): Promise<void> => {
+      try {
+        setLoading(true);
+        setError(null);
+        setRetryCount(currentRetryCount);
 
-      const foundCollection = collectionsData.find(
-        (c) => c.id === parseInt(id || "0")
-      );
-      if (!foundCollection) {
-        setError("Collection not found");
-        return;
+        if (currentRetryCount > 0) {
+          setLoadingMessage(
+            `Retrying... Attempt ${currentRetryCount + 1}/${maxRetries}`
+          );
+        } else {
+          setLoadingMessage("Loading collection data...");
+        }
+
+        // Add timeout to prevent hanging requests
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("Request timeout")), 15000);
+        });
+
+        setLoadingMessage("Fetching products and collections...");
+        const dataPromise = Promise.all([
+          getAllProducts(),
+          getAllCollections(),
+        ]);
+
+        const [productsData, collectionsData] = await Promise.race([
+          dataPromise,
+          timeoutPromise,
+        ]);
+
+        setLoadingMessage("Processing collection data...");
+        const foundCollection = collectionsData.find(
+          (c: Collection) => c.id === parseInt(id || "0")
+        );
+
+        if (!foundCollection) {
+          setError("Collection not found");
+          return;
+        }
+
+        const productsInCollection = productsData.filter(
+          (product: Product) => product.collectionId === foundCollection.id
+        );
+
+        setCollection(foundCollection);
+        setCollectionProducts(productsInCollection);
+        setRetryCount(0);
+      } catch (err) {
+        const apiError = err as ApiError;
+        console.error("Error loading collection data:", err);
+
+        // Retry logic for network errors
+        if (
+          currentRetryCount < maxRetries &&
+          (apiError.message?.includes("fetch") ||
+            apiError.message?.includes("network") ||
+            apiError.message?.includes("timeout") ||
+            apiError.message?.includes("connection") ||
+            !apiError.message)
+        ) {
+          currentRetryCount++;
+          console.log(`Retrying... Attempt ${currentRetryCount}/${maxRetries}`);
+
+          // Exponential backoff
+          const delay = 1000 * currentRetryCount;
+          setLoadingMessage(
+            `Connection failed. Retrying in ${delay / 1000} seconds...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          return attemptLoad();
+        }
+
+        // Final error state
+        if (currentRetryCount >= maxRetries) {
+          setError(
+            "Unable to load collection data after multiple attempts. Please check your connection and try again."
+          );
+        } else {
+          setError(
+            apiError.message ||
+              "Failed to load collection data. Please try again."
+          );
+        }
+      } finally {
+        setLoading(false);
+        setLoadingMessage("Loading collection...");
       }
+    };
 
-      const productsInCollection = productsData.filter(
-        (product) => product.collectionId === foundCollection.id
-      );
-
-      setCollection(foundCollection);
-      setCollectionProducts(productsInCollection);
-    } catch (err) {
-      const apiError = err as ApiError;
-      setError(apiError.message || "Failed to load collection data");
-      console.error("Error loading collection data:", err);
-    } finally {
-      setLoading(false);
-    }
+    await attemptLoad();
   };
 
   const handleAddToCart = (product: Product) => {
@@ -116,13 +181,59 @@ const CollectionDetail: React.FC = () => {
             justifyContent: "center",
           }}
         >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            style={{ color: "#3b82f6" }}
+          <div
+            style={{
+              textAlign: "center",
+              background: "rgba(255, 255, 255, 0.9)",
+              borderRadius: "20px",
+              padding: "3rem",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+              maxWidth: "400px",
+            }}
           >
-            <Sparkles size={48} />
-          </motion.div>
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              style={{ color: "#3b82f6", marginBottom: "1rem" }}
+            >
+              <Sparkles size={48} />
+            </motion.div>
+            <h3
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: "600",
+                color: "#1e293b",
+                marginBottom: "0.5rem",
+              }}
+            >
+              {loadingMessage}
+            </h3>
+            {retryCount > 0 && (
+              <p
+                style={{
+                  color: "#64748b",
+                  fontSize: "0.875rem",
+                  margin: "0.5rem 0 0 0",
+                }}
+              >
+                Attempt {retryCount} of 3
+              </p>
+            )}
+            <div
+              style={{
+                marginTop: "1rem",
+                padding: "0.5rem 1rem",
+                background: "rgba(59, 130, 246, 0.1)",
+                borderRadius: "8px",
+                fontSize: "0.75rem",
+                color: "#3b82f6",
+              }}
+            >
+              💡 Tip: If loading takes too long, check your internet connection
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -144,10 +255,12 @@ const CollectionDetail: React.FC = () => {
               maxWidth: "600px",
               margin: "0 auto",
               textAlign: "center",
-              background: "rgba(255, 255, 255, 0.8)",
+              background: "rgba(255, 255, 255, 0.9)",
               borderRadius: "20px",
               padding: "3rem",
               backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
             }}
           >
             <Sparkles
@@ -164,28 +277,68 @@ const CollectionDetail: React.FC = () => {
             >
               {error || "Collection not found"}
             </h2>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate("/shop")}
+            <p
               style={{
-                padding: "0.75rem 1.5rem",
-                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: "600",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                margin: "0 auto",
+                color: "#64748b",
+                marginBottom: "2rem",
+                lineHeight: "1.6",
               }}
             >
-              <ArrowLeft size={20} />
-              Back to Shop
-            </motion.button>
+              {error?.includes("connection") || error?.includes("network")
+                ? "It looks like there's a connection issue. Please check your internet connection and try again."
+                : "We couldn't load the collection data. Please try again."}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: "1rem",
+                justifyContent: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => loadCollectionData()}
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "12px",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontWeight: "600",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <Sparkles size={20} />
+                Try Again
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate("/shop")}
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  background: "rgba(255, 255, 255, 0.9)",
+                  color: "#64748b",
+                  border: "1px solid rgba(0, 0, 0, 0.1)",
+                  borderRadius: "12px",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontWeight: "600",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <ArrowLeft size={20} />
+                Back to Shop
+              </motion.button>
+            </div>
           </div>
         </div>
       </div>
@@ -259,10 +412,11 @@ const CollectionDetail: React.FC = () => {
               overflow: "hidden",
             }}
           >
-            {/* Modern Header with Gradient Background */}
+            {/* Elegant Text Header */}
             <div
               style={{
-                height: window.innerWidth <= 768 ? "120px" : "140px",
+                padding:
+                  window.innerWidth <= 768 ? "2rem 1.5rem" : "2.5rem 2rem",
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 position: "relative",
                 display: "flex",
@@ -301,6 +455,7 @@ const CollectionDetail: React.FC = () => {
                   backdropFilter: "blur(10px)",
                   border: "2px solid rgba(255, 255, 255, 0.3)",
                   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+                  marginRight: "1.5rem",
                 }}
               >
                 <Sparkles
@@ -309,216 +464,223 @@ const CollectionDetail: React.FC = () => {
                 />
               </div>
 
-              {/* Image Count Badge */}
-              {images.length > 0 && (
+              {/* Collection Title and Description */}
+              <div style={{ flex: 1, textAlign: "left" }}>
+                <h1
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "1.75rem" : "2.5rem",
+                    fontWeight: "700",
+                    color: "white",
+                    margin: "0 0 0.75rem 0",
+                    lineHeight: "1.2",
+                    letterSpacing: "-0.025em",
+                    textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
+                  }}
+                >
+                  {collection.name}
+                </h1>
+                <p
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "1rem" : "1.125rem",
+                    color: "rgba(255, 255, 255, 0.9)",
+                    lineHeight: "1.6",
+                    margin: 0,
+                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  {collection.description}
+                </p>
+              </div>
+
+              {/* Stats Badges */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                  marginLeft: "1.5rem",
+                }}
+              >
+                {/* Product Count Badge */}
                 <div
                   style={{
-                    position: "absolute",
-                    top: "16px",
-                    right: "16px",
-                    padding: "6px 12px",
-                    background: "rgba(34, 197, 94, 0.95)",
-                    color: "white",
-                    borderRadius: "20px",
-                    fontSize: "0.75rem",
+                    padding: "8px 16px",
+                    background: "rgba(255, 255, 255, 0.95)",
+                    color: "#1e293b",
+                    borderRadius: "25px",
+                    fontSize: "0.8rem",
                     fontWeight: "700",
                     backdropFilter: "blur(20px)",
-                    boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
+                    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
                     display: "flex",
                     alignItems: "center",
-                    gap: "4px",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    gap: "6px",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
                     letterSpacing: "0.025em",
                   }}
                 >
-                  <Eye size={12} />
-                  {images.length} Images
-                </div>
-              )}
-
-              {/* Product Count Badge */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "16px",
-                  left: "16px",
-                  padding: "6px 12px",
-                  background: "rgba(255, 255, 255, 0.95)",
-                  color: "#1e293b",
-                  borderRadius: "20px",
-                  fontSize: "0.75rem",
-                  fontWeight: "700",
-                  backdropFilter: "blur(20px)",
-                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  border: "1px solid rgba(255, 255, 255, 0.3)",
-                  letterSpacing: "0.025em",
-                }}
-              >
-                <Package size={12} />
-                {totalProducts} {totalProducts === 1 ? "Product" : "Products"}
-              </div>
-            </div>
-
-            {/* Collection Info */}
-            <div>
-              <h1
-                style={{
-                  fontSize: window.innerWidth <= 768 ? "1.75rem" : "2.5rem",
-                  fontWeight: "700",
-                  color: "#1e293b",
-                  margin: "0 0 1rem 0",
-                  lineHeight: "1.2",
-                }}
-              >
-                {collection.name}
-              </h1>
-              <p
-                style={{
-                  fontSize: window.innerWidth <= 768 ? "1rem" : "1.125rem",
-                  color: "#64748b",
-                  lineHeight: "1.6",
-                  margin: "0 0 2rem 0",
-                }}
-              >
-                {collection.description}
-              </p>
-
-              {/* Collection Stats */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                  gap: "1rem",
-                }}
-              >
-                <div
-                  style={{
-                    padding: "1rem",
-                    background: "rgba(102, 126, 234, 0.05)",
-                    borderRadius: "12px",
-                    border: "1px solid rgba(102, 126, 234, 0.1)",
-                    textAlign: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    <Package size={16} style={{ color: "#667eea" }} />
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "500",
-                        color: "#667eea",
-                      }}
-                    >
-                      Products
-                    </span>
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "1.5rem",
-                      fontWeight: "700",
-                      color: "#1e293b",
-                      margin: 0,
-                    }}
-                  >
-                    {totalProducts}
-                  </p>
+                  <Package size={14} />
+                  {totalProducts} {totalProducts === 1 ? "Product" : "Products"}
                 </div>
 
-                <div
-                  style={{
-                    padding: "1rem",
-                    background: "rgba(34, 197, 94, 0.05)",
-                    borderRadius: "12px",
-                    border: "1px solid rgba(34, 197, 94, 0.1)",
-                    textAlign: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    <Sparkles size={16} style={{ color: "#22c55e" }} />
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "500",
-                        color: "#22c55e",
-                      }}
-                    >
-                      Available
-                    </span>
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "1.5rem",
-                      fontWeight: "700",
-                      color: "#1e293b",
-                      margin: 0,
-                    }}
-                  >
-                    {availableProducts}
-                  </p>
-                </div>
-
+                {/* Image Count Badge */}
                 {images.length > 0 && (
                   <div
                     style={{
-                      padding: "1rem",
-                      background: "rgba(59, 130, 246, 0.05)",
-                      borderRadius: "12px",
-                      border: "1px solid rgba(59, 130, 246, 0.1)",
-                      textAlign: "center",
+                      padding: "8px 16px",
+                      background: "rgba(34, 197, 94, 0.95)",
+                      color: "white",
+                      borderRadius: "25px",
+                      fontSize: "0.8rem",
+                      fontWeight: "700",
+                      backdropFilter: "blur(20px)",
+                      boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      letterSpacing: "0.025em",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        marginBottom: "0.5rem",
-                      }}
-                    >
-                      <Eye size={16} style={{ color: "#3b82f6" }} />
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "500",
-                          color: "#3b82f6",
-                        }}
-                      >
-                        Images
-                      </span>
-                    </div>
-                    <p
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "700",
-                        color: "#1e293b",
-                        margin: 0,
-                      }}
-                    >
-                      {images.length}
-                    </p>
+                    <Eye size={14} />
+                    {images.length} Images
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Collection Stats */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  padding: "1rem",
+                  background: "rgba(102, 126, 234, 0.05)",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(102, 126, 234, 0.1)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Package size={16} style={{ color: "#667eea" }} />
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      color: "#667eea",
+                    }}
+                  >
+                    Products
+                  </span>
+                </div>
+                <p
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "700",
+                    color: "#1e293b",
+                    margin: 0,
+                  }}
+                >
+                  {totalProducts}
+                </p>
+              </div>
+
+              <div
+                style={{
+                  padding: "1rem",
+                  background: "rgba(34, 197, 94, 0.05)",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(34, 197, 94, 0.1)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Sparkles size={16} style={{ color: "#22c55e" }} />
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      color: "#22c55e",
+                    }}
+                  >
+                    Available
+                  </span>
+                </div>
+                <p
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "700",
+                    color: "#1e293b",
+                    margin: 0,
+                  }}
+                >
+                  {availableProducts}
+                </p>
+              </div>
+
+              {images.length > 0 && (
+                <div
+                  style={{
+                    padding: "1rem",
+                    background: "rgba(59, 130, 246, 0.05)",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(59, 130, 246, 0.1)",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    <Eye size={16} style={{ color: "#3b82f6" }} />
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: "500",
+                        color: "#3b82f6",
+                      }}
+                    >
+                      Images
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "1.5rem",
+                      fontWeight: "700",
+                      color: "#1e293b",
+                      margin: 0,
+                    }}
+                  >
+                    {images.length}
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -633,20 +795,40 @@ const CollectionDetail: React.FC = () => {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.05 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
+                      whileHover={{ y: -12, scale: 1.03 }}
                       style={{
-                        background: "rgba(255, 255, 255, 0.95)",
+                        background:
+                          "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)",
                         borderRadius:
-                          window.innerWidth <= 768 ? "16px" : "20px",
+                          window.innerWidth <= 768 ? "20px" : "24px",
                         overflow: "hidden",
-                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-                        border: "1px solid rgba(255, 255, 255, 0.3)",
+                        boxShadow:
+                          "0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.06)",
+                        border: "1px solid rgba(255, 255, 255, 0.4)",
                         backdropFilter: "blur(20px)",
-                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                        transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                         display: viewMode === "list" ? "flex" : "block",
                         alignItems: viewMode === "list" ? "stretch" : "unset",
                         height: viewMode === "list" ? "auto" : "100%",
                         position: "relative",
+                        // Artistic border gradient
+                        backgroundClip: "padding-box",
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          borderRadius: "inherit",
+                          padding: "2px",
+                          background:
+                            "linear-gradient(135deg, #667eea, #764ba2, #f093fb)",
+                          WebkitMask:
+                            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                          WebkitMaskComposite: "xor",
+                          maskComposite: "exclude",
+                        },
                       }}
                     >
                       {/* Product Image Container */}
@@ -656,33 +838,57 @@ const CollectionDetail: React.FC = () => {
                           height:
                             viewMode === "grid"
                               ? window.innerWidth <= 768
-                                ? "220px"
-                                : "300px"
-                              : "200px",
-                          width: viewMode === "list" ? "280px" : "100%",
+                                ? "240px"
+                                : "320px"
+                              : "220px",
+                          width: viewMode === "list" ? "300px" : "100%",
                           flexShrink: 0,
                           background: product.image
                             ? `url(${product.image}) center/cover`
-                            : "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+                            : "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
                           position: "relative",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
-                          transition: "all 0.4s ease",
+                          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                           overflow: "hidden",
+                          // Artistic overlay
+                          "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background:
+                              "linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))",
+                            opacity: 0,
+                            transition: "opacity 0.3s ease",
+                          },
                         }}
                         onMouseEnter={(e) => {
                           if (product.image) {
-                            e.currentTarget.style.transform = "scale(1.08)";
+                            e.currentTarget.style.transform = "scale(1.05)";
                           }
+                          // Show artistic overlay
+                          const overlay = e.currentTarget.querySelector(
+                            ".artistic-overlay"
+                          ) as HTMLElement;
+                          if (overlay) overlay.style.opacity = "1";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = "scale(1)";
+                          // Hide artistic overlay
+                          const overlay = e.currentTarget.querySelector(
+                            ".artistic-overlay"
+                          ) as HTMLElement;
+                          if (overlay) overlay.style.opacity = "0";
                         }}
                       >
-                        {/* Image Overlay */}
+                        {/* Artistic Overlay */}
                         <div
+                          className="artistic-overlay"
                           style={{
                             position: "absolute",
                             top: 0,
@@ -690,15 +896,47 @@ const CollectionDetail: React.FC = () => {
                             right: 0,
                             bottom: 0,
                             background:
-                              "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 100%)",
+                              "linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15), rgba(240, 147, 251, 0.1))",
                             opacity: 0,
-                            transition: "opacity 0.3s ease",
+                            transition: "opacity 0.4s ease",
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.opacity = "1";
+                        />
+
+                        {/* Floating Particles Effect */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "10%",
+                            left: "10%",
+                            width: "4px",
+                            height: "4px",
+                            background: "rgba(255, 255, 255, 0.8)",
+                            borderRadius: "50%",
+                            animation: "float 3s ease-in-out infinite",
                           }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.opacity = "0";
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "20%",
+                            right: "15%",
+                            width: "6px",
+                            height: "6px",
+                            background: "rgba(255, 255, 255, 0.6)",
+                            borderRadius: "50%",
+                            animation: "float 4s ease-in-out infinite 1s",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "25%",
+                            left: "20%",
+                            width: "3px",
+                            height: "3px",
+                            background: "rgba(255, 255, 255, 0.7)",
+                            borderRadius: "50%",
+                            animation: "float 5s ease-in-out infinite 2s",
                           }}
                         />
 
@@ -708,49 +946,66 @@ const CollectionDetail: React.FC = () => {
                               display: "flex",
                               flexDirection: "column",
                               alignItems: "center",
-                              gap: "0.5rem",
-                              color: "#94a3b8",
+                              gap: "1rem",
+                              color: "white",
+                              textAlign: "center",
                             }}
                           >
-                            <Eye size={48} />
-                            <span
+                            <div
                               style={{
-                                fontSize: "0.875rem",
-                                fontWeight: "500",
+                                width: "80px",
+                                height: "80px",
+                                background: "rgba(255, 255, 255, 0.2)",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backdropFilter: "blur(10px)",
+                                border: "2px solid rgba(255, 255, 255, 0.3)",
                               }}
                             >
-                              No Image
+                              <Eye size={40} />
+                            </div>
+                            <span
+                              style={{
+                                fontSize: "1rem",
+                                fontWeight: "600",
+                                textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
+                              }}
+                            >
+                              No Image Available
                             </span>
                           </div>
                         )}
 
-                        {/* Status Badge */}
+                        {/* Elegant Status Badge */}
                         <div
                           style={{
                             position: "absolute",
-                            top: "16px",
-                            left: "16px",
-                            padding: "6px 12px",
+                            top: "20px",
+                            left: "20px",
+                            padding: "8px 16px",
                             background:
                               product.price > 0
-                                ? "rgba(34, 197, 94, 0.95)"
-                                : "rgba(239, 68, 68, 0.95)",
+                                ? "linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(22, 163, 74, 0.95))"
+                                : "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))",
                             color: "white",
-                            borderRadius: "20px",
-                            fontSize: "0.75rem",
+                            borderRadius: "25px",
+                            fontSize: "0.8rem",
                             fontWeight: "700",
-                            backdropFilter: "blur(10px)",
-                            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
-                            border: "1px solid rgba(255, 255, 255, 0.2)",
-                            letterSpacing: "0.025em",
+                            backdropFilter: "blur(20px)",
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                            border: "1px solid rgba(255, 255, 255, 0.3)",
+                            letterSpacing: "0.05em",
+                            textTransform: "uppercase",
                           }}
                         >
-                          {product.price > 0 ? "Available" : "Not Available"}
+                          {product.price > 0 ? "Available" : "Out of Stock"}
                         </div>
 
-                        {/* Wishlist Button */}
+                        {/* Artistic Wishlist Button */}
                         <motion.button
-                          whileHover={{ scale: 1.1 }}
+                          whileHover={{ scale: 1.15, rotate: 5 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -758,89 +1013,93 @@ const CollectionDetail: React.FC = () => {
                           }}
                           style={{
                             position: "absolute",
-                            top: "16px",
-                            right: "16px",
-                            padding: "10px",
+                            top: "20px",
+                            right: "20px",
+                            padding: "12px",
                             background: isInWishlist
-                              ? "rgba(239, 68, 68, 0.95)"
+                              ? "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))"
                               : "rgba(255, 255, 255, 0.95)",
                             color: isInWishlist ? "white" : "#64748b",
                             border: "none",
                             borderRadius: "50%",
                             cursor: "pointer",
-                            backdropFilter: "blur(10px)",
-                            transition: "all 0.3s ease",
-                            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
-                            width: "40px",
-                            height: "40px",
+                            backdropFilter: "blur(20px)",
+                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                            width: "48px",
+                            height: "48px",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            border: "2px solid rgba(255, 255, 255, 0.3)",
                           }}
                         >
                           <Heart
-                            size={18}
+                            size={20}
                             fill={isInWishlist ? "currentColor" : "none"}
                           />
                         </motion.button>
 
-                        {/* View Details Overlay */}
+                        {/* Elegant View Details Overlay */}
                         <div
                           style={{
                             position: "absolute",
-                            bottom: "16px",
+                            bottom: "20px",
                             left: "50%",
                             transform: "translateX(-50%)",
-                            padding: "8px 16px",
+                            padding: "12px 24px",
                             background: "rgba(255, 255, 255, 0.95)",
                             color: "#1e293b",
-                            borderRadius: "20px",
-                            fontSize: "0.75rem",
+                            borderRadius: "30px",
+                            fontSize: "0.85rem",
                             fontWeight: "600",
-                            backdropFilter: "blur(10px)",
-                            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
-                            border: "1px solid rgba(255, 255, 255, 0.3)",
+                            backdropFilter: "blur(20px)",
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                            border: "1px solid rgba(255, 255, 255, 0.4)",
                             opacity: 0,
-                            transition: "all 0.3s ease",
+                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                             cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
-                            gap: "4px",
+                            gap: "6px",
+                            letterSpacing: "0.05em",
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.opacity = "1";
+                            e.currentTarget.style.transform =
+                              "translateX(-50%) scale(1.05)";
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.opacity = "0";
+                            e.currentTarget.style.transform =
+                              "translateX(-50%) scale(1)";
                           }}
                         >
-                          <Eye size={14} />
+                          <Eye size={16} />
                           View Details
                         </div>
                       </div>
 
-                      {/* Product Info */}
+                      {/* Elegant Product Info */}
                       <div
                         style={{
-                          padding: viewMode === "list" ? "2rem" : "1.5rem",
+                          padding: viewMode === "list" ? "2.5rem" : "2rem",
                           flex: viewMode === "list" ? 1 : "unset",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "space-between",
                           height: viewMode === "list" ? "auto" : "100%",
                           background:
-                            "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)",
+                            "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)",
                         }}
                       >
                         {/* Title and Description Section */}
-                        <div style={{ marginBottom: "1.5rem" }}>
+                        <div style={{ marginBottom: "2rem" }}>
                           <h3
                             style={{
                               fontSize:
-                                window.innerWidth <= 768
-                                  ? "1.125rem"
-                                  : "1.25rem",
-                              fontWeight: "700",
+                                window.innerWidth <= 768 ? "1.25rem" : "1.5rem",
+                              fontWeight: "800",
                               color: "#1e293b",
                               margin: "0 0 1rem 0",
                               lineHeight: "1.3",
@@ -849,6 +1108,7 @@ const CollectionDetail: React.FC = () => {
                               display: "-webkit-box",
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: "vertical",
+                              letterSpacing: "-0.02em",
                             }}
                           >
                             {product.title}
@@ -858,28 +1118,29 @@ const CollectionDetail: React.FC = () => {
                             <p
                               style={{
                                 color: "#64748b",
-                                lineHeight: "1.6",
-                                margin: "0 0 1rem 0",
-                                fontSize: "0.875rem",
+                                lineHeight: "1.7",
+                                margin: "0 0 1.5rem 0",
+                                fontSize: "0.95rem",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 display: "-webkit-box",
                                 WebkitLineClamp: 3,
                                 WebkitBoxOrient: "vertical",
+                                fontWeight: "400",
                               }}
                             >
                               {product.description}
                             </p>
                           )}
 
-                          {/* Product Details */}
+                          {/* Elegant Product Details */}
                           <div
                             style={{
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "space-between",
                               flexWrap: "wrap",
-                              gap: "0.75rem",
+                              gap: "1rem",
                             }}
                           >
                             {dimensions && (
@@ -887,22 +1148,25 @@ const CollectionDetail: React.FC = () => {
                                 style={{
                                   display: "flex",
                                   alignItems: "center",
-                                  gap: "0.5rem",
-                                  padding: "6px 12px",
-                                  background: "rgba(59, 130, 246, 0.1)",
-                                  borderRadius: "12px",
+                                  gap: "0.75rem",
+                                  padding: "8px 16px",
+                                  background:
+                                    "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))",
+                                  borderRadius: "16px",
                                   border: "1px solid rgba(59, 130, 246, 0.2)",
+                                  backdropFilter: "blur(10px)",
                                 }}
                               >
                                 <Package
-                                  size={14}
+                                  size={16}
                                   style={{ color: "#3b82f6" }}
                                 />
                                 <span
                                   style={{
-                                    fontSize: "0.75rem",
+                                    fontSize: "0.8rem",
                                     fontWeight: "600",
                                     color: "#3b82f6",
+                                    letterSpacing: "0.02em",
                                   }}
                                 >
                                   {dimensions.width}cm × {dimensions.height}cm
@@ -910,27 +1174,28 @@ const CollectionDetail: React.FC = () => {
                               </div>
                             )}
 
-                            {/* Price Status */}
+                            {/* Artistic Price Status */}
                             <div
                               style={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "0.5rem",
-                                padding: "6px 12px",
+                                gap: "0.75rem",
+                                padding: "8px 16px",
                                 background:
                                   product.price > 0
-                                    ? "rgba(34, 197, 94, 0.1)"
-                                    : "rgba(239, 68, 68, 0.1)",
-                                borderRadius: "12px",
+                                    ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1))"
+                                    : "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))",
+                                borderRadius: "16px",
                                 border: `1px solid ${
                                   product.price > 0
                                     ? "rgba(34, 197, 94, 0.2)"
                                     : "rgba(239, 68, 68, 0.2)"
                                 }`,
+                                backdropFilter: "blur(10px)",
                               }}
                             >
                               <Sparkles
-                                size={14}
+                                size={16}
                                 style={{
                                   color:
                                     product.price > 0 ? "#22c55e" : "#ef4444",
@@ -938,10 +1203,11 @@ const CollectionDetail: React.FC = () => {
                               />
                               <span
                                 style={{
-                                  fontSize: "0.75rem",
+                                  fontSize: "0.8rem",
                                   fontWeight: "600",
                                   color:
                                     product.price > 0 ? "#22c55e" : "#ef4444",
+                                  letterSpacing: "0.02em",
                                 }}
                               >
                                 {product.price > 0
@@ -952,13 +1218,17 @@ const CollectionDetail: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Add to Cart Button */}
+                        {/* Artistic Add to Cart Button */}
                         <motion.button
                           whileHover={{
-                            scale: product.price > 0 ? 1.02 : 1,
+                            scale: product.price > 0 ? 1.03 : 1,
+                            boxShadow:
+                              product.price > 0
+                                ? "0 12px 32px rgba(59, 130, 246, 0.4)"
+                                : "none",
                           }}
                           whileTap={{
-                            scale: product.price > 0 ? 0.98 : 1,
+                            scale: product.price > 0 ? 0.97 : 1,
                           }}
                           onClick={() =>
                             product.price > 0 && handleAddToCart(product)
@@ -970,63 +1240,88 @@ const CollectionDetail: React.FC = () => {
                           }
                           style={{
                             width: "100%",
-                            padding: "1rem 1.25rem",
+                            padding: "1.25rem 1.5rem",
                             background:
                               product.price === 0
-                                ? "linear-gradient(135deg, #6b7280, #4b5563)"
+                                ? "linear-gradient(135deg, #9ca3af, #6b7280)"
                                 : addedToCartItems.has(product.id)
                                 ? "linear-gradient(135deg, #22c55e, #16a34a)"
                                 : isInCart(product.id)
                                 ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                                : "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                : "linear-gradient(135deg, #667eea, #764ba2)",
                             color: "white",
                             border: "none",
-                            borderRadius: "12px",
+                            borderRadius: "16px",
                             cursor:
                               product.price === 0 ||
                               addedToCartItems.has(product.id) ||
                               isInCart(product.id)
                                 ? "not-allowed"
                                 : "pointer",
-                            fontSize: "0.9rem",
+                            fontSize: "1rem",
                             fontWeight: "700",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            gap: "0.5rem",
-                            transition: "all 0.3s ease",
-                            height: "48px",
+                            gap: "0.75rem",
+                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                            height: "56px",
                             boxShadow:
                               product.price === 0
                                 ? "none"
-                                : "0 4px 16px rgba(59, 130, 246, 0.3)",
+                                : "0 8px 24px rgba(102, 126, 234, 0.3)",
                             opacity:
-                              product.price === 0 ||
-                              addedToCartItems.has(product.id) ||
-                              isInCart(product.id)
+                              product.price === 0
                                 ? 0.6
+                                : addedToCartItems.has(product.id) ||
+                                  isInCart(product.id)
+                                ? 0.8
                                 : 1,
-                            letterSpacing: "0.025em",
+                            letterSpacing: "0.02em",
+                            textTransform: "uppercase",
+                            position: "relative",
+                            overflow: "hidden",
                           }}
                         >
+                          {/* Button Background Pattern */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background:
+                                "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)",
+                              transform: "translateX(-100%)",
+                              transition: "transform 0.6s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (product.price > 0) {
+                                e.currentTarget.style.transform =
+                                  "translateX(100%)";
+                              }
+                            }}
+                          />
+
                           {product.price === 0 ? (
                             <>
-                              <X size={18} />
-                              Not Available
+                              <X size={20} />
+                              Cannot Add
                             </>
                           ) : addedToCartItems.has(product.id) ? (
                             <>
-                              <Check size={18} />
+                              <Check size={20} />
                               Added to Cart!
                             </>
                           ) : isInCart(product.id) ? (
                             <>
-                              <ShoppingCart size={18} />
+                              <ShoppingCart size={20} />
                               Already in Cart
                             </>
                           ) : (
                             <>
-                              <ShoppingCart size={18} />
+                              <ShoppingCart size={20} />
                               Add to Cart
                             </>
                           )}
