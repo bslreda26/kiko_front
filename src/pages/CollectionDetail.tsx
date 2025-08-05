@@ -194,6 +194,9 @@ const CollectionDetail: React.FC = () => {
 
   const images = getParsedImages(collection);
   const totalProducts = collectionProducts.length;
+  const availableProducts = collectionProducts.filter(
+    (product) => product.price > 0
+  ).length;
 
   return (
     <div className="App">
@@ -469,7 +472,7 @@ const CollectionDetail: React.FC = () => {
                       margin: 0,
                     }}
                   >
-                    {totalProducts}
+                    {availableProducts}
                   </p>
                 </div>
 
