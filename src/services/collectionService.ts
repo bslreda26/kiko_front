@@ -30,6 +30,7 @@ export class CollectionService {
   static async getAllCollections(): Promise<Collection[]> {
     try {
       const response = await api.get<Collection[]>(CollectionService.BASE_PATH);
+      console.log('API Response - Collections:', response.data);
       return response.data;
     } catch (error: any) {
       throw CollectionService.handleError(error);

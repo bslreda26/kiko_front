@@ -140,10 +140,10 @@ const AdminDashboard: React.FC = () => {
     setSuccessMessage(null);
 
     if (type === "product") {
-                                        if (item) {
-             const product = item as Product;
-             const dimensions = getParsedDimensions(product);
-             setProductForm({
+      if (item) {
+        const product = item as Product;
+        const dimensions = getParsedDimensions(product);
+        setProductForm({
           title: product.title,
           description: product.description,
           image: product.image,
@@ -171,6 +171,12 @@ const AdminDashboard: React.FC = () => {
       if (item) {
         const collection = item as Collection;
         const images = getParsedImages(collection);
+        console.log(
+          "Editing collection images:",
+          images,
+          "raw images:",
+          collection.images
+        );
         setCollectionForm({
           name: collection.name,
           description: collection.description,
@@ -240,22 +246,22 @@ const AdminDashboard: React.FC = () => {
         return;
       }
 
-             if (modalType === "product") {
-         // Prepare product data
-         const productData = {
-           title: productForm.title.trim(),
-           description: productForm.description.trim(),
-           image: productForm.image.trim(),
-           price: Number(productForm.price), // Ensure it's a number
-           dimensions: JSON.stringify({
-             width: Number(productForm.dimensions.width),
-             height: Number(productForm.dimensions.height),
-             depth: Number(productForm.dimensions.depth),
-           }),
-                        collectionId: productForm.collectionId,
-           };
-       
-           if (editingItem) {
+      if (modalType === "product") {
+        // Prepare product data
+        const productData = {
+          title: productForm.title.trim(),
+          description: productForm.description.trim(),
+          image: productForm.image.trim(),
+          price: Number(productForm.price), // Ensure it's a number
+          dimensions: JSON.stringify({
+            width: Number(productForm.dimensions.width),
+            height: Number(productForm.dimensions.height),
+            depth: Number(productForm.dimensions.depth),
+          }),
+          collectionId: productForm.collectionId,
+        };
+
+        if (editingItem) {
           // Update existing product
           await updateProduct(
             (editingItem as Product).id,
@@ -271,6 +277,12 @@ const AdminDashboard: React.FC = () => {
         // Prepare collection data
         const validImages = collectionForm.images.filter(
           (img) => img.trim() !== ""
+        );
+        console.log(
+          "Saving collection with images:",
+          validImages,
+          "JSON:",
+          JSON.stringify(validImages)
         );
         const collectionData = {
           name: collectionForm.name.trim(),

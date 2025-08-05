@@ -166,9 +166,9 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-           const dimensions = getParsedDimensions(product);
-       
-         return (
+  const dimensions = getParsedDimensions(product);
+
+  return (
     <div className="App">
       <div
         style={{
@@ -181,7 +181,7 @@ const ProductDetail: React.FC = () => {
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
-            padding: "2rem",
+            padding: window.innerWidth <= 768 ? "1rem" : "2rem",
           }}
         >
           {/* Back Button */}
@@ -220,7 +220,12 @@ const ProductDetail: React.FC = () => {
             style={{
               display: "grid",
               gridTemplateColumns: window.innerWidth > 768 ? "1fr 1fr" : "1fr",
-              gap: window.innerWidth > 768 ? "3rem" : "2rem",
+              gap:
+                window.innerWidth > 768
+                  ? "3rem"
+                  : window.innerWidth <= 480
+                  ? "1rem"
+                  : "2rem",
               alignItems: "start",
             }}
           >
@@ -231,7 +236,7 @@ const ProductDetail: React.FC = () => {
               transition={{ duration: 0.8 }}
               style={{
                 background: "rgba(255, 255, 255, 0.95)",
-                borderRadius: "20px",
+                borderRadius: window.innerWidth <= 768 ? "16px" : "20px",
                 overflow: "hidden",
                 boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -309,8 +314,8 @@ const ProductDetail: React.FC = () => {
             <div
               style={{
                 background: "rgba(255, 255, 255, 0.95)",
-                borderRadius: "20px",
-                padding: "2rem",
+                borderRadius: window.innerWidth <= 768 ? "16px" : "20px",
+                padding: window.innerWidth <= 768 ? "1.5rem" : "2rem",
                 boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
                 backdropFilter: "blur(20px)",
@@ -320,7 +325,7 @@ const ProductDetail: React.FC = () => {
               <div style={{ marginBottom: "2rem" }}>
                 <h1
                   style={{
-                    fontSize: "2rem",
+                    fontSize: window.innerWidth <= 768 ? "1.5rem" : "2rem",
                     fontWeight: "700",
                     color: "#1e293b",
                     margin: "0 0 1rem 0",
@@ -391,59 +396,64 @@ const ProductDetail: React.FC = () => {
                     display: "grid",
                     gridTemplateColumns:
                       window.innerWidth > 480 ? "1fr 1fr" : "1fr",
-                    gap: "1rem",
+                    gap: window.innerWidth <= 768 ? "0.75rem" : "1rem",
                   }}
                 >
-                  {dimensions && (dimensions.width > 0 || dimensions.height > 0) && (
-                    <div
-                      style={{
-                        padding: "1rem",
-                        background: "rgba(59, 130, 246, 0.05)",
-                        borderRadius: "12px",
-                        border: "1px solid rgba(59, 130, 246, 0.1)",
-                      }}
-                    >
+                  {dimensions &&
+                    (dimensions.width > 0 || dimensions.height > 0) && (
                       <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          marginBottom: "0.5rem",
+                          padding: "1rem",
+                          background: "rgba(59, 130, 246, 0.05)",
+                          borderRadius: "12px",
+                          border: "1px solid rgba(59, 130, 246, 0.1)",
                         }}
                       >
-                        <Package size={16} style={{ color: "#3b82f6" }} />
-                        <span
+                        <div
                           style={{
-                            fontSize: "0.875rem",
-                            fontWeight: "500",
-                            color: "#3b82f6",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            marginBottom: "0.5rem",
                           }}
                         >
-                          Dimensions
-                        </span>
+                          <Package size={16} style={{ color: "#3b82f6" }} />
+                          <span
+                            style={{
+                              fontSize: "0.875rem",
+                              fontWeight: "500",
+                              color: "#3b82f6",
+                            }}
+                          >
+                            Dimensions
+                          </span>
+                        </div>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "0.875rem",
+                            color: "#64748b",
+                          }}
+                        >
+                          {dimensions.width > 0 && dimensions.height > 0 ? (
+                            <>
+                              {dimensions.width}cm × {dimensions.height}cm
+                              {dimensions.depth > 0 &&
+                                ` × ${dimensions.depth}cm`}
+                            </>
+                          ) : (
+                            <>
+                              {dimensions.width > 0 &&
+                                `${dimensions.width}cm width`}
+                              {dimensions.height > 0 &&
+                                `${dimensions.height}cm height`}
+                              {dimensions.depth > 0 &&
+                                `${dimensions.depth}cm depth`}
+                            </>
+                          )}
+                        </p>
                       </div>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "0.875rem",
-                          color: "#64748b",
-                        }}
-                      >
-                        {dimensions.width > 0 && dimensions.height > 0 ? (
-                          <>
-                            {dimensions.width}cm × {dimensions.height}cm
-                            {dimensions.depth > 0 && ` × ${dimensions.depth}cm`}
-                          </>
-                        ) : (
-                          <>
-                            {dimensions.width > 0 && `${dimensions.width}cm width`}
-                            {dimensions.height > 0 && `${dimensions.height}cm height`}
-                            {dimensions.depth > 0 && `${dimensions.depth}cm depth`}
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  )}
+                    )}
 
                   <div
                     style={{

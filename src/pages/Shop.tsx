@@ -10,12 +10,14 @@ import {
   Sparkles,
   Check,
   X,
+  Package,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
 import type { Product, Collection, ApiError } from "../types/api";
 import { getParsedDimensions, getParsedImages } from "../types/api";
 import { useCart } from "../contexts/CartContext";
+import { useResponsive } from "../hooks/useResponsive";
 
 type ViewMode = "grid" | "list";
 type ContentFilter = "collections" | "products";
@@ -34,6 +36,7 @@ const Shop: React.FC = () => {
 
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
+  const { isMobile, isTablet } = useResponsive();
 
   // Load initial data
   useEffect(() => {
@@ -250,6 +253,7 @@ const Shop: React.FC = () => {
               marginBottom: "2rem",
               flexWrap: "wrap",
               gap: "1rem",
+              flexDirection: isMobile ? "column" : "row",
             }}
           >
             {/* Content Filter Toggle */}
@@ -412,13 +416,23 @@ const Shop: React.FC = () => {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                  gap: "1.5rem",
-                  padding: "0 0.5rem",
+                  gridTemplateColumns: isMobile
+                    ? "1fr"
+                    : isTablet
+                    ? "repeat(auto-fill, minmax(280px, 1fr))"
+                    : "repeat(auto-fill, minmax(320px, 1fr))",
+                  gap: isMobile ? "1rem" : "1.5rem",
+                  padding: isMobile ? "0" : "0 0.5rem",
                 }}
               >
                 {collections.map((collection, index) => {
                   const images = getParsedImages(collection);
+                  console.log(
+                    `Collection ${collection.id} images:`,
+                    images,
+                    "raw images:",
+                    collection.images
+                  );
                   const productCount = getProductCountInCollection(
                     collection.id
                   );
@@ -436,7 +450,7 @@ const Shop: React.FC = () => {
                       onClick={() => handleCollectionClick(collection.id)}
                       style={{
                         background: "rgba(255, 255, 255, 0.98)",
-                        borderRadius: "24px",
+                        borderRadius: isMobile ? "16px" : "24px",
                         overflow: "hidden",
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
                         border: "1px solid rgba(226, 232, 240, 0.8)",
@@ -445,107 +459,128 @@ const Shop: React.FC = () => {
                         transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                         display: "flex",
                         flexDirection: "column",
-                        minHeight: "400px",
+                        minHeight: isMobile ? "280px" : "320px",
+                        position: "relative",
                       }}
                     >
-                      {images.length > 0 && (
+                      {/* Modern Header with Gradient Background */}
+                      <div
+                        style={{
+                          height: isMobile ? "120px" : "140px",
+                          background:
+                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          position: "relative",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {/* Animated Background Pattern */}
                         <div
                           style={{
-                            height: "240px",
-                            background: `url(${images[0]}) center/cover`,
-                            position: "relative",
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            borderRadius: "20px 20px 0 0",
-                            overflow: "hidden",
+                            position: "absolute",
+                            top: "-50%",
+                            left: "-50%",
+                            width: "200%",
+                            height: "200%",
+                            background:
+                              "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
+                            backgroundSize: "20px 20px",
+                            animation: "float 6s ease-in-out infinite",
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = "scale(1.05)";
-                            e.currentTarget.style.filter = "brightness(1.1)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "scale(1)";
-                            e.currentTarget.style.filter = "brightness(1)";
+                        />
+
+                        {/* Collection Icon */}
+                        <div
+                          style={{
+                            background: "rgba(255, 255, 255, 0.2)",
+                            borderRadius: "50%",
+                            width: isMobile ? "60px" : "70px",
+                            height: isMobile ? "60px" : "70px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backdropFilter: "blur(10px)",
+                            border: "2px solid rgba(255, 255, 255, 0.3)",
+                            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
                           }}
                         >
-                          <div
-                            style={{
-                              position: "absolute",
-                              inset: 0,
-                              background:
-                                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 100%)",
-                            }}
+                          <Sparkles
+                            size={isMobile ? 28 : 32}
+                            style={{ color: "white" }}
                           />
+                        </div>
 
-                          {/* Product Count Badge */}
+                        {/* Product Count Badge */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "16px",
+                            right: "16px",
+                            padding: "6px 12px",
+                            background: "rgba(255, 255, 255, 0.95)",
+                            color: "#1e293b",
+                            borderRadius: "20px",
+                            fontSize: "0.75rem",
+                            fontWeight: "700",
+                            backdropFilter: "blur(20px)",
+                            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            border: "1px solid rgba(255, 255, 255, 0.3)",
+                            letterSpacing: "0.025em",
+                          }}
+                        >
+                          <Package size={12} />
+                          {productCount} {productCount === 1 ? "Item" : "Items"}
+                        </div>
+
+                        {/* Image Count Badge */}
+                        {images.length > 0 && (
                           <div
                             style={{
                               position: "absolute",
-                              top: "20px",
-                              right: "20px",
-                              padding: "8px 16px",
-                              background: "rgba(59, 130, 246, 0.9)",
+                              top: "16px",
+                              left: "16px",
+                              padding: "6px 12px",
+                              background: "rgba(34, 197, 94, 0.95)",
                               color: "white",
-                              borderRadius: "25px",
-                              fontSize: "0.8rem",
+                              borderRadius: "20px",
+                              fontSize: "0.75rem",
                               fontWeight: "700",
                               backdropFilter: "blur(20px)",
-                              boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+                              boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
                               display: "flex",
                               alignItems: "center",
-                              gap: "6px",
+                              gap: "4px",
                               border: "1px solid rgba(255, 255, 255, 0.2)",
                               letterSpacing: "0.025em",
                             }}
                           >
-                            <Sparkles size={14} />
-                            {productCount}{" "}
-                            {productCount === 1 ? "Item" : "Items"}
+                            <Eye size={12} />
+                            {images.length} Images
                           </div>
+                        )}
+                      </div>
 
-                          {/* Image Count Badge */}
-                          {images.length > 1 && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: "20px",
-                                left: "20px",
-                                padding: "8px 14px",
-                                background: "rgba(34, 197, 94, 0.9)",
-                                color: "white",
-                                borderRadius: "25px",
-                                fontSize: "0.8rem",
-                                fontWeight: "700",
-                                backdropFilter: "blur(20px)",
-                                boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "6px",
-                                border: "1px solid rgba(255, 255, 255, 0.2)",
-                                letterSpacing: "0.025em",
-                              }}
-                            >
-                              <Eye size={14} />
-                              {images.length} Images
-                            </div>
-                          )}
-                        </div>
-                      )}
                       <div
                         style={{
-                          padding: "1.5rem 1.25rem",
+                          padding: isMobile ? "1.25rem" : "1.5rem",
                           flex: 1,
                           display: "flex",
                           flexDirection: "column",
-                          gap: "1rem",
+                          gap: isMobile ? "0.75rem" : "1rem",
                         }}
                       >
                         <div style={{ flex: 1 }}>
                           <h3
                             style={{
-                              fontSize: "1.25rem",
+                              fontSize: isMobile ? "1.1rem" : "1.25rem",
                               fontWeight: "700",
                               color: "#1e293b",
-                              margin: "0 0 1rem 0",
+                              margin: "0 0 0.75rem 0",
                               lineHeight: "1.3",
                               letterSpacing: "-0.025em",
                             }}
@@ -571,7 +606,7 @@ const Shop: React.FC = () => {
                           </p>
                         </div>
 
-                        {/* Collection Stats */}
+                        {/* Modern Collection Stats */}
                         <div
                           style={{
                             display: "flex",
@@ -579,30 +614,30 @@ const Shop: React.FC = () => {
                             justifyContent: "space-between",
                             padding: "1rem 1.25rem",
                             background:
-                              "linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.05))",
+                              "linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.05))",
                             borderRadius: "16px",
-                            border: "1px solid rgba(59, 130, 246, 0.15)",
+                            border: "1px solid rgba(102, 126, 234, 0.15)",
                             backdropFilter: "blur(10px)",
-                            boxShadow: "0 2px 8px rgba(59, 130, 246, 0.1)",
+                            boxShadow: "0 2px 8px rgba(102, 126, 234, 0.1)",
                           }}
                         >
                           <span
                             style={{
-                              fontSize: "0.95rem",
-                              color: "#3b82f6",
+                              fontSize: "0.9rem",
+                              color: "#667eea",
                               fontWeight: "700",
                               letterSpacing: "0.025em",
                               textTransform: "uppercase" as const,
                             }}
                           >
-                            View Collection
+                            Explore Collection
                           </span>
                           <div
                             style={{
                               display: "flex",
                               alignItems: "center",
-                              gap: "0.75rem",
-                              fontSize: "0.8rem",
+                              gap: "0.5rem",
+                              fontSize: "0.75rem",
                               color: "#64748b",
                               fontWeight: "600",
                             }}
@@ -611,28 +646,28 @@ const Shop: React.FC = () => {
                               style={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "4px",
-                                padding: "4px 8px",
-                                background: "rgba(59, 130, 246, 0.1)",
-                                borderRadius: "8px",
+                                gap: "3px",
+                                padding: "3px 6px",
+                                background: "rgba(102, 126, 234, 0.1)",
+                                borderRadius: "6px",
                               }}
                             >
-                              <Sparkles size={12} />
-                              <span>{productCount} products</span>
+                              <Package size={10} />
+                              <span>{productCount}</span>
                             </div>
                             {images.length > 0 && (
                               <div
                                 style={{
                                   display: "flex",
                                   alignItems: "center",
-                                  gap: "4px",
-                                  padding: "4px 8px",
+                                  gap: "3px",
+                                  padding: "3px 6px",
                                   background: "rgba(34, 197, 94, 0.1)",
-                                  borderRadius: "8px",
+                                  borderRadius: "6px",
                                 }}
                               >
-                                <Eye size={12} />
-                                <span>{images.length} images</span>
+                                <Eye size={10} />
+                                <span>{images.length}</span>
                               </div>
                             )}
                           </div>
@@ -703,10 +738,19 @@ const Shop: React.FC = () => {
                     display: "grid",
                     gridTemplateColumns:
                       viewMode === "grid"
-                        ? "repeat(auto-fill, minmax(280px, 1fr))"
+                        ? isMobile
+                          ? "1fr"
+                          : isTablet
+                          ? "repeat(auto-fill, minmax(250px, 1fr))"
+                          : "repeat(auto-fill, minmax(280px, 1fr))"
                         : "1fr",
-                    gap: viewMode === "grid" ? "1.5rem" : "1rem",
-                    padding: "0 0.5rem",
+                    gap:
+                      viewMode === "grid"
+                        ? isMobile
+                          ? "1rem"
+                          : "1.5rem"
+                        : "1rem",
+                    padding: isMobile ? "0" : "0 0.5rem",
                   }}
                 >
                   {products.map((product, index) => {
@@ -726,7 +770,12 @@ const Shop: React.FC = () => {
                         }}
                         style={{
                           background: "rgba(255, 255, 255, 0.98)",
-                          borderRadius: viewMode === "grid" ? "20px" : "16px",
+                          borderRadius:
+                            viewMode === "grid"
+                              ? isMobile
+                                ? "16px"
+                                : "20px"
+                              : "16px",
                           overflow: "hidden",
                           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
                           border: "1px solid rgba(226, 232, 240, 0.8)",
@@ -737,7 +786,12 @@ const Shop: React.FC = () => {
                           alignItems:
                             viewMode === "list" ? "stretch" : "stretch",
                           height: viewMode === "list" ? "auto" : "100%",
-                          minHeight: viewMode === "grid" ? "420px" : "auto",
+                          minHeight:
+                            viewMode === "grid"
+                              ? isMobile
+                                ? "380px"
+                                : "420px"
+                              : "auto",
                           maxWidth: viewMode === "grid" ? "none" : "100%",
                         }}
                       >
@@ -745,7 +799,12 @@ const Shop: React.FC = () => {
                         <div
                           onClick={() => handleProductClick(product.id)}
                           style={{
-                            height: viewMode === "grid" ? "220px" : "140px",
+                            height:
+                              viewMode === "grid"
+                                ? isMobile
+                                  ? "180px"
+                                  : "220px"
+                                : "140px",
                             width: viewMode === "list" ? "200px" : "100%",
                             flexShrink: 0,
                             background: product.image
@@ -759,7 +818,9 @@ const Shop: React.FC = () => {
                             transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                             borderRadius:
                               viewMode === "grid"
-                                ? "16px 16px 0 0"
+                                ? isMobile
+                                  ? "16px 16px 0 0"
+                                  : "16px 16px 0 0"
                                 : "12px 0 0 12px",
                             overflow: "hidden",
                           }}
@@ -885,48 +946,56 @@ const Shop: React.FC = () => {
                                 gap: "0.5rem",
                               }}
                             >
-                                                          {dimensions && (dimensions.width > 0 || dimensions.height > 0) ? (
-                              <div
-                                style={{
-                                  padding: "4px 10px",
-                                  background: "rgba(148, 163, 184, 0.1)",
-                                  borderRadius: "12px",
-                                  fontSize: "0.75rem",
-                                  color: "#64748b",
-                                  fontWeight: "600",
-                                  border:
-                                    "1px solid rgba(148, 163, 184, 0.2)",
-                                }}
-                              >
-                                {dimensions.width > 0 && dimensions.height > 0 ? (
-                                  <>
-                                    {dimensions.width}cm × {dimensions.height}cm
-                                    {dimensions.depth > 0 && ` × ${dimensions.depth}cm`}
-                                  </>
-                                ) : (
-                                  <>
-                                    {dimensions.width > 0 && `${dimensions.width}cm width`}
-                                    {dimensions.height > 0 && `${dimensions.height}cm height`}
-                                    {dimensions.depth > 0 && `${dimensions.depth}cm depth`}
-                                  </>
-                                )}
-                              </div>
-                            ) : (
-                              <div
-                                style={{
-                                  padding: "4px 10px",
-                                  background: "rgba(148, 163, 184, 0.1)",
-                                  borderRadius: "12px",
-                                  fontSize: "0.75rem",
-                                  color: "#64748b",
-                                  fontWeight: "600",
-                                  border:
-                                    "1px solid rgba(148, 163, 184, 0.2)",
-                                }}
-                              >
-                                No dimensions
-                              </div>
-                            )}
+                              {dimensions &&
+                              (dimensions.width > 0 ||
+                                dimensions.height > 0) ? (
+                                <div
+                                  style={{
+                                    padding: "4px 10px",
+                                    background: "rgba(148, 163, 184, 0.1)",
+                                    borderRadius: "12px",
+                                    fontSize: "0.75rem",
+                                    color: "#64748b",
+                                    fontWeight: "600",
+                                    border:
+                                      "1px solid rgba(148, 163, 184, 0.2)",
+                                  }}
+                                >
+                                  {dimensions.width > 0 &&
+                                  dimensions.height > 0 ? (
+                                    <>
+                                      {dimensions.width}cm × {dimensions.height}
+                                      cm
+                                      {dimensions.depth > 0 &&
+                                        ` × ${dimensions.depth}cm`}
+                                    </>
+                                  ) : (
+                                    <>
+                                      {dimensions.width > 0 &&
+                                        `${dimensions.width}cm width`}
+                                      {dimensions.height > 0 &&
+                                        `${dimensions.height}cm height`}
+                                      {dimensions.depth > 0 &&
+                                        `${dimensions.depth}cm depth`}
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <div
+                                  style={{
+                                    padding: "4px 10px",
+                                    background: "rgba(148, 163, 184, 0.1)",
+                                    borderRadius: "12px",
+                                    fontSize: "0.75rem",
+                                    color: "#64748b",
+                                    fontWeight: "600",
+                                    border:
+                                      "1px solid rgba(148, 163, 184, 0.2)",
+                                  }}
+                                >
+                                  No dimensions
+                                </div>
+                              )}
                             </div>
 
                             {product.description && (
@@ -978,7 +1047,7 @@ const Shop: React.FC = () => {
                               padding: "1rem",
                               background:
                                 product.price === 0
-                                  ? "linear-gradient(135deg, #6b7280, #4b5563)"
+                                  ? "linear-gradient(135deg, #9ca3af, #6b7280)"
                                   : addedToCartItems.has(product.id)
                                   ? "linear-gradient(135deg, #22c55e, #16a34a)"
                                   : isInCart(product.id)
@@ -1004,7 +1073,7 @@ const Shop: React.FC = () => {
                               height: "48px",
                               boxShadow:
                                 product.price === 0
-                                  ? "none"
+                                  ? "0 2px 8px rgba(156, 163, 175, 0.3)"
                                   : addedToCartItems.has(product.id)
                                   ? "0 4px 16px rgba(34, 197, 94, 0.3)"
                                   : isInCart(product.id)
@@ -1016,7 +1085,7 @@ const Shop: React.FC = () => {
                                 product.price === 0 ||
                                 addedToCartItems.has(product.id) ||
                                 isInCart(product.id)
-                                  ? 0.6
+                                  ? 0.7
                                   : 1,
                             }}
                           >

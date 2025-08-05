@@ -180,5 +180,8 @@ export const parseJsonString = <T>(jsonString: string, fallback: T): T => {
 
 // Helper function to get parsed images array
 export const getParsedImages = (collection: Collection): string[] => {
-  return parseJsonString(collection.images, []);
+  console.log(`Parsing images for collection ${collection.id}:`, collection.images, 'type:', typeof collection.images);
+  const result = parseJsonString(collection.images, []);
+  console.log('Parsed images result:', result);
+  return result;
 };
