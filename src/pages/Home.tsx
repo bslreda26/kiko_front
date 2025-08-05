@@ -442,17 +442,12 @@ const Home: React.FC = () => {
                         <h4>{product.title}</h4>
                         <p
                           style={{
-                            color:
-                              product.isAvailable === true
-                                ? "#22c55e"
-                                : "#ef4444",
+                            color: product.price > 0 ? "#22c55e" : "#ef4444",
                             fontWeight: "600",
                             fontSize: "0.9rem",
                           }}
                         >
-                          {product.isAvailable === true
-                            ? "Available"
-                            : "Not Available"}
+                          {product.price > 0 ? "Available" : "Not Available"}
                         </p>
                         <motion.button
                           className="view-button"

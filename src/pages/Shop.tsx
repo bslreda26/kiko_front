@@ -9,6 +9,7 @@ import {
   Heart,
   Sparkles,
   Check,
+  X,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
@@ -70,16 +71,6 @@ const Shop: React.FC = () => {
       }
       return newWishlist;
     });
-  };
-
-  const getAvailabilityStatus = (isAvailable: boolean) => {
-    return isAvailable === true
-      ? "Available"
-      : "Not Available";
-  };
-
-  const isAvailable = (isAvailable: boolean) => {
-    return isAvailable === true;
   };
 
   const getCollectionName = (collectionId: number) => {
@@ -894,25 +885,6 @@ const Shop: React.FC = () => {
                                 gap: "0.5rem",
                               }}
                             >
-                              <p
-                                style={{
-                                  fontSize: "1rem",
-                                  fontWeight: "600",
-                                  color: isAvailable(product.isAvailable)
-                                    ? "#22c55e"
-                                    : "#ef4444",
-                                  margin: 0,
-                                  letterSpacing: "-0.025em",
-                                  padding: "4px 12px",
-                                  background: isAvailable(product.isAvailable)
-                                    ? "rgba(34, 197, 94, 0.1)"
-                                    : "rgba(239, 68, 68, 0.1)",
-                                  borderRadius: "20px",
-                                  display: "inline-block",
-                                }}
-                              >
-                                {getAvailabilityStatus(product.isAvailable)}
-                              </p>
                               {dimensions && (
                                 <div
                                   style={{
@@ -954,39 +926,47 @@ const Shop: React.FC = () => {
                           {/* Add to Cart Button */}
                           <motion.button
                             whileHover={{
-                              scale: isAvailable(product.isAvailable) ? 1.02 : 1,
-                              boxShadow: !isAvailable(product.isAvailable)
-                                ? "0 8px 25px rgba(107, 114, 128, 0.2)"
-                                : addedToCartItems.has(product.id)
-                                ? "0 8px 25px rgba(34, 197, 94, 0.4)"
-                                : isInCart(product.id)
-                                ? "0 8px 25px rgba(245, 158, 11, 0.4)"
-                                : "0 8px 25px rgba(59, 130, 246, 0.4)",
+                              scale: product.price > 0 ? 1.02 : 1,
+                              boxShadow:
+                                product.price === 0
+                                  ? "none"
+                                  : addedToCartItems.has(product.id)
+                                  ? "0 8px 25px rgba(34, 197, 94, 0.4)"
+                                  : isInCart(product.id)
+                                  ? "0 8px 25px rgba(245, 158, 11, 0.4)"
+                                  : "0 8px 25px rgba(59, 130, 246, 0.4)",
                             }}
                             whileTap={{
-                              scale: isAvailable(product.isAvailable) ? 0.98 : 1,
+                              scale: product.price > 0 ? 0.98 : 1,
                             }}
                             onClick={() =>
-                              isAvailable(product.isAvailable) &&
-                              handleAddToCart(product)
+                              product.price > 0 && handleAddToCart(product)
                             }
-                            disabled={!isAvailable(product.isAvailable)}
+                            disabled={
+                              addedToCartItems.has(product.id) ||
+                              isInCart(product.id) ||
+                              product.price === 0
+                            }
                             style={{
                               width: "100%",
                               padding: "1rem",
-                              background: !isAvailable(product.isAvailable)
-                                ? "linear-gradient(135deg, #6b7280, #4b5563)"
-                                : addedToCartItems.has(product.id)
-                                ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                                : isInCart(product.id)
-                                ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                                : "linear-gradient(135deg, #3b82f6, #1e40af)",
+                              background:
+                                product.price === 0
+                                  ? "linear-gradient(135deg, #6b7280, #4b5563)"
+                                  : addedToCartItems.has(product.id)
+                                  ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                                  : isInCart(product.id)
+                                  ? "linear-gradient(135deg, #f59e0b, #d97706)"
+                                  : "linear-gradient(135deg, #3b82f6, #1e40af)",
                               color: "white",
                               border: "none",
                               borderRadius: "14px",
-                              cursor: isAvailable(product.isAvailable)
-                                ? "pointer"
-                                : "not-allowed",
+                              cursor:
+                                product.price === 0 ||
+                                addedToCartItems.has(product.id) ||
+                                isInCart(product.id)
+                                  ? "not-allowed"
+                                  : "pointer",
                               fontSize: "0.95rem",
                               fontWeight: "700",
                               display: "flex",
@@ -996,21 +976,27 @@ const Shop: React.FC = () => {
                               transition:
                                 "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                               height: "48px",
-                              boxShadow: !isAvailable(product.isAvailable)
-                                ? "0 4px 16px rgba(107, 114, 128, 0.2)"
-                                : addedToCartItems.has(product.id)
-                                ? "0 4px 16px rgba(34, 197, 94, 0.3)"
-                                : isInCart(product.id)
-                                ? "0 4px 16px rgba(245, 158, 11, 0.3)"
-                                : "0 4px 16px rgba(59, 130, 246, 0.3)",
+                              boxShadow:
+                                product.price === 0
+                                  ? "none"
+                                  : addedToCartItems.has(product.id)
+                                  ? "0 4px 16px rgba(34, 197, 94, 0.3)"
+                                  : isInCart(product.id)
+                                  ? "0 4px 16px rgba(245, 158, 11, 0.3)"
+                                  : "0 4px 16px rgba(59, 130, 246, 0.3)",
                               letterSpacing: "0.025em",
                               textTransform: "uppercase" as const,
-                              opacity: isAvailable(product.isAvailable) ? 1 : 0.6,
+                              opacity:
+                                product.price === 0 ||
+                                addedToCartItems.has(product.id) ||
+                                isInCart(product.id)
+                                  ? 0.6
+                                  : 1,
                             }}
                           >
-                            {!isAvailable(product.isAvailable) ? (
+                            {product.price === 0 ? (
                               <>
-                                <Eye size={20} />
+                                <X size={20} />
                                 Not Available
                               </>
                             ) : addedToCartItems.has(product.id) ? (

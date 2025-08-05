@@ -45,7 +45,7 @@ interface ProductForm {
   title: string;
   description: string;
   image: string;
-  isAvailable: boolean;
+  price: number;
   dimensions: { width: number; height: number; depth: number };
   collectionId: number;
 }
@@ -79,7 +79,7 @@ const AdminDashboard: React.FC = () => {
     title: "",
     description: "",
     image: "",
-    isAvailable: true,
+    price: 1, // Default to Available (1)
     dimensions: { width: 0, height: 0, depth: 0 },
     collectionId: 0,
   });
@@ -93,6 +93,19 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Ensure form is properly initialized when modal opens
+  useEffect(() => {
+    if (modalType === "product" && !editingItem) {
+      // Force re-initialization for new products
+      setTimeout(() => {
+        setProductForm((prev) => ({
+          ...prev,
+          price: 1,
+        }));
+      }, 0);
+    }
+  }, [modalType, editingItem]);
 
   const loadData = async () => {
     try {
@@ -127,26 +140,32 @@ const AdminDashboard: React.FC = () => {
     setSuccessMessage(null);
 
     if (type === "product") {
-      if (item) {
-        const product = item as Product;
-        const dimensions = getParsedDimensions(product);
-        setProductForm({
-          title: product.title,
-          description: product.description,
-          image: product.image,
-          isAvailable: product.isAvailable === true,
-          dimensions,
-          collectionId: product.collectionId,
-        });
+             if (item) {
+         const product = item as Product;
+         const dimensions = getParsedDimensions(product);
+         setProductForm({
+           title: product.title,
+           description: product.description,
+           image: product.image,
+           price: Number(product.price), // Ensure it's a number
+           dimensions: {
+             width: dimensions?.width || 0,
+             height: dimensions?.height || 0,
+             depth: dimensions?.depth || 0,
+           },
+           collectionId: product.collectionId,
+         });
       } else {
+        // Force a fresh form state for new products
         setProductForm({
           title: "",
           description: "",
           image: "",
-          isAvailable: true,
+          price: 1, // Default to Available (1)
           dimensions: { width: 0, height: 0, depth: 0 },
           collectionId: collections[0]?.id || 0,
         });
+        console.log("New product form initialized with price:", 1);
       }
     } else if (type === "collection") {
       if (item) {
@@ -172,17 +191,20 @@ const AdminDashboard: React.FC = () => {
     setEditingItem(null);
   };
 
-  const validateProductForm = (): string | null => {
+  const validateProductForm = (productForm: ProductForm): string | null => {
     if (!productForm.title.trim()) return "Product title is required";
     if (!productForm.description.trim())
       return "Product description is required";
     if (!productForm.image.trim()) return "Product image URL is required";
+    if (productForm.price < 0 || productForm.price > 1)
+      return "Availability must be selected (Available or Not Available)";
     if (productForm.collectionId <= 0) return "Please select a collection";
     if (
       productForm.dimensions.width <= 0 ||
-      productForm.dimensions.height <= 0
+      productForm.dimensions.height <= 0 ||
+      productForm.dimensions.depth <= 0
     ) {
-      return "Product dimensions must be greater than 0";
+      return "All dimensions must be greater than 0";
     }
     return null;
   };
@@ -207,7 +229,7 @@ const AdminDashboard: React.FC = () => {
       // Validate form data
       let validationError: string | null = null;
       if (modalType === "product") {
-        validationError = validateProductForm();
+        validationError = validateProductForm(productForm);
       } else if (modalType === "collection") {
         validationError = validateCollectionForm();
       }
@@ -218,16 +240,20 @@ const AdminDashboard: React.FC = () => {
         return;
       }
 
-      if (modalType === "product") {
-        // Prepare product data
-        const productData = {
-          title: productForm.title.trim(),
-          description: productForm.description.trim(),
-          image: productForm.image.trim(),
-          isAvailable: productForm.isAvailable,
-          dimensions: JSON.stringify(productForm.dimensions),
-          collectionId: productForm.collectionId,
-        };
+             if (modalType === "product") {
+         // Prepare product data
+         const productData = {
+           title: productForm.title.trim(),
+           description: productForm.description.trim(),
+           image: productForm.image.trim(),
+           price: Number(productForm.price), // Ensure it's a number
+           dimensions: JSON.stringify({
+             width: Number(productForm.dimensions.width),
+             height: Number(productForm.dimensions.height),
+             depth: Number(productForm.dimensions.depth),
+           }),
+           collectionId: productForm.collectionId,
+         };
 
         if (editingItem) {
           // Update existing product
@@ -618,23 +644,18 @@ const AdminDashboard: React.FC = () => {
                             style={{
                               fontSize: "1rem",
                               fontWeight: "600",
-                              color:
-                                product.isAvailable === true
-                                  ? "#22c55e"
-                                  : "#ef4444",
+                              color: product.price > 0 ? "#22c55e" : "#ef4444",
                               margin: "0 0 0.5rem 0",
                               padding: "4px 12px",
                               background:
-                                product.isAvailable === true
+                                product.price > 0
                                   ? "rgba(34, 197, 94, 0.1)"
                                   : "rgba(239, 68, 68, 0.1)",
                               borderRadius: "20px",
                               display: "inline-block",
                             }}
                           >
-                            {product.isAvailable === true
-                              ? "Available"
-                              : "Not Available"}
+                            {product.price > 0 ? "Available" : "Not Available"}
                           </p>
                           <p
                             style={{
@@ -1004,32 +1025,38 @@ const AdminDashboard: React.FC = () => {
                 >
                   <div>
                     <label
+                      htmlFor="price"
                       style={{
                         display: "block",
                         marginBottom: "0.5rem",
-                        fontWeight: "500",
-                      }}
-                    >
-                      Available
-                    </label>
-                    <select
-                      value={productForm.isAvailable ? "true" : "false"}
-                      onChange={(e) =>
-                        setProductForm((prev) => ({
-                          ...prev,
-                          isAvailable: e.target.value === "true",
-                        }))
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "2px solid #e5e7eb",
-                        borderRadius: "8px",
+                        fontWeight: "600",
+                        color: "#374151",
                         fontSize: "0.9rem",
                       }}
                     >
-                      <option value="true">Available</option>
-                      <option value="false">Not Available</option>
+                      Availability
+                    </label>
+                    <select
+                      key={`price-select-${productForm.price}`}
+                      value={productForm.price}
+                      onChange={(e) => {
+                        const newPrice = Number(e.target.value);
+                        setProductForm((prev) => ({
+                          ...prev,
+                          price: newPrice,
+                        }));
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "8px",
+                        fontSize: "0.9rem",
+                        backgroundColor: "#ffffff",
+                      }}
+                    >
+                      <option value={1}>Available</option>
+                      <option value={0}>Not Available</option>
                     </select>
                   </div>
                   <div>
@@ -1087,11 +1114,7 @@ const AdminDashboard: React.FC = () => {
                     <input
                       type="number"
                       step="0.1"
-                      value={
-                        productForm.dimensions.width === 0
-                          ? ""
-                          : productForm.dimensions.width
-                      }
+                      value={productForm.dimensions.width || ""}
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
@@ -1112,11 +1135,7 @@ const AdminDashboard: React.FC = () => {
                     <input
                       type="number"
                       step="0.1"
-                      value={
-                        productForm.dimensions.height === 0
-                          ? ""
-                          : productForm.dimensions.height
-                      }
+                      value={productForm.dimensions.height || ""}
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
@@ -1137,11 +1156,7 @@ const AdminDashboard: React.FC = () => {
                     <input
                       type="number"
                       step="0.1"
-                      value={
-                        productForm.dimensions.depth === 0
-                          ? ""
-                          : productForm.dimensions.depth
-                      }
+                      value={productForm.dimensions.depth || ""}
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,

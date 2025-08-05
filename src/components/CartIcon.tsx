@@ -8,12 +8,6 @@ const CartIcon: React.FC = () => {
   const { items, totalItems, updateQuantity, removeFromCart, clearCart } =
     useCart();
 
-  const getAvailabilityStatus = (isAvailable: boolean) => {
-    return isAvailable === true
-      ? "Available"
-      : "Not Available";
-  };
-
   const handleCheckout = () => {
     if (items.length === 0) return;
 
@@ -25,7 +19,9 @@ const CartIcon: React.FC = () => {
     items.forEach((item, index) => {
       message += `${index + 1}. ${item.title}\n`;
       message += `   Quantity: ${item.quantity}\n`;
-      message += `   Status: ${getAvailabilityStatus(item.isAvailable)}\n\n`;
+      message += `   Status: ${
+        item.price > 0 ? "Available" : "Not Available"
+      }\n\n`;
     });
 
     // Add total
@@ -271,13 +267,13 @@ const CartIcon: React.FC = () => {
                           </h4>
                           <p
                             style={{
-                              fontSize: "0.9rem",
-                              color: item.isAvailable ? "#22c55e" : "#ef4444",
+                              fontSize: "0.875rem",
+                              color: item.price > 0 ? "#22c55e" : "#ef4444",
                               margin: 0,
                               fontWeight: "600",
                             }}
                           >
-                            {getAvailabilityStatus(item.isAvailable)}
+                            {item.price > 0 ? "Available" : "Not Available"}
                           </p>
                         </div>
 

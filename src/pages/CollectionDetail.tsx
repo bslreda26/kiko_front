@@ -11,6 +11,7 @@ import {
   Grid3X3,
   List,
   Package,
+  X,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
@@ -71,16 +72,6 @@ const CollectionDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getAvailabilityStatus = (isAvailable: boolean) => {
-    return isAvailable === true
-      ? "Available"
-      : "Not Available";
-  };
-
-  const isAvailable = (isAvailable: boolean) => {
-    return isAvailable === true;
   };
 
   const handleAddToCart = (product: Product) => {
@@ -202,9 +193,7 @@ const CollectionDetail: React.FC = () => {
   }
 
   const images = getParsedImages(collection);
-  const availableProducts = collectionProducts.filter((product) =>
-    isAvailable(product.isAvailable)
-  ).length;
+  const totalProducts = collectionProducts.length;
 
   return (
     <div className="App">
@@ -385,7 +374,7 @@ const CollectionDetail: React.FC = () => {
                         margin: 0,
                       }}
                     >
-                      {collectionProducts.length}
+                      {totalProducts}
                     </p>
                   </div>
 
@@ -426,7 +415,7 @@ const CollectionDetail: React.FC = () => {
                         margin: 0,
                       }}
                     >
-                      {availableProducts}
+                      {totalProducts}
                     </p>
                   </div>
                 </div>
@@ -454,7 +443,7 @@ const CollectionDetail: React.FC = () => {
                 margin: 0,
               }}
             >
-              Products ({collectionProducts.length})
+              Products ({totalProducts})
             </h2>
 
             <div
@@ -657,19 +646,21 @@ const CollectionDetail: React.FC = () => {
                               style={{
                                 fontSize: "1rem",
                                 fontWeight: "600",
-                                color: isAvailable(product.isAvailable)
-                                  ? "#22c55e"
-                                  : "#ef4444",
+                                color:
+                                  product.price > 0 ? "#22c55e" : "#ef4444",
                                 margin: 0,
                                 padding: "4px 12px",
-                                background: isAvailable(product.isAvailable)
-                                  ? "rgba(34, 197, 94, 0.1)"
-                                  : "rgba(239, 68, 68, 0.1)",
+                                background:
+                                  product.price > 0
+                                    ? "rgba(34, 197, 94, 0.1)"
+                                    : "rgba(239, 68, 68, 0.1)",
                                 borderRadius: "20px",
                                 display: "inline-block",
                               }}
                             >
-                              {getAvailabilityStatus(product.isAvailable)}
+                              {product.price > 0
+                                ? "Available"
+                                : "Not Available"}
                             </p>
                             {dimensions && (
                               <p
@@ -707,32 +698,39 @@ const CollectionDetail: React.FC = () => {
                         {/* Add to Cart Button */}
                         <motion.button
                           whileHover={{
-                            scale: isAvailable(product.isAvailable) ? 1.02 : 1,
+                            scale: product.price > 0 ? 1.02 : 1,
                           }}
                           whileTap={{
-                            scale: isAvailable(product.isAvailable) ? 0.98 : 1,
+                            scale: product.price > 0 ? 0.98 : 1,
                           }}
                           onClick={() =>
-                            isAvailable(product.isAvailable) &&
-                            handleAddToCart(product)
+                            product.price > 0 && handleAddToCart(product)
                           }
-                          disabled={!isAvailable(product.isAvailable)}
+                          disabled={
+                            addedToCartItems.has(product.id) ||
+                            isInCart(product.id) ||
+                            product.price === 0
+                          }
                           style={{
                             width: "100%",
                             padding: "0.875rem 1rem",
-                            background: !isAvailable(product.isAvailable)
-                              ? "linear-gradient(135deg, #6b7280, #4b5563)"
-                              : addedToCartItems.has(product.id)
-                              ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                              : isInCart(product.id)
-                              ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                              : "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                            background:
+                              product.price === 0
+                                ? "linear-gradient(135deg, #6b7280, #4b5563)"
+                                : addedToCartItems.has(product.id)
+                                ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                                : isInCart(product.id)
+                                ? "linear-gradient(135deg, #f59e0b, #d97706)"
+                                : "linear-gradient(135deg, #3b82f6, #8b5cf6)",
                             color: "white",
                             border: "none",
                             borderRadius: "10px",
-                            cursor: isAvailable(product.isAvailable)
-                              ? "pointer"
-                              : "not-allowed",
+                            cursor:
+                              product.price === 0 ||
+                              addedToCartItems.has(product.id) ||
+                              isInCart(product.id)
+                                ? "not-allowed"
+                                : "pointer",
                             fontSize: "0.9rem",
                             fontWeight: "600",
                             display: "flex",
@@ -741,15 +739,21 @@ const CollectionDetail: React.FC = () => {
                             gap: "0.5rem",
                             transition: "all 0.3s ease",
                             height: "44px",
-                            boxShadow: !isAvailable(product.isAvailable)
-                              ? "0 2px 8px rgba(107, 114, 128, 0.2)"
-                              : "0 2px 8px rgba(59, 130, 246, 0.3)",
-                            opacity: isAvailable(product.isAvailable) ? 1 : 0.6,
+                            boxShadow:
+                              product.price === 0
+                                ? "none"
+                                : "0 2px 8px rgba(59, 130, 246, 0.3)",
+                            opacity:
+                              product.price === 0 ||
+                              addedToCartItems.has(product.id) ||
+                              isInCart(product.id)
+                                ? 0.6
+                                : 1,
                           }}
                         >
-                          {!isAvailable(product.isAvailable) ? (
+                          {product.price === 0 ? (
                             <>
-                              <Eye size={18} />
+                              <X size={18} />
                               Not Available
                             </>
                           ) : addedToCartItems.has(product.id) ? (
