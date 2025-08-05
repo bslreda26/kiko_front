@@ -140,21 +140,21 @@ const AdminDashboard: React.FC = () => {
     setSuccessMessage(null);
 
     if (type === "product") {
-             if (item) {
-         const product = item as Product;
-         const dimensions = getParsedDimensions(product);
-         setProductForm({
-           title: product.title,
-           description: product.description,
-           image: product.image,
-           price: Number(product.price), // Ensure it's a number
-           dimensions: {
-             width: dimensions?.width || 0,
-             height: dimensions?.height || 0,
-             depth: dimensions?.depth || 0,
-           },
-           collectionId: product.collectionId,
-         });
+                                        if (item) {
+             const product = item as Product;
+             const dimensions = getParsedDimensions(product);
+             setProductForm({
+          title: product.title,
+          description: product.description,
+          image: product.image,
+          price: Number(product.price), // Ensure it's a number
+          dimensions: {
+            width: dimensions?.width || 0,
+            height: dimensions?.height || 0,
+            depth: dimensions?.depth || 0,
+          },
+          collectionId: product.collectionId,
+        });
       } else {
         // Force a fresh form state for new products
         setProductForm({
@@ -252,10 +252,10 @@ const AdminDashboard: React.FC = () => {
              height: Number(productForm.dimensions.height),
              depth: Number(productForm.dimensions.depth),
            }),
-           collectionId: productForm.collectionId,
-         };
-
-        if (editingItem) {
+                        collectionId: productForm.collectionId,
+           };
+       
+           if (editingItem) {
           // Update existing product
           await updateProduct(
             (editingItem as Product).id,

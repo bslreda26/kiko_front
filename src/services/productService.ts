@@ -14,10 +14,10 @@ export class ProductService {
   /**
    * Create a new product
    */
-  static async createProduct(data: CreateProductRequest): Promise<Product> {
-    try {
-      const response = await api.post<Product>(ProductService.BASE_PATH, data);
-      return response.data;
+           static async createProduct(data: CreateProductRequest): Promise<Product> {
+           try {
+             const response = await api.post<Product>(ProductService.BASE_PATH, data);
+             return response.data;
     } catch (error: any) {
       throw ProductService.handleError(error);
     }
@@ -26,10 +26,10 @@ export class ProductService {
   /**
    * Get all products
    */
-  static async getAllProducts(): Promise<Product[]> {
-    try {
-      const response = await api.get<Product[]>(ProductService.BASE_PATH);
-      return response.data;
+           static async getAllProducts(): Promise<Product[]> {
+           try {
+             const response = await api.get<Product[]>(ProductService.BASE_PATH);
+             return response.data;
     } catch (error: any) {
       throw ProductService.handleError(error);
     }

@@ -671,7 +671,7 @@ const CollectionDetail: React.FC = () => {
                                   fontWeight: "500",
                                 }}
                               >
-                                {dimensions.width}" × {dimensions.height}"
+                                {dimensions.width}cm × {dimensions.height}cm
                               </p>
                             )}
                           </div>

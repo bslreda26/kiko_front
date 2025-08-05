@@ -166,9 +166,9 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  const dimensions = getParsedDimensions(product);
-
-  return (
+           const dimensions = getParsedDimensions(product);
+       
+         return (
     <div className="App">
       <div
         style={{
@@ -394,7 +394,7 @@ const ProductDetail: React.FC = () => {
                     gap: "1rem",
                   }}
                 >
-                  {dimensions && (
+                  {dimensions && (dimensions.width > 0 || dimensions.height > 0) && (
                     <div
                       style={{
                         padding: "1rem",
@@ -429,8 +429,18 @@ const ProductDetail: React.FC = () => {
                           color: "#64748b",
                         }}
                       >
-                        {dimensions.width}" × {dimensions.height}"
-                        {dimensions.depth && ` × ${dimensions.depth}"`}
+                        {dimensions.width > 0 && dimensions.height > 0 ? (
+                          <>
+                            {dimensions.width}cm × {dimensions.height}cm
+                            {dimensions.depth > 0 && ` × ${dimensions.depth}cm`}
+                          </>
+                        ) : (
+                          <>
+                            {dimensions.width > 0 && `${dimensions.width}cm width`}
+                            {dimensions.height > 0 && `${dimensions.height}cm height`}
+                            {dimensions.depth > 0 && `${dimensions.depth}cm depth`}
+                          </>
+                        )}
                       </p>
                     </div>
                   )}

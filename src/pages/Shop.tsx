@@ -885,22 +885,48 @@ const Shop: React.FC = () => {
                                 gap: "0.5rem",
                               }}
                             >
-                              {dimensions && (
-                                <div
-                                  style={{
-                                    padding: "4px 10px",
-                                    background: "rgba(148, 163, 184, 0.1)",
-                                    borderRadius: "12px",
-                                    fontSize: "0.75rem",
-                                    color: "#64748b",
-                                    fontWeight: "600",
-                                    border:
-                                      "1px solid rgba(148, 163, 184, 0.2)",
-                                  }}
-                                >
-                                  {dimensions.width}" × {dimensions.height}"
-                                </div>
-                              )}
+                                                          {dimensions && (dimensions.width > 0 || dimensions.height > 0) ? (
+                              <div
+                                style={{
+                                  padding: "4px 10px",
+                                  background: "rgba(148, 163, 184, 0.1)",
+                                  borderRadius: "12px",
+                                  fontSize: "0.75rem",
+                                  color: "#64748b",
+                                  fontWeight: "600",
+                                  border:
+                                    "1px solid rgba(148, 163, 184, 0.2)",
+                                }}
+                              >
+                                {dimensions.width > 0 && dimensions.height > 0 ? (
+                                  <>
+                                    {dimensions.width}cm × {dimensions.height}cm
+                                    {dimensions.depth > 0 && ` × ${dimensions.depth}cm`}
+                                  </>
+                                ) : (
+                                  <>
+                                    {dimensions.width > 0 && `${dimensions.width}cm width`}
+                                    {dimensions.height > 0 && `${dimensions.height}cm height`}
+                                    {dimensions.depth > 0 && `${dimensions.depth}cm depth`}
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <div
+                                style={{
+                                  padding: "4px 10px",
+                                  background: "rgba(148, 163, 184, 0.1)",
+                                  borderRadius: "12px",
+                                  fontSize: "0.75rem",
+                                  color: "#64748b",
+                                  fontWeight: "600",
+                                  border:
+                                    "1px solid rgba(148, 163, 184, 0.2)",
+                                }}
+                              >
+                                No dimensions
+                              </div>
+                            )}
                             </div>
 
                             {product.description && (

@@ -57,7 +57,7 @@ export interface Product {
   title: string;
   description: string;
   image: string;
-  dimensions: string; // JSON string of ProductDimensions
+  dimensions: ProductDimensions | string; // Can be either object or JSON string
   price: number; // Availability: 0 = not available, >0 = available
   collectionId: number;
   createdAt: string;
@@ -144,9 +144,38 @@ export const parseJsonString = <T>(jsonString: string, fallback: T): T => {
   }
 };
 
-// Helper function to get parsed dimensions
-export const getParsedDimensions = (product: Product): ProductDimensions => {
-  return parseJsonString(product.dimensions, { width: 0, height: 0, depth: 0 });
+         // Helper function to get parsed dimensions
+         export const getParsedDimensions = (product: Product): ProductDimensions => {
+           
+           // If dimensions is already an object, return it directly
+           if (typeof product.dimensions === 'object' && product.dimensions !== null) {
+    console.log('Dimensions is object:', product.dimensions);
+    return product.dimensions as ProductDimensions;
+  }
+  
+  // If dimensions is a string, parse it
+  if (typeof product.dimensions === 'string' && product.dimensions.trim() !== '') {
+    console.log('Dimensions is string:', product.dimensions);
+                 try {
+               const parsed = JSON.parse(product.dimensions);
+               // Validate that parsed object has required properties
+               if (parsed && typeof parsed === 'object' &&  
+          typeof parsed.width === 'number' && 
+          typeof parsed.height === 'number' && 
+          typeof parsed.depth === 'number') {
+        return parsed as ProductDimensions;
+                       } else {
+                   // Invalid parsed dimensions
+                 }
+               } catch (error) {
+      console.error('Failed to parse dimensions string:', product.dimensions, error);
+    }
+    return parseJsonString(product.dimensions, { width: 0, height: 0, depth: 0 });
+  }
+  
+  // Fallback
+  console.log('Dimensions fallback for product:', product.id, 'dimensions:', product.dimensions);
+  return { width: 0, height: 0, depth: 0 };
 };
 
 // Helper function to get parsed images array
