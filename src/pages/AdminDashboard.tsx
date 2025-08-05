@@ -388,7 +388,7 @@ const AdminDashboard: React.FC = () => {
           style={{
             maxWidth: "1400px",
             margin: "0 auto",
-            padding: "2rem",
+            padding: window.innerWidth <= 768 ? "1rem" : "2rem",
           }}
         >
           {/* Header */}
@@ -397,12 +397,14 @@ const AdminDashboard: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             style={{
               display: "flex",
+              flexDirection: window.innerWidth <= 768 ? "column" : "row",
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: window.innerWidth <= 768 ? "flex-start" : "center",
+              gap: window.innerWidth <= 768 ? "1rem" : "0",
               marginBottom: "2rem",
               background: "rgba(255, 255, 255, 0.9)",
-              borderRadius: "16px",
-              padding: "1.5rem 2rem",
+              borderRadius: window.innerWidth <= 768 ? "12px" : "16px",
+              padding: window.innerWidth <= 768 ? "1rem" : "1.5rem 2rem",
               boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
               backdropFilter: "blur(10px)",
             }}
@@ -410,7 +412,7 @@ const AdminDashboard: React.FC = () => {
             <div>
               <h1
                 style={{
-                  fontSize: "2rem",
+                  fontSize: window.innerWidth <= 768 ? "1.5rem" : "2rem",
                   fontWeight: "700",
                   color: "#1e293b",
                   margin: "0 0 0.5rem 0",
@@ -420,7 +422,7 @@ const AdminDashboard: React.FC = () => {
               </h1>
               <p
                 style={{
-                  fontSize: "1rem",
+                  fontSize: window.innerWidth <= 768 ? "0.9rem" : "1rem",
                   color: "#64748b",
                   margin: 0,
                 }}
@@ -434,15 +436,17 @@ const AdminDashboard: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.75rem 1rem",
+                padding:
+                  window.innerWidth <= 768 ? "0.5rem 0.75rem" : "0.75rem 1rem",
                 background: "rgba(239, 68, 68, 0.1)",
                 color: "#ef4444",
                 border: "1px solid rgba(239, 68, 68, 0.2)",
                 borderRadius: "10px",
                 cursor: "pointer",
-                fontSize: "0.9rem",
+                fontSize: window.innerWidth <= 768 ? "0.8rem" : "0.9rem",
                 fontWeight: "500",
                 transition: "all 0.3s ease",
+                alignSelf: window.innerWidth <= 768 ? "flex-end" : "auto",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
@@ -451,7 +455,7 @@ const AdminDashboard: React.FC = () => {
                 e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
               }}
             >
-              <LogOut size={16} />
+              <LogOut size={window.innerWidth <= 768 ? 14 : 16} />
               Logout
             </button>
           </motion.div>
@@ -463,8 +467,10 @@ const AdminDashboard: React.FC = () => {
             transition={{ delay: 0.1 }}
             style={{
               display: "flex",
+              flexDirection: window.innerWidth <= 768 ? "column" : "row",
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: window.innerWidth <= 768 ? "stretch" : "center",
+              gap: window.innerWidth <= 768 ? "1rem" : "0",
               marginBottom: "2rem",
             }}
           >
@@ -476,6 +482,7 @@ const AdminDashboard: React.FC = () => {
                 padding: "4px",
                 border: "2px solid #e2e8f0",
                 backdropFilter: "blur(10px)",
+                flex: window.innerWidth <= 768 ? "1" : "auto",
               }}
             >
               <button
@@ -485,7 +492,7 @@ const AdminDashboard: React.FC = () => {
                   setSuccessMessage(null);
                 }}
                 style={{
-                  padding: "12px 20px",
+                  padding: window.innerWidth <= 768 ? "10px 16px" : "12px 20px",
                   background:
                     activeTab === "products"
                       ? "linear-gradient(135deg, #3b82f6, #8b5cf6)"
@@ -497,13 +504,16 @@ const AdminDashboard: React.FC = () => {
                   transition: "all 0.3s ease",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
-                  fontSize: "0.9rem",
+                  gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                  fontSize: window.innerWidth <= 768 ? "0.8rem" : "0.9rem",
                   fontWeight: "500",
+                  flex: "1",
                 }}
               >
-                <Package size={18} />
-                Products ({products.length})
+                <Package size={window.innerWidth <= 768 ? 16 : 18} />
+                <span style={{ whiteSpace: "nowrap" }}>
+                  Products ({products.length})
+                </span>
               </button>
               <button
                 onClick={() => {
@@ -512,7 +522,7 @@ const AdminDashboard: React.FC = () => {
                   setSuccessMessage(null);
                 }}
                 style={{
-                  padding: "12px 20px",
+                  padding: window.innerWidth <= 768 ? "10px 16px" : "12px 20px",
                   background:
                     activeTab === "collections"
                       ? "linear-gradient(135deg, #10b981, #059669)"
@@ -524,13 +534,16 @@ const AdminDashboard: React.FC = () => {
                   transition: "all 0.3s ease",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
-                  fontSize: "0.9rem",
+                  gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                  fontSize: window.innerWidth <= 768 ? "0.8rem" : "0.9rem",
                   fontWeight: "500",
+                  flex: "1",
                 }}
               >
-                <Sparkles size={18} />
-                Collections ({collections.length})
+                <Sparkles size={window.innerWidth <= 768 ? 16 : 18} />
+                <span style={{ whiteSpace: "nowrap" }}>
+                  Collections ({collections.length})
+                </span>
               </button>
             </div>
 
@@ -543,19 +556,21 @@ const AdminDashboard: React.FC = () => {
               style={{
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: "0.5rem",
-                padding: "12px 20px",
+                padding: window.innerWidth <= 768 ? "12px 16px" : "12px 20px",
                 background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
                 color: "white",
                 border: "none",
                 borderRadius: "12px",
                 cursor: "pointer",
-                fontSize: "0.9rem",
+                fontSize: window.innerWidth <= 768 ? "0.85rem" : "0.9rem",
                 fontWeight: "600",
                 boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                width: window.innerWidth <= 768 ? "100%" : "auto",
               }}
             >
-              <Plus size={18} />
+              <Plus size={window.innerWidth <= 768 ? 16 : 18} />
               Add {activeTab === "products" ? "Product" : "Collection"}
             </motion.button>
           </motion.div>
@@ -609,8 +624,13 @@ const AdminDashboard: React.FC = () => {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-                  gap: "1.5rem",
+                  gridTemplateColumns:
+                    window.innerWidth <= 768
+                      ? "1fr"
+                      : window.innerWidth <= 1024
+                      ? "repeat(auto-fill, minmax(300px, 1fr))"
+                      : "repeat(auto-fill, minmax(350px, 1fr))",
+                  gap: window.innerWidth <= 768 ? "1rem" : "1.5rem",
                 }}
               >
                 {products.map((product) => {
@@ -626,8 +646,9 @@ const AdminDashboard: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       style={{
                         background: "rgba(255, 255, 255, 0.95)",
-                        borderRadius: "16px",
-                        padding: "1.5rem",
+                        borderRadius:
+                          window.innerWidth <= 768 ? "12px" : "16px",
+                        padding: window.innerWidth <= 768 ? "1rem" : "1.5rem",
                         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                         border: "1px solid rgba(255, 255, 255, 0.3)",
                         backdropFilter: "blur(10px)",
@@ -636,15 +657,22 @@ const AdminDashboard: React.FC = () => {
                       <div
                         style={{
                           display: "flex",
+                          flexDirection:
+                            window.innerWidth <= 768 ? "column" : "row",
                           justifyContent: "space-between",
-                          alignItems: "flex-start",
+                          alignItems:
+                            window.innerWidth <= 768
+                              ? "flex-start"
+                              : "flex-start",
+                          gap: window.innerWidth <= 768 ? "1rem" : "0",
                           marginBottom: "1rem",
                         }}
                       >
                         <div style={{ flex: 1 }}>
                           <h3
                             style={{
-                              fontSize: "1.125rem",
+                              fontSize:
+                                window.innerWidth <= 768 ? "1rem" : "1.125rem",
                               fontWeight: "600",
                               color: "#1e293b",
                               margin: "0 0 0.5rem 0",
@@ -654,11 +682,15 @@ const AdminDashboard: React.FC = () => {
                           </h3>
                           <p
                             style={{
-                              fontSize: "1rem",
+                              fontSize:
+                                window.innerWidth <= 768 ? "0.9rem" : "1rem",
                               fontWeight: "600",
                               color: product.price > 0 ? "#22c55e" : "#ef4444",
                               margin: "0 0 0.5rem 0",
-                              padding: "4px 12px",
+                              padding:
+                                window.innerWidth <= 768
+                                  ? "3px 8px"
+                                  : "4px 12px",
                               background:
                                 product.price > 0
                                   ? "rgba(34, 197, 94, 0.1)"
@@ -671,7 +703,10 @@ const AdminDashboard: React.FC = () => {
                           </p>
                           <p
                             style={{
-                              fontSize: "0.875rem",
+                              fontSize:
+                                window.innerWidth <= 768
+                                  ? "0.8rem"
+                                  : "0.875rem",
                               color: "#64748b",
                               margin: "0 0 0.5rem 0",
                             }}
@@ -681,7 +716,10 @@ const AdminDashboard: React.FC = () => {
                           {dimensions && (
                             <p
                               style={{
-                                fontSize: "0.8rem",
+                                fontSize:
+                                  window.innerWidth <= 768
+                                    ? "0.75rem"
+                                    : "0.8rem",
                                 color: "#94a3b8",
                                 margin: 0,
                               }}
@@ -693,11 +731,20 @@ const AdminDashboard: React.FC = () => {
                             </p>
                           )}
                         </div>
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap:
+                              window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                            alignSelf:
+                              window.innerWidth <= 768 ? "flex-end" : "auto",
+                          }}
+                        >
                           <button
                             onClick={() => openModal("product", product)}
                             style={{
-                              padding: "0.5rem",
+                              padding:
+                                window.innerWidth <= 768 ? "0.4rem" : "0.5rem",
                               background: "rgba(59, 130, 246, 0.1)",
                               color: "#3b82f6",
                               border: "1px solid rgba(59, 130, 246, 0.2)",
@@ -754,8 +801,13 @@ const AdminDashboard: React.FC = () => {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-                  gap: "1.5rem",
+                  gridTemplateColumns:
+                    window.innerWidth <= 768
+                      ? "1fr"
+                      : window.innerWidth <= 1024
+                      ? "repeat(auto-fill, minmax(300px, 1fr))"
+                      : "repeat(auto-fill, minmax(350px, 1fr))",
+                  gap: window.innerWidth <= 768 ? "1rem" : "1.5rem",
                 }}
               >
                 {collections.map((collection) => {
@@ -771,8 +823,9 @@ const AdminDashboard: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       style={{
                         background: "rgba(255, 255, 255, 0.95)",
-                        borderRadius: "16px",
-                        padding: "1.5rem",
+                        borderRadius:
+                          window.innerWidth <= 768 ? "12px" : "16px",
+                        padding: window.innerWidth <= 768 ? "1rem" : "1.5rem",
                         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                         border: "1px solid rgba(255, 255, 255, 0.3)",
                         backdropFilter: "blur(10px)",
@@ -781,15 +834,22 @@ const AdminDashboard: React.FC = () => {
                       <div
                         style={{
                           display: "flex",
+                          flexDirection:
+                            window.innerWidth <= 768 ? "column" : "row",
                           justifyContent: "space-between",
-                          alignItems: "flex-start",
+                          alignItems:
+                            window.innerWidth <= 768
+                              ? "flex-start"
+                              : "flex-start",
+                          gap: window.innerWidth <= 768 ? "1rem" : "0",
                           marginBottom: "1rem",
                         }}
                       >
                         <div style={{ flex: 1 }}>
                           <h3
                             style={{
-                              fontSize: "1.125rem",
+                              fontSize:
+                                window.innerWidth <= 768 ? "1rem" : "1.125rem",
                               fontWeight: "600",
                               color: "#1e293b",
                               margin: "0 0 0.5rem 0",
@@ -799,7 +859,10 @@ const AdminDashboard: React.FC = () => {
                           </h3>
                           <p
                             style={{
-                              fontSize: "0.875rem",
+                              fontSize:
+                                window.innerWidth <= 768
+                                  ? "0.8rem"
+                                  : "0.875rem",
                               color: "#64748b",
                               margin: "0 0 0.5rem 0",
                             }}
@@ -807,11 +870,20 @@ const AdminDashboard: React.FC = () => {
                             {productCount} products • {images.length} images
                           </p>
                         </div>
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap:
+                              window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                            alignSelf:
+                              window.innerWidth <= 768 ? "flex-end" : "auto",
+                          }}
+                        >
                           <button
                             onClick={() => openModal("collection", collection)}
                             style={{
-                              padding: "0.5rem",
+                              padding:
+                                window.innerWidth <= 768 ? "0.4rem" : "0.5rem",
                               background: "rgba(16, 185, 129, 0.1)",
                               color: "#10b981",
                               border: "1px solid rgba(16, 185, 129, 0.2)",
@@ -883,7 +955,7 @@ const AdminDashboard: React.FC = () => {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 9999,
-            padding: "1rem",
+            padding: window.innerWidth <= 768 ? "0.5rem" : "1rem",
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
@@ -894,11 +966,11 @@ const AdminDashboard: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             style={{
               background: "white",
-              borderRadius: "20px",
-              padding: "2rem",
+              borderRadius: window.innerWidth <= 768 ? "16px" : "20px",
+              padding: window.innerWidth <= 768 ? "1rem" : "2rem",
               width: "100%",
-              maxWidth: "600px",
-              maxHeight: "90vh",
+              maxWidth: window.innerWidth <= 768 ? "100%" : "600px",
+              maxHeight: window.innerWidth <= 768 ? "90vh" : "80vh",
               overflow: "auto",
             }}
           >
@@ -907,12 +979,12 @@ const AdminDashboard: React.FC = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "2rem",
+                marginBottom: window.innerWidth <= 768 ? "1.5rem" : "2rem",
               }}
             >
               <h2
                 style={{
-                  fontSize: "1.5rem",
+                  fontSize: window.innerWidth <= 768 ? "1.25rem" : "1.5rem",
                   fontWeight: "700",
                   color: "#1e293b",
                   margin: 0,
@@ -927,11 +999,11 @@ const AdminDashboard: React.FC = () => {
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  padding: "0.5rem",
+                  padding: window.innerWidth <= 768 ? "0.4rem" : "0.5rem",
                   color: "#64748b",
                 }}
               >
-                <X size={24} />
+                <X size={window.innerWidth <= 768 ? 20 : 24} />
               </button>
             </div>
 
@@ -940,7 +1012,7 @@ const AdminDashboard: React.FC = () => {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "1.5rem",
+                  gap: window.innerWidth <= 768 ? "1rem" : "1.5rem",
                 }}
               >
                 <div>
@@ -949,6 +1021,7 @@ const AdminDashboard: React.FC = () => {
                       display: "block",
                       marginBottom: "0.5rem",
                       fontWeight: "500",
+                      fontSize: window.innerWidth <= 768 ? "0.9rem" : "1rem",
                     }}
                   >
                     Title
@@ -964,10 +1037,10 @@ const AdminDashboard: React.FC = () => {
                     }
                     style={{
                       width: "100%",
-                      padding: "0.75rem",
+                      padding: window.innerWidth <= 768 ? "0.6rem" : "0.75rem",
                       border: "2px solid #e5e7eb",
                       borderRadius: "8px",
-                      fontSize: "0.9rem",
+                      fontSize: window.innerWidth <= 768 ? "0.85rem" : "0.9rem",
                     }}
                     placeholder="Enter product title"
                   />
@@ -979,6 +1052,7 @@ const AdminDashboard: React.FC = () => {
                       display: "block",
                       marginBottom: "0.5rem",
                       fontWeight: "500",
+                      fontSize: window.innerWidth <= 768 ? "0.9rem" : "1rem",
                     }}
                   >
                     Description
@@ -991,13 +1065,13 @@ const AdminDashboard: React.FC = () => {
                         description: e.target.value,
                       }))
                     }
-                    rows={3}
+                    rows={window.innerWidth <= 768 ? 2 : 3}
                     style={{
                       width: "100%",
-                      padding: "0.75rem",
+                      padding: window.innerWidth <= 768 ? "0.6rem" : "0.75rem",
                       border: "2px solid #e5e7eb",
                       borderRadius: "8px",
-                      fontSize: "0.9rem",
+                      fontSize: window.innerWidth <= 768 ? "0.85rem" : "0.9rem",
                       resize: "vertical",
                     }}
                     placeholder="Enter product description"
@@ -1031,8 +1105,9 @@ const AdminDashboard: React.FC = () => {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "1rem",
+                    gridTemplateColumns:
+                      window.innerWidth <= 768 ? "1fr" : "1fr 1fr",
+                    gap: window.innerWidth <= 768 ? "0.75rem" : "1rem",
                   }}
                 >
                   <div>
@@ -1119,8 +1194,9 @@ const AdminDashboard: React.FC = () => {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr",
-                      gap: "0.5rem",
+                      gridTemplateColumns:
+                        window.innerWidth <= 768 ? "1fr 1fr" : "1fr 1fr 1fr",
+                      gap: window.innerWidth <= 768 ? "0.4rem" : "0.5rem",
                     }}
                   >
                     <input
@@ -1288,9 +1364,10 @@ const AdminDashboard: React.FC = () => {
             <div
               style={{
                 display: "flex",
+                flexDirection: window.innerWidth <= 768 ? "column" : "row",
                 justifyContent: "flex-end",
-                gap: "1rem",
-                marginTop: "2rem",
+                gap: window.innerWidth <= 768 ? "0.75rem" : "1rem",
+                marginTop: window.innerWidth <= 768 ? "1.5rem" : "2rem",
                 paddingTop: "1rem",
                 borderTop: "1px solid #e5e7eb",
               }}
@@ -1298,14 +1375,16 @@ const AdminDashboard: React.FC = () => {
               <button
                 onClick={closeModal}
                 style={{
-                  padding: "0.75rem 1.5rem",
+                  padding:
+                    window.innerWidth <= 768 ? "0.6rem 1rem" : "0.75rem 1.5rem",
                   background: "rgba(107, 114, 128, 0.1)",
                   color: "#6b7280",
                   border: "1px solid rgba(107, 114, 128, 0.2)",
                   borderRadius: "8px",
                   cursor: "pointer",
-                  fontSize: "0.9rem",
+                  fontSize: window.innerWidth <= 768 ? "0.85rem" : "0.9rem",
                   fontWeight: "500",
+                  width: window.innerWidth <= 768 ? "100%" : "auto",
                 }}
               >
                 Cancel
@@ -1316,7 +1395,8 @@ const AdminDashboard: React.FC = () => {
                 onClick={handleSave}
                 disabled={modalLoading}
                 style={{
-                  padding: "0.75rem 1.5rem",
+                  padding:
+                    window.innerWidth <= 768 ? "0.6rem 1rem" : "0.75rem 1.5rem",
                   background: modalLoading
                     ? "#9ca3af"
                     : "linear-gradient(135deg, #3b82f6, #8b5cf6)",
@@ -1324,11 +1404,13 @@ const AdminDashboard: React.FC = () => {
                   border: "none",
                   borderRadius: "8px",
                   cursor: modalLoading ? "not-allowed" : "pointer",
-                  fontSize: "0.9rem",
+                  fontSize: window.innerWidth <= 768 ? "0.85rem" : "0.9rem",
                   fontWeight: "600",
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "center",
                   gap: "0.5rem",
+                  width: window.innerWidth <= 768 ? "100%" : "auto",
                 }}
               >
                 {modalLoading ? (

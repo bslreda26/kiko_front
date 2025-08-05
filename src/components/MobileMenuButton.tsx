@@ -17,6 +17,9 @@ const MobileMenuButton: React.FC<MobileMenuButtonProps> = ({
       onClick={onClick}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
+      initial={{ opacity: 0, y: -5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 1.1, ease: "easeOut" }}
       style={{
         background:
           "linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))",
@@ -24,9 +27,6 @@ const MobileMenuButton: React.FC<MobileMenuButtonProps> = ({
         borderRadius: "12px",
         cursor: "pointer",
         padding: "0.5rem",
-        animation: "navItemFadeIn 0.6s ease-out 1.1s both",
-        opacity: 0,
-        transform: "translateY(-5px)",
         height: "45px",
         width: "45px",
         display: "flex",

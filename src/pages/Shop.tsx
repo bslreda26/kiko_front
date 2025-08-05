@@ -15,7 +15,7 @@ import {
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
 import type { Product, Collection, ApiError } from "../types/api";
-import { getParsedDimensions, getParsedImages } from "../types/api";
+import { getParsedDimensions } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import { useResponsive } from "../hooks/useResponsive";
 
@@ -419,14 +419,13 @@ const Shop: React.FC = () => {
                   gridTemplateColumns: isMobile
                     ? "1fr"
                     : isTablet
-                    ? "repeat(auto-fill, minmax(300px, 1fr))"
-                    : "repeat(auto-fill, minmax(350px, 1fr))",
+                    ? "repeat(auto-fill, minmax(280px, 1fr))"
+                    : "repeat(auto-fill, minmax(320px, 1fr))",
                   gap: isMobile ? "1.5rem" : "2rem",
                   padding: isMobile ? "0" : "0 0.5rem",
                 }}
               >
                 {collections.map((collection, index) => {
-                  const images = getParsedImages(collection);
                   const productCount = getProductCountInCollection(
                     collection.id
                   );
@@ -438,205 +437,31 @@ const Shop: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                       whileHover={{
-                        y: -4,
+                        y: -8,
+                        scale: 1.02,
                         transition: { duration: 0.3, ease: "easeOut" },
                       }}
                       onClick={() => handleCollectionClick(collection.id)}
                       style={{
-                        background: "rgba(255, 255, 255, 0.95)",
-                        borderRadius: "20px",
+                        background: "rgba(255, 255, 255, 0.98)",
+                        borderRadius: "16px",
                         overflow: "hidden",
-                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-                        border: "1px solid rgba(226, 232, 240, 0.6)",
+                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+                        border: "1px solid rgba(226, 232, 240, 0.4)",
                         backdropFilter: "blur(20px)",
                         cursor: "pointer",
-                        transition: "all 0.3s ease",
+                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                         position: "relative",
-                        minHeight: "280px",
+                        height: "200px",
                         display: "flex",
                         flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textAlign: "center",
+                        padding: "2rem",
                       }}
                     >
-                      {/* Header Section */}
-                      <div
-                        style={{
-                          padding: "2rem 1.5rem 1.5rem",
-                          background:
-                            "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                          position: "relative",
-                          borderBottom: "1px solid rgba(226, 232, 240, 0.4)",
-                        }}
-                      >
-                        {/* Collection Icon */}
-                        <div
-                          style={{
-                            width: "48px",
-                            height: "48px",
-                            background:
-                              "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                            borderRadius: "12px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginBottom: "1rem",
-                            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-                          }}
-                        >
-                          <Sparkles size={24} style={{ color: "white" }} />
-                        </div>
-
-                        {/* Collection Title */}
-                        <h3
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "700",
-                            color: "#1e293b",
-                            margin: "0 0 0.5rem 0",
-                            lineHeight: "1.2",
-                            letterSpacing: "-0.02em",
-                          }}
-                        >
-                          {collection.name}
-                        </h3>
-
-                        {/* Collection Description */}
-                        {collection.description && (
-                          <p
-                            style={{
-                              color: "#64748b",
-                              fontSize: "0.95rem",
-                              lineHeight: "1.5",
-                              margin: 0,
-                              fontWeight: "400",
-                            }}
-                          >
-                            {collection.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Content Section */}
-                      <div
-                        style={{
-                          padding: "1.5rem",
-                          flex: 1,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        {/* Stats Row */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                            marginBottom: "1.5rem",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          {/* Product Count */}
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "0.5rem",
-                              padding: "0.5rem 0.75rem",
-                              background: "rgba(59, 130, 246, 0.1)",
-                              borderRadius: "8px",
-                              border: "1px solid rgba(59, 130, 246, 0.2)",
-                            }}
-                          >
-                            <Package size={16} style={{ color: "#3b82f6" }} />
-                            <span
-                              style={{
-                                fontSize: "0.875rem",
-                                fontWeight: "600",
-                                color: "#3b82f6",
-                              }}
-                            >
-                              {productCount}{" "}
-                              {productCount === 1 ? "Product" : "Products"}
-                            </span>
-                          </div>
-
-                          {/* Image Count */}
-                          {images.length > 0 && (
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.5rem",
-                                padding: "0.5rem 0.75rem",
-                                background: "rgba(34, 197, 94, 0.1)",
-                                borderRadius: "8px",
-                                border: "1px solid rgba(34, 197, 94, 0.2)",
-                              }}
-                            >
-                              <Eye size={16} style={{ color: "#22c55e" }} />
-                              <span
-                                style={{
-                                  fontSize: "0.875rem",
-                                  fontWeight: "600",
-                                  color: "#22c55e",
-                                }}
-                              >
-                                {images.length}{" "}
-                                {images.length === 1 ? "Image" : "Images"}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Action Button */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "1rem 1.25rem",
-                            background:
-                              "linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))",
-                            borderRadius: "12px",
-                            border: "1px solid rgba(102, 126, 234, 0.1)",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: "0.875rem",
-                              fontWeight: "600",
-                              color: "#667eea",
-                              letterSpacing: "0.025em",
-                            }}
-                          >
-                            Explore Collection
-                          </span>
-                          <div
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                              borderRadius: "50%",
-                              background:
-                                "linear-gradient(135deg, #667eea, #764ba2)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: "6px",
-                                height: "6px",
-                                background: "white",
-                                borderRadius: "50%",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Hover Overlay */}
+                      {/* Modern Gradient Background */}
                       <div
                         style={{
                           position: "absolute",
@@ -645,7 +470,67 @@ const Shop: React.FC = () => {
                           right: 0,
                           bottom: 0,
                           background:
-                            "linear-gradient(135deg, rgba(102, 126, 234, 0.02), rgba(118, 75, 162, 0.02))",
+                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          opacity: 0.05,
+                          transition: "opacity 0.3s ease",
+                        }}
+                      />
+
+                      {/* Collection Title */}
+                      <h3
+                        style={{
+                          fontSize: "1.75rem",
+                          fontWeight: "800",
+                          color: "#1e293b",
+                          margin: "0 0 1rem 0",
+                          lineHeight: "1.2",
+                          letterSpacing: "-0.025em",
+                          position: "relative",
+                          zIndex: 1,
+                        }}
+                      >
+                        {collection.name}
+                      </h3>
+
+                      {/* Product Count */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          padding: "0.75rem 1.25rem",
+                          background: "rgba(255, 255, 255, 0.9)",
+                          borderRadius: "25px",
+                          border: "1px solid rgba(255, 255, 255, 0.3)",
+                          backdropFilter: "blur(10px)",
+                          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+                          position: "relative",
+                          zIndex: 1,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "0.9rem",
+                            fontWeight: "600",
+                            color: "#667eea",
+                            letterSpacing: "0.025em",
+                          }}
+                        >
+                          {productCount}{" "}
+                          {productCount === 1 ? "Product" : "Products"}
+                        </span>
+                      </div>
+
+                      {/* Hover Effect */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background:
+                            "linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08))",
                           opacity: 0,
                           transition: "opacity 0.3s ease",
                           pointerEvents: "none",

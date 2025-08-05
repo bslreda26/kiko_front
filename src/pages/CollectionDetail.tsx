@@ -403,8 +403,8 @@ const CollectionDetail: React.FC = () => {
             style={{
               background: "rgba(255, 255, 255, 0.95)",
               borderRadius: window.innerWidth <= 768 ? "16px" : "20px",
-              padding: window.innerWidth <= 768 ? "1.5rem" : "2rem",
-              marginBottom: window.innerWidth <= 768 ? "2rem" : "3rem",
+              padding: window.innerWidth <= 768 ? "1rem" : "2rem",
+              marginBottom: window.innerWidth <= 768 ? "1.5rem" : "3rem",
               boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
               border: "1px solid rgba(255, 255, 255, 0.3)",
               backdropFilter: "blur(20px)",
@@ -415,16 +415,17 @@ const CollectionDetail: React.FC = () => {
             {/* Elegant Text Header */}
             <div
               style={{
-                padding:
-                  window.innerWidth <= 768 ? "2rem 1.5rem" : "2.5rem 2rem",
+                padding: window.innerWidth <= 768 ? "1.5rem 1rem" : "2.5rem 2rem",
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 position: "relative",
                 display: "flex",
-                alignItems: "center",
+                flexDirection: window.innerWidth <= 768 ? "column" : "row",
+                alignItems: window.innerWidth <= 768 ? "center" : "center",
                 justifyContent: "center",
                 overflow: "hidden",
                 borderRadius: window.innerWidth <= 768 ? "12px" : "16px",
-                marginBottom: "2rem",
+                marginBottom: window.innerWidth <= 768 ? "1.5rem" : "2rem",
+                gap: window.innerWidth <= 768 ? "1rem" : "0",
               }}
             >
               {/* Animated Background Pattern */}
@@ -447,45 +448,55 @@ const CollectionDetail: React.FC = () => {
                 style={{
                   background: "rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
-                  width: window.innerWidth <= 768 ? "60px" : "70px",
-                  height: window.innerWidth <= 768 ? "60px" : "70px",
+                  width: window.innerWidth <= 768 ? "50px" : "70px",
+                  height: window.innerWidth <= 768 ? "50px" : "70px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   backdropFilter: "blur(10px)",
                   border: "2px solid rgba(255, 255, 255, 0.3)",
                   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-                  marginRight: "1.5rem",
+                  marginRight: window.innerWidth <= 768 ? "0" : "1.5rem",
+                  marginBottom: window.innerWidth <= 768 ? "0.5rem" : "0",
                 }}
               >
                 <Sparkles
-                  size={window.innerWidth <= 768 ? 28 : 32}
+                  size={window.innerWidth <= 768 ? 24 : 32}
                   style={{ color: "white" }}
                 />
               </div>
 
               {/* Collection Title and Description */}
-              <div style={{ flex: 1, textAlign: "left" }}>
+              <div style={{ 
+                flex: 1, 
+                textAlign: window.innerWidth <= 768 ? "center" : "left",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: window.innerWidth <= 768 ? "center" : "flex-start",
+              }}>
                 <h1
                   style={{
-                    fontSize: window.innerWidth <= 768 ? "1.75rem" : "2.5rem",
+                    fontSize: window.innerWidth <= 768 ? "1.5rem" : "2.5rem",
                     fontWeight: "700",
                     color: "white",
                     margin: "0 0 0.75rem 0",
                     lineHeight: "1.2",
                     letterSpacing: "-0.025em",
                     textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
+                    textAlign: window.innerWidth <= 768 ? "center" : "left",
                   }}
                 >
                   {collection.name}
                 </h1>
                 <p
                   style={{
-                    fontSize: window.innerWidth <= 768 ? "1rem" : "1.125rem",
+                    fontSize: window.innerWidth <= 768 ? "0.9rem" : "1.125rem",
                     color: "rgba(255, 255, 255, 0.9)",
                     lineHeight: "1.6",
                     margin: 0,
                     textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)",
+                    textAlign: window.innerWidth <= 768 ? "center" : "left",
+                    maxWidth: window.innerWidth <= 768 ? "100%" : "none",
                   }}
                 >
                   {collection.description}
@@ -496,30 +507,34 @@ const CollectionDetail: React.FC = () => {
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                  marginLeft: "1.5rem",
+                  flexDirection: window.innerWidth <= 768 ? "row" : "column",
+                  gap: window.innerWidth <= 768 ? "0.5rem" : "0.75rem",
+                  marginLeft: window.innerWidth <= 768 ? "0" : "1.5rem",
+                  marginTop: window.innerWidth <= 768 ? "1rem" : "0",
+                  justifyContent: window.innerWidth <= 768 ? "center" : "flex-start",
+                  flexWrap: "wrap",
                 }}
               >
                 {/* Product Count Badge */}
                 <div
                   style={{
-                    padding: "8px 16px",
+                    padding: window.innerWidth <= 768 ? "6px 12px" : "8px 16px",
                     background: "rgba(255, 255, 255, 0.95)",
                     color: "#1e293b",
                     borderRadius: "25px",
-                    fontSize: "0.8rem",
+                    fontSize: window.innerWidth <= 768 ? "0.7rem" : "0.8rem",
                     fontWeight: "700",
                     backdropFilter: "blur(20px)",
                     boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
                     display: "flex",
                     alignItems: "center",
-                    gap: "6px",
+                    gap: window.innerWidth <= 768 ? "4px" : "6px",
                     border: "1px solid rgba(255, 255, 255, 0.3)",
                     letterSpacing: "0.025em",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  <Package size={14} />
+                  <Package size={window.innerWidth <= 768 ? 12 : 14} />
                   {totalProducts} {totalProducts === 1 ? "Product" : "Products"}
                 </div>
 
@@ -527,22 +542,23 @@ const CollectionDetail: React.FC = () => {
                 {images.length > 0 && (
                   <div
                     style={{
-                      padding: "8px 16px",
+                      padding: window.innerWidth <= 768 ? "6px 12px" : "8px 16px",
                       background: "rgba(34, 197, 94, 0.95)",
                       color: "white",
                       borderRadius: "25px",
-                      fontSize: "0.8rem",
+                      fontSize: window.innerWidth <= 768 ? "0.7rem" : "0.8rem",
                       fontWeight: "700",
                       backdropFilter: "blur(20px)",
                       boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
                       display: "flex",
                       alignItems: "center",
-                      gap: "6px",
+                      gap: window.innerWidth <= 768 ? "4px" : "6px",
                       border: "1px solid rgba(255, 255, 255, 0.2)",
                       letterSpacing: "0.025em",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    <Eye size={14} />
+                    <Eye size={window.innerWidth <= 768 ? 12 : 14} />
                     {images.length} Images
                   </div>
                 )}
@@ -553,13 +569,15 @@ const CollectionDetail: React.FC = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                gap: "1rem",
+                gridTemplateColumns: window.innerWidth <= 768 
+                  ? "repeat(auto-fit, minmax(120px, 1fr))" 
+                  : "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: window.innerWidth <= 768 ? "0.75rem" : "1rem",
               }}
             >
               <div
                 style={{
-                  padding: "1rem",
+                  padding: window.innerWidth <= 768 ? "0.75rem" : "1rem",
                   background: "rgba(102, 126, 234, 0.05)",
                   borderRadius: "12px",
                   border: "1px solid rgba(102, 126, 234, 0.1)",
@@ -571,14 +589,14 @@ const CollectionDetail: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "0.5rem",
-                    marginBottom: "0.5rem",
+                    gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                    marginBottom: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
                   }}
                 >
-                  <Package size={16} style={{ color: "#667eea" }} />
+                  <Package size={window.innerWidth <= 768 ? 14 : 16} style={{ color: "#667eea" }} />
                   <span
                     style={{
-                      fontSize: "0.875rem",
+                      fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                       fontWeight: "500",
                       color: "#667eea",
                     }}
@@ -588,7 +606,7 @@ const CollectionDetail: React.FC = () => {
                 </div>
                 <p
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: window.innerWidth <= 768 ? "1.25rem" : "1.5rem",
                     fontWeight: "700",
                     color: "#1e293b",
                     margin: 0,
@@ -600,7 +618,7 @@ const CollectionDetail: React.FC = () => {
 
               <div
                 style={{
-                  padding: "1rem",
+                  padding: window.innerWidth <= 768 ? "0.75rem" : "1rem",
                   background: "rgba(34, 197, 94, 0.05)",
                   borderRadius: "12px",
                   border: "1px solid rgba(34, 197, 94, 0.1)",
@@ -612,14 +630,14 @@ const CollectionDetail: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "0.5rem",
-                    marginBottom: "0.5rem",
+                    gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                    marginBottom: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
                   }}
                 >
-                  <Sparkles size={16} style={{ color: "#22c55e" }} />
+                  <Sparkles size={window.innerWidth <= 768 ? 14 : 16} style={{ color: "#22c55e" }} />
                   <span
                     style={{
-                      fontSize: "0.875rem",
+                      fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                       fontWeight: "500",
                       color: "#22c55e",
                     }}
@@ -629,7 +647,7 @@ const CollectionDetail: React.FC = () => {
                 </div>
                 <p
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: window.innerWidth <= 768 ? "1.25rem" : "1.5rem",
                     fontWeight: "700",
                     color: "#1e293b",
                     margin: 0,
@@ -642,7 +660,7 @@ const CollectionDetail: React.FC = () => {
               {images.length > 0 && (
                 <div
                   style={{
-                    padding: "1rem",
+                    padding: window.innerWidth <= 768 ? "0.75rem" : "1rem",
                     background: "rgba(59, 130, 246, 0.05)",
                     borderRadius: "12px",
                     border: "1px solid rgba(59, 130, 246, 0.1)",
@@ -654,14 +672,14 @@ const CollectionDetail: React.FC = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "0.5rem",
-                      marginBottom: "0.5rem",
+                      gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                      marginBottom: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
                     }}
                   >
-                    <Eye size={16} style={{ color: "#3b82f6" }} />
+                    <Eye size={window.innerWidth <= 768 ? 14 : 16} style={{ color: "#3b82f6" }} />
                     <span
                       style={{
-                        fontSize: "0.875rem",
+                        fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                         fontWeight: "500",
                         color: "#3b82f6",
                       }}
@@ -671,7 +689,7 @@ const CollectionDetail: React.FC = () => {
                   </div>
                   <p
                     style={{
-                      fontSize: "1.5rem",
+                      fontSize: window.innerWidth <= 768 ? "1.25rem" : "1.5rem",
                       fontWeight: "700",
                       color: "#1e293b",
                       margin: 0,
@@ -813,22 +831,6 @@ const CollectionDetail: React.FC = () => {
                         position: "relative",
                         // Artistic border gradient
                         backgroundClip: "padding-box",
-                        "&::before": {
-                          content: '""',
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          borderRadius: "inherit",
-                          padding: "2px",
-                          background:
-                            "linear-gradient(135deg, #667eea, #764ba2, #f093fb)",
-                          WebkitMask:
-                            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                          WebkitMaskComposite: "xor",
-                          maskComposite: "exclude",
-                        },
                       }}
                     >
                       {/* Product Image Container */}
@@ -853,19 +855,6 @@ const CollectionDetail: React.FC = () => {
                           cursor: "pointer",
                           transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                           overflow: "hidden",
-                          // Artistic overlay
-                          "&::before": {
-                            content: '""',
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background:
-                              "linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))",
-                            opacity: 0,
-                            transition: "opacity 0.3s ease",
-                          },
                         }}
                         onMouseEnter={(e) => {
                           if (product.image) {
@@ -1020,7 +1009,6 @@ const CollectionDetail: React.FC = () => {
                               ? "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))"
                               : "rgba(255, 255, 255, 0.95)",
                             color: isInWishlist ? "white" : "#64748b",
-                            border: "none",
                             borderRadius: "50%",
                             cursor: "pointer",
                             backdropFilter: "blur(20px)",
