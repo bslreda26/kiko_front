@@ -95,6 +95,7 @@ const Navbar: React.FC = () => {
         onHomeClick={handleHomeClick}
         onAboutClick={handleAboutClick}
         onShopClick={handleShopClick}
+        onClose={() => setIsMobileMenuOpen(false)}
       />
     </nav>
   );

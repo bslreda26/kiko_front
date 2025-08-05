@@ -177,16 +177,15 @@ const Home: React.FC = () => {
               <span className="title-separator"></span>
               <span className="title-word">E</span>
             </div>
+            <motion.p
+              className="hero-subtitle italian-style"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+            >
+              Where art touches the soul{" "}
+            </motion.p>
           </motion.div>
-
-          <motion.p
-            className="hero-subtitle"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-          >
-            Where art touches the soul{" "}
-          </motion.p>
 
           <motion.div
             className="hero-buttons"

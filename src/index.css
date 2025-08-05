@@ -476,6 +476,17 @@ body {
   animation: subtitleShimmer 3s ease-in-out infinite;
 }
 
+.hero-subtitle.italian-style {
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 0.3rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  font-family: "Playfair Display", serif;
+}
+
 .hero-buttons {
   display: flex;
   gap: 1.5rem;
@@ -1063,6 +1074,8 @@ body {
   justify-content: center;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .mobile-menu-button:hover {
@@ -1076,8 +1089,98 @@ body {
   transform: translateY(-2px);
 }
 
+.mobile-menu-button:active {
+  transform: scale(0.95);
+}
+
 .mobile-menu {
   display: none;
+}
+
+/* Enhanced Mobile Menu Styles */
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  /* Prevent body scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  /* Enhanced mobile menu backdrop */
+  .mobile-menu-backdrop {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Mobile menu animations */
+  .mobile-menu {
+    transform-origin: top right;
+  }
+
+  /* Mobile menu item hover effects */
+  .mobile-menu a:hover,
+  .mobile-menu button:hover {
+    background: rgba(102, 126, 234, 0.1) !important;
+    border-color: rgba(102, 126, 234, 0.2) !important;
+    transform: translateX(4px);
+  }
+
+  /* Mobile menu close button */
+  .mobile-menu button[aria-label*="Close"] {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .mobile-menu button[aria-label*="Close"]:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* Extra Small Mobile Menu Adjustments */
+@media (max-width: 480px) {
+  .mobile-menu {
+    width: 260px;
+    padding: 1.5rem 1rem;
+  }
+
+  .mobile-menu a,
+  .mobile-menu button {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+  }
+
+  .mobile-menu h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Ultra Small Mobile Menu Adjustments */
+@media (max-width: 360px) {
+  .mobile-menu {
+    width: 240px;
+    padding: 1.2rem 0.8rem;
+  }
+
+  .mobile-menu a,
+  .mobile-menu button {
+    padding: 0.7rem 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  .mobile-menu h3 {
+    font-size: 1rem;
+  }
 }
 
 /* Enhanced Navbar Effects */
@@ -5324,5 +5427,587 @@ a:focus {
 
   .collection-card .collection-stats {
     padding: 0.75rem !important;
+  }
+}
+
+/* Enhanced Mobile Responsive Design for Home Page */
+@media (max-width: 768px) {
+  /* Improved Hero Section for Mobile */
+  .hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .hero-title-container {
+    margin-bottom: 2rem;
+  }
+
+  .title-word {
+    font-size: 2.2rem;
+    letter-spacing: 2px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 1.5rem 0;
+    padding: 0 1rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 2rem;
+  }
+
+  .cta-button {
+    width: 100%;
+    max-width: 280px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    border-radius: 50px;
+  }
+
+  /* Enhanced Artist Section for Mobile */
+  .artist-section {
+    padding: 4rem 0;
+  }
+
+  .artist-content {
+    flex-direction: column;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .artist-images {
+    order: 1;
+    margin-bottom: 2rem;
+  }
+
+  .artist-image {
+    height: 300px;
+    border-radius: 20px;
+  }
+
+  .artist-story {
+    order: 2;
+    padding: 0 1rem;
+  }
+
+  .artist-story h3 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .artist-story p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .collection-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+  }
+
+  .collection-tag {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 25px;
+  }
+
+  /* Enhanced Work Section for Mobile - Centered Featured Works */
+  .work-section {
+    padding: 4rem 0;
+    text-align: center;
+  }
+
+  .work-section .container {
+    padding: 0 1rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  /* Centered Gallery Grid for Mobile */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .gallery-item {
+    height: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .gallery-item:active {
+    transform: scale(0.98);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Enhanced Overlay for Mobile */
+  .item-overlay {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+  }
+
+  .overlay-content {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .overlay-content h4 {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .overlay-content p {
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .view-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 25px;
+  }
+
+  /* Enhanced CTA Button for Mobile */
+  .work-cta {
+    margin-top: 3rem;
+    text-align: center;
+  }
+
+  .explore-collection-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    border-radius: 50px;
+    margin: 0 auto;
+  }
+
+  /* Loading and Error States for Mobile */
+  .gallery-loading {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .gallery-error {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .retry-button {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    margin-top: 1rem;
+  }
+}
+
+/* Extra Small Mobile Devices */
+@media (max-width: 480px) {
+  .hero-title-container {
+    padding: 1rem 1.5rem;
+  }
+
+  .title-word {
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+  }
+
+  .title-separator {
+    font-size: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .cta-button {
+    max-width: 250px;
+    padding: 0.9rem 1.8rem;
+    font-size: 0.95rem;
+  }
+
+  .artist-story h3 {
+    font-size: 1.8rem;
+  }
+
+  .artist-story p {
+    font-size: 0.95rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+  }
+
+  .gallery-grid {
+    max-width: 350px;
+    gap: 1.5rem;
+  }
+
+  .gallery-item {
+    height: 300px;
+  }
+
+  .overlay-content h4 {
+    font-size: 1.2rem;
+  }
+
+  .overlay-content p {
+    font-size: 0.85rem;
+  }
+
+  .view-button {
+    padding: 0.7rem 1.3rem;
+    font-size: 0.85rem;
+  }
+
+  .explore-collection-btn {
+    max-width: 250px;
+    padding: 0.9rem 1.8rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Ultra Small Mobile Devices */
+@media (max-width: 360px) {
+  .hero-title-container {
+    padding: 0.8rem 1.2rem;
+  }
+
+  .title-word {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+
+  .title-separator {
+    font-size: 0.9rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .cta-button {
+    max-width: 220px;
+    padding: 0.8rem 1.6rem;
+    font-size: 0.9rem;
+  }
+
+  .artist-story h3 {
+    font-size: 1.6rem;
+  }
+
+  .artist-story p {
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .gallery-grid {
+    max-width: 300px;
+    gap: 1.2rem;
+  }
+
+  .gallery-item {
+    height: 280px;
+  }
+
+  .overlay-content {
+    padding: 1.2rem;
+  }
+
+  .overlay-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .overlay-content p {
+    font-size: 0.8rem;
+  }
+
+  .view-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+
+  .explore-collection-btn {
+    max-width: 220px;
+    padding: 0.8rem 1.6rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .hero-title-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .title-word {
+    font-size: 1.8rem;
+  }
+
+  .hero-subtitle {
+    margin: 1rem 0;
+  }
+
+  .hero-buttons {
+    margin-top: 1.5rem;
+  }
+
+  .artist-section {
+    padding: 3rem 0;
+  }
+
+  .artist-content {
+    gap: 2rem;
+  }
+
+  .artist-image {
+    height: 250px;
+  }
+
+  .work-section {
+    padding: 3rem 0;
+  }
+
+  .gallery-grid {
+    max-width: 500px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .gallery-item {
+    height: 200px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .gallery-item:hover .item-overlay {
+    opacity: 1;
+  }
+
+  .gallery-item:hover .overlay-content {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .gallery-item:active .item-overlay {
+    opacity: 1;
+  }
+
+  .gallery-item:active .overlay-content {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .cta-button:active,
+  .explore-collection-btn:active,
+  .view-button:active {
+    transform: scale(0.95);
+  }
+}
+
+/* High DPI Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .gallery-item img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .gallery-item,
+  .gallery-item img,
+  .item-overlay,
+  .overlay-content,
+  .cta-button,
+  .explore-collection-btn,
+  .view-button {
+    transition: none;
+  }
+
+  .gallery-item:hover img {
+    transform: none;
+  }
+
+  .gallery-item:hover .overlay-content {
+    transform: none;
+  }
+}
+
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+  /* Optimize animations for mobile */
+  .gallery-item,
+  .gallery-item img,
+  .item-overlay,
+  .overlay-content {
+    will-change: auto;
+  }
+
+  /* Reduce animation complexity on mobile */
+  .hero-title-container::before,
+  .hero-title-container::after,
+  .artist-section::before,
+  .artist-section::after,
+  .work-section::before,
+  .work-section::after {
+    animation-duration: 0s;
+    animation-play-state: paused;
+  }
+
+  /* Optimize image loading for mobile */
+  .gallery-item img {
+    loading: lazy;
+  }
+
+  /* Improve touch targets */
+  .gallery-item,
+  .cta-button,
+  .explore-collection-btn,
+  .view-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better mobile scrolling */
+  .work-section {
+    scroll-margin-top: 80px;
+  }
+
+  .artist-section {
+    scroll-margin-top: 80px;
+  }
+}
+
+/* Mobile Loading States */
+@media (max-width: 768px) {
+  .gallery-loading {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-spinner {
+    margin: 1rem auto;
+  }
+
+  .gallery-error {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Mobile Image Modal Optimizations */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 400px;
+    max-height: 80vh;
+  }
+
+  .modal-content img {
+    max-height: 60vh;
+    object-fit: contain;
+  }
+}
+
+/* Mobile Footer Optimizations */
+@media (max-width: 768px) {
+  .footer {
+    padding: 3rem 0 2rem 0;
+  }
+
+  .footer-content {
+    gap: 2rem;
+  }
+
+  .footer-section {
+    text-align: center;
+  }
+
+  .footer-links {
+    justify-content: center;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
   }
 }
