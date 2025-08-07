@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, ArrowRight, Instagram, Mail, Heart, ArrowUp } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Eye,
+  ArrowRight,
+  Instagram,
+  Mail,
+  Heart,
+  ArrowUp,
+  MessageCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-// import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization";
 import ProductService, { getLatestProducts } from "../services/productService";
 import type { Product, ApiError } from "../types/api";
 
@@ -56,15 +63,11 @@ const Home: React.FC = () => {
   const artistRef = useRef<HTMLDivElement>(null);
   const workRef = useRef<HTMLDivElement>(null);
 
-  // Performance optimization hook (unused in simplified version)
-  // const { getOptimizedTransition, shouldReduceAnimations } = usePerformanceOptimization();
-
   // Load latest products
   const loadLatestProducts = async () => {
     try {
       setProductsLoading(true);
       setProductsError(null);
-      // Try using the exported function first, fallback to class method
       let products;
       try {
         products = await getLatestProducts(6);
@@ -86,12 +89,12 @@ const Home: React.FC = () => {
     // Header background image carousel - longer intervals for better performance
     const headerInterval = setInterval(() => {
       setCurrentHeaderImage((prev) => (prev + 1) % headerImages.length);
-    }, 12000);
+    }, 15000);
 
     // Artist image carousel - smooth, elegant timing
     const artistInterval = setInterval(() => {
       setCurrentArtistImage((prev) => (prev + 1) % artistImages.length);
-    }, 8000);
+    }, 12000);
 
     // Load latest products
     loadLatestProducts();
@@ -121,33 +124,20 @@ const Home: React.FC = () => {
       {/* Section 1: Header/Hero */}
       <section ref={heroRef} id="home" className="hero-section">
         <div className="hero-background" style={{ backgroundColor: "#000000" }}>
-          <AnimatePresence>
-            <motion.div
-              key={currentHeaderImage}
-              className="header-background-image"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: "easeInOut" }}
-              style={{
-                backgroundImage: `url(${headerImages[currentHeaderImage]})`,
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
-            />
-          </AnimatePresence>
-
-          <motion.div
-            className="floating-particles"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            transition={{ duration: 1.5 }}
+          <div
+            className="header-background-image"
+            style={{
+              backgroundImage: `url(${headerImages[currentHeaderImage]})`,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              transition: "opacity 1.5s ease-in-out",
+            }}
           />
         </div>
 
@@ -156,7 +146,7 @@ const Home: React.FC = () => {
             className="hero-title-container"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           >
             <div className="hero-title">
               <span className="title-word">K</span>
@@ -181,9 +171,9 @@ const Home: React.FC = () => {
               className="hero-subtitle italian-style"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.8 }}
             >
-              Where art touches the soul{" "}
+              Where colors speak louder than words{" "}
             </motion.p>
           </motion.div>
 
@@ -191,7 +181,7 @@ const Home: React.FC = () => {
             className="hero-buttons"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.2, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 1.2 }}
           >
             <motion.button
               className="cta-button primary"
@@ -219,13 +209,7 @@ const Home: React.FC = () => {
       {/* Section 2: Artist Story */}
       <section ref={artistRef} id="artist" className="artist-section">
         <div className="artist-background">
-          <motion.div
-            className="artist-background-overlay"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            viewport={{ once: true }}
-          />
+          <div className="artist-background-overlay" />
         </div>
 
         <div className="container">
@@ -233,7 +217,7 @@ const Home: React.FC = () => {
             className="artist-content"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
             <div className="artist-images">
@@ -243,9 +227,18 @@ const Home: React.FC = () => {
                   src={artistImages[currentArtistImage]}
                   alt="Artist"
                   className="artist-image"
-                  initial={{ opacity: 0, scale: 1.05 }}
+                  initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 2, ease: "easeOut" }}
+                  exit={{ opacity: 0, scale: 1.02 }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.4, 0.0, 0.2, 1],
+                    opacity: { duration: 0.6 },
+                    scale: { duration: 0.8 },
+                  }}
+                  onLoad={() => {
+                    // Smooth transition when image loads
+                  }}
                 />
               </div>
             </div>
@@ -254,32 +247,19 @@ const Home: React.FC = () => {
               className="artist-story"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
             >
               <h3>The Artist's Journey</h3>
 
               <p>
-                Born from a passion for contemporary expression, Kikoplume
-                represents the intersection of traditional artistry and modern
-                innovation. Each piece tells a story of emotion, creativity, and
-                the human experience.
+                Kikoplume is a Canadian-Lebanese painter, traveling artist, and
+                adventurer based in Lebanon. With a background in audiovisual
+                cinema, she gradually shifted toward painting, where she found
+                her true means of expression. For her, art is a powerful
+                language - a way to express emotions, share stories, and connect
+                with others through color and imagination.
               </p>
-
-              <p>
-                Through bold colors, dynamic compositions, and thoughtful
-                symbolism, our work invites viewers to explore their own
-                interpretations and emotional connections to art.
-              </p>
-
-              <div className="artist-collections">
-                <h4>Featured Collections</h4>
-                <div className="collection-tags">
-                  <span className="collection-tag">Abstract Emotions</span>
-                  <span className="collection-tag">Urban Landscapes</span>
-                  <span className="collection-tag">Digital Dreams</span>
-                </div>
-              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -290,18 +270,18 @@ const Home: React.FC = () => {
         <div className="container">
           <motion.h2
             className="section-title"
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Featured Works
+            Kikoplume's Latest Creations
           </motion.h2>
           <motion.p
             className="section-subtitle"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
             Discover our most recent artworks - fresh from the studio
@@ -309,17 +289,15 @@ const Home: React.FC = () => {
 
           <motion.div
             className="work-gallery"
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
             {productsLoading ? (
               <div className="gallery-loading">
-                <motion.div
+                <div
                   className="loading-spinner"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   style={{
                     width: "50px",
                     height: "50px",
@@ -327,6 +305,7 @@ const Home: React.FC = () => {
                     borderTop: "3px solid #3b82f6",
                     borderRadius: "50%",
                     margin: "2rem auto",
+                    animation: "spin 1s linear infinite",
                   }}
                 />
                 <p
@@ -375,23 +354,17 @@ const Home: React.FC = () => {
                     className="gallery-item"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     onClick={() => openImageModal(work.src)}
                     style={{ cursor: "pointer" }}
                   >
-                    <motion.img
+                    <img
                       src={work.src}
                       alt={work.title}
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.2 }}
+                      style={{ transition: "transform 0.2s ease" }}
                     />
-                    <motion.div
-                      className="item-overlay"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <div className="item-overlay">
                       <div className="overlay-content">
                         <h4>{work.title}</h4>
                         <p>{work.description}</p>
@@ -408,7 +381,7 @@ const Home: React.FC = () => {
                           Explore
                         </motion.button>
                       </div>
-                    </motion.div>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -420,23 +393,17 @@ const Home: React.FC = () => {
                     className="gallery-item"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     onClick={() => openImageModal(product.image)}
                     style={{ cursor: "pointer" }}
                   >
-                    <motion.img
+                    <img
                       src={product.image}
                       alt={product.title}
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.2 }}
+                      style={{ transition: "transform 0.2s ease" }}
                     />
-                    <motion.div
-                      className="item-overlay"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <div className="item-overlay">
                       <div className="overlay-content">
                         <h4>{product.title}</h4>
                         <p
@@ -446,7 +413,7 @@ const Home: React.FC = () => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          {product.price > 0 ? "Available" : "Not Available"}
+                          {product.price > 0 ? "Available" : "Sold Out"}
                         </p>
                         <motion.button
                           className="view-button"
@@ -460,7 +427,7 @@ const Home: React.FC = () => {
                           View Details
                         </motion.button>
                       </div>
-                    </motion.div>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -469,17 +436,13 @@ const Home: React.FC = () => {
 
           <motion.div
             className="work-cta"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
           >
             <motion.button
               className="explore-collection-btn"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate("/shop")}
@@ -496,18 +459,12 @@ const Home: React.FC = () => {
         <div className="footer-content">
           <motion.div
             className="footer-section"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <motion.div
-              className="footer-brand"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
+            <div className="footer-brand">
               <h3 className="footer-brand-title">Kikoplume</h3>
               <p className="footer-tagline">
                 Where creativity flows and emotions bloom
@@ -516,18 +473,21 @@ const Home: React.FC = () => {
                 Contemporary art that speaks to the soul, crafted with passion
                 and purpose.
               </p>
-            </motion.div>
+            </div>
           </motion.div>
 
           <motion.div
             className="footer-section"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
             <h4 className="footer-title">Connect</h4>
-            <div className="footer-links">
+            <div
+              className="footer-links"
+              style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}
+            >
               <motion.a
                 href="https://www.instagram.com/kikoplume/?hl=en"
                 target="_blank"
@@ -548,23 +508,17 @@ const Home: React.FC = () => {
                 <Mail size={20} />
                 <span>Email</span>
               </motion.a>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="footer-section"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h4 className="footer-title">Follow the Journey</h4>
-            <p className="footer-text">
-              Stay updated with our latest works, exhibitions, and artistic
-              insights.
-            </p>
-            <div className="footer-heart">
-              <Heart size={24} fill="#e11d48" color="#e11d48" />
+              <motion.a
+                href="https://wa.me/96176611668"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <MessageCircle size={20} />
+                <span>WhatsApp</span>
+              </motion.a>
             </div>
           </motion.div>
         </div>
@@ -573,7 +527,7 @@ const Home: React.FC = () => {
           className="footer-bottom"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           viewport={{ once: true }}
         >
           <p>&copy; 2025 Kikoplume. All rights reserved. by BSL</p>
@@ -589,30 +543,61 @@ const Home: React.FC = () => {
       </footer>
 
       {/* Image Modal */}
-      <AnimatePresence>
-        {isModalOpen && selectedImage && (
-          <motion.div
-            className="modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeImageModal}
+      {isModalOpen && selectedImage && (
+        <div
+          className="modal-overlay"
+          onClick={closeImageModal}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              maxWidth: "90%",
+              maxHeight: "90%",
+            }}
           >
-            <motion.div
-              className="modal-content"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+            <img
+              src={selectedImage}
+              alt="Artwork"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "90vh",
+                objectFit: "contain",
+              }}
+            />
+            <button
+              className="modal-close"
+              onClick={closeImageModal}
+              style={{
+                position: "absolute",
+                top: "-40px",
+                right: "0",
+                background: "none",
+                border: "none",
+                color: "white",
+                fontSize: "2rem",
+                cursor: "pointer",
+              }}
             >
-              <img src={selectedImage} alt="Artwork" />
-              <button className="modal-close" onClick={closeImageModal}>
-                ×
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

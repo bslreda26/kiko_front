@@ -5,8 +5,13 @@ import { useCart } from "../contexts/CartContext";
 
 const CartIcon: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showWhatsAppNotification, setShowWhatsAppNotification] =
+    useState(false);
   const { items, totalItems, updateQuantity, removeFromCart, clearCart } =
     useCart();
+
+  // Detect iOS device
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   const handleCheckout = () => {
     if (items.length === 0) return;
@@ -19,9 +24,7 @@ const CartIcon: React.FC = () => {
     items.forEach((item, index) => {
       message += `${index + 1}. ${item.title}\n`;
       message += `   Quantity: ${item.quantity}\n`;
-      message += `   Status: ${
-        item.price > 0 ? "Available" : "Not Available"
-      }\n\n`;
+      message += `   Status: ${item.price > 0 ? "Available" : "Sold Out"}\n\n`;
     });
 
     // Add total
@@ -38,15 +41,109 @@ const CartIcon: React.FC = () => {
     // Create WhatsApp URL
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
-    // Open WhatsApp
-    window.open(whatsappUrl, "_blank");
+    // iOS-compatible WhatsApp opening with fallback
+    const openWhatsApp = () => {
+      // Try multiple methods for better iOS compatibility
+      try {
+        if (isIOS) {
+          // iOS-specific handling
+          // Method 1: Try direct URL opening
+          window.location.href = whatsappUrl;
+
+          // Method 2: Fallback to web WhatsApp after delay
+          setTimeout(() => {
+            const webWhatsAppUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+            window.open(webWhatsAppUrl, "_blank");
+          }, 1500);
+        } else {
+          // Non-iOS devices
+          // Method 1: Direct window.open
+          const newWindow = window.open(whatsappUrl, "_blank");
+
+          // Method 2: If window.open fails, try location.href
+          if (
+            !newWindow ||
+            newWindow.closed ||
+            typeof newWindow.closed === "undefined"
+          ) {
+            window.location.href = whatsappUrl;
+          }
+
+          // Method 3: Add timeout to check if WhatsApp opened
+          setTimeout(() => {
+            // If WhatsApp didn't open, try web fallback
+            const webWhatsAppUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+            window.open(webWhatsAppUrl, "_blank");
+          }, 2000);
+        }
+      } catch (error) {
+        console.log("WhatsApp opening failed, trying fallback method");
+        // Method 4: Create a temporary link and click it
+        const link = document.createElement("a");
+        link.href = whatsappUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    };
+
+    // Show notification for iOS users
+    setShowWhatsAppNotification(true);
+
+    // Open WhatsApp with iOS compatibility
+    openWhatsApp();
 
     // Close the cart modal
     setIsOpen(false);
+
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+      setShowWhatsAppNotification(false);
+    }, 3000);
   };
 
   return (
     <>
+      {/* WhatsApp Notification */}
+      <AnimatePresence>
+        {showWhatsAppNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            style={{
+              position: "fixed",
+              top: "20px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "linear-gradient(135deg, #25D366, #128C7E)",
+              color: "white",
+              padding: "1rem 1.5rem",
+              borderRadius: "12px",
+              zIndex: 10000,
+              boxShadow: "0 8px 25px rgba(37, 140, 126, 0.3)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              maxWidth: "90%",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <span>💬</span>
+              <span style={{ fontSize: "0.9rem", fontWeight: "500" }}>
+                {isIOS
+                  ? "Opening WhatsApp... If it doesn't open, tap the notification or check Safari settings."
+                  : "Opening WhatsApp... If it doesn't open, check your browser settings."}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Cart Icon Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
@@ -118,6 +215,7 @@ const CartIcon: React.FC = () => {
 
             {/* Cart Modal */}
             <motion.div
+              className="cart-modal"
               initial={{ opacity: 0, x: "100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
@@ -273,7 +371,7 @@ const CartIcon: React.FC = () => {
                               fontWeight: "600",
                             }}
                           >
-                            {item.price > 0 ? "Available" : "Not Available"}
+                            {item.price > 0 ? "Available" : "Sold Out"}
                           </p>
                         </div>
 
@@ -412,6 +510,7 @@ const CartIcon: React.FC = () => {
                   </div>
 
                   <motion.button
+                    className="whatsapp-button"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleCheckout}

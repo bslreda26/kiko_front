@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ShoppingCart,
-  Heart,
   Sparkles,
   Check,
   Eye,
@@ -18,6 +17,7 @@ import { getAllCollections } from "../services/collectionService";
 import type { Product, Collection, ApiError } from "../types/api";
 import { getParsedDimensions, getParsedImages } from "../types/api";
 import { useCart } from "../contexts/CartContext";
+import ImageModal from "../components/ImageModal";
 
 type ViewMode = "grid" | "list";
 
@@ -30,10 +30,18 @@ const CollectionDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [wishlist, setWishlist] = useState<Set<number>>(new Set());
   const [addedToCartItems, setAddedToCartItems] = useState<Set<number>>(
     new Set()
   );
+  const [imageModal, setImageModal] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    title: string;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    title: "",
+  });
   const [loadingMessage, setLoadingMessage] = useState("Loading collection...");
   const [retryCount, setRetryCount] = useState(0);
 
@@ -156,15 +164,19 @@ const CollectionDetail: React.FC = () => {
     navigate(`/product/${productId}`);
   };
 
-  const toggleWishlist = (productId: number) => {
-    setWishlist((prev) => {
-      const newWishlist = new Set(prev);
-      if (newWishlist.has(productId)) {
-        newWishlist.delete(productId);
-      } else {
-        newWishlist.add(productId);
-      }
-      return newWishlist;
+  const openImageModal = (imageUrl: string, title: string) => {
+    setImageModal({
+      isOpen: true,
+      imageUrl,
+      title,
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModal({
+      isOpen: false,
+      imageUrl: "",
+      title: "",
     });
   };
 
@@ -415,7 +427,8 @@ const CollectionDetail: React.FC = () => {
             {/* Elegant Text Header */}
             <div
               style={{
-                padding: window.innerWidth <= 768 ? "1.5rem 1rem" : "2.5rem 2rem",
+                padding:
+                  window.innerWidth <= 768 ? "1.5rem 1rem" : "2.5rem 2rem",
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 position: "relative",
                 display: "flex",
@@ -467,13 +480,16 @@ const CollectionDetail: React.FC = () => {
               </div>
 
               {/* Collection Title and Description */}
-              <div style={{ 
-                flex: 1, 
-                textAlign: window.innerWidth <= 768 ? "center" : "left",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: window.innerWidth <= 768 ? "center" : "flex-start",
-              }}>
+              <div
+                style={{
+                  flex: 1,
+                  textAlign: window.innerWidth <= 768 ? "center" : "left",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems:
+                    window.innerWidth <= 768 ? "center" : "flex-start",
+                }}
+              >
                 <h1
                   style={{
                     fontSize: window.innerWidth <= 768 ? "1.5rem" : "2.5rem",
@@ -511,7 +527,8 @@ const CollectionDetail: React.FC = () => {
                   gap: window.innerWidth <= 768 ? "0.5rem" : "0.75rem",
                   marginLeft: window.innerWidth <= 768 ? "0" : "1.5rem",
                   marginTop: window.innerWidth <= 768 ? "1rem" : "0",
-                  justifyContent: window.innerWidth <= 768 ? "center" : "flex-start",
+                  justifyContent:
+                    window.innerWidth <= 768 ? "center" : "flex-start",
                   flexWrap: "wrap",
                 }}
               >
@@ -542,7 +559,8 @@ const CollectionDetail: React.FC = () => {
                 {images.length > 0 && (
                   <div
                     style={{
-                      padding: window.innerWidth <= 768 ? "6px 12px" : "8px 16px",
+                      padding:
+                        window.innerWidth <= 768 ? "6px 12px" : "8px 16px",
                       background: "rgba(34, 197, 94, 0.95)",
                       color: "white",
                       borderRadius: "25px",
@@ -569,9 +587,10 @@ const CollectionDetail: React.FC = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: window.innerWidth <= 768 
-                  ? "repeat(auto-fit, minmax(120px, 1fr))" 
-                  : "repeat(auto-fit, minmax(150px, 1fr))",
+                gridTemplateColumns:
+                  window.innerWidth <= 768
+                    ? "repeat(auto-fit, minmax(120px, 1fr))"
+                    : "repeat(auto-fit, minmax(150px, 1fr))",
                 gap: window.innerWidth <= 768 ? "0.75rem" : "1rem",
               }}
             >
@@ -590,13 +609,18 @@ const CollectionDetail: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
-                    marginBottom: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                    marginBottom:
+                      window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
                   }}
                 >
-                  <Package size={window.innerWidth <= 768 ? 14 : 16} style={{ color: "#667eea" }} />
+                  <Package
+                    size={window.innerWidth <= 768 ? 14 : 16}
+                    style={{ color: "#667eea" }}
+                  />
                   <span
                     style={{
-                      fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
+                      fontSize:
+                        window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                       fontWeight: "500",
                       color: "#667eea",
                     }}
@@ -631,13 +655,18 @@ const CollectionDetail: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
-                    marginBottom: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                    marginBottom:
+                      window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
                   }}
                 >
-                  <Sparkles size={window.innerWidth <= 768 ? 14 : 16} style={{ color: "#22c55e" }} />
+                  <Sparkles
+                    size={window.innerWidth <= 768 ? 14 : 16}
+                    style={{ color: "#22c55e" }}
+                  />
                   <span
                     style={{
-                      fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
+                      fontSize:
+                        window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                       fontWeight: "500",
                       color: "#22c55e",
                     }}
@@ -673,13 +702,18 @@ const CollectionDetail: React.FC = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       gap: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
-                      marginBottom: window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
+                      marginBottom:
+                        window.innerWidth <= 768 ? "0.25rem" : "0.5rem",
                     }}
                   >
-                    <Eye size={window.innerWidth <= 768 ? 14 : 16} style={{ color: "#3b82f6" }} />
+                    <Eye
+                      size={window.innerWidth <= 768 ? 14 : 16}
+                      style={{ color: "#3b82f6" }}
+                    />
                     <span
                       style={{
-                        fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
+                        fontSize:
+                          window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                         fontWeight: "500",
                         color: "#3b82f6",
                       }}
@@ -805,7 +839,6 @@ const CollectionDetail: React.FC = () => {
               >
                 {collectionProducts.map((product, index) => {
                   const dimensions = getParsedDimensions(product);
-                  const isInWishlist = wishlist.has(product.id);
 
                   return (
                     <motion.div
@@ -989,44 +1022,42 @@ const CollectionDetail: React.FC = () => {
                             textTransform: "uppercase",
                           }}
                         >
-                          {product.price > 0 ? "Available" : "Out of Stock"}
+                          {product.price > 0 ? "Available" : "Sold Out"}
                         </div>
 
-                        {/* Artistic Wishlist Button */}
-                        <motion.button
-                          whileHover={{ scale: 1.15, rotate: 5 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleWishlist(product.id);
-                          }}
-                          style={{
-                            position: "absolute",
-                            top: "20px",
-                            right: "20px",
-                            padding: "12px",
-                            background: isInWishlist
-                              ? "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))"
-                              : "rgba(255, 255, 255, 0.95)",
-                            color: isInWishlist ? "white" : "#64748b",
-                            borderRadius: "50%",
-                            cursor: "pointer",
-                            backdropFilter: "blur(20px)",
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-                            width: "48px",
-                            height: "48px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            border: "2px solid rgba(255, 255, 255, 0.3)",
-                          }}
-                        >
-                          <Heart
-                            size={20}
-                            fill={isInWishlist ? "currentColor" : "none"}
-                          />
-                        </motion.button>
+                        {/* Eye Button for Full Image View */}
+                        {product.image && (
+                          <motion.button
+                            whileHover={{ scale: 1.15, rotate: 5 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openImageModal(product.image, product.title);
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: "20px",
+                              right: "20px",
+                              padding: "12px",
+                              background: "rgba(255, 255, 255, 0.95)",
+                              color: "#64748b",
+                              borderRadius: "50%",
+                              cursor: "pointer",
+                              backdropFilter: "blur(20px)",
+                              transition:
+                                "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                              width: "48px",
+                              height: "48px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              border: "2px solid rgba(255, 255, 255, 0.3)",
+                            }}
+                          >
+                            <Eye size={20} />
+                          </motion.button>
+                        )}
 
                         {/* Elegant View Details Overlay */}
                         <div
@@ -1198,9 +1229,7 @@ const CollectionDetail: React.FC = () => {
                                   letterSpacing: "0.02em",
                                 }}
                               >
-                                {product.price > 0
-                                  ? "In Stock"
-                                  : "Out of Stock"}
+                                {product.price > 0 ? "In Stock" : "Sold Out"}
                               </span>
                             </div>
                           </div>
@@ -1355,6 +1384,14 @@ const CollectionDetail: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModal.isOpen}
+        onClose={closeImageModal}
+        imageUrl={imageModal.imageUrl}
+        title={imageModal.title}
+      />
     </div>
   );
 };

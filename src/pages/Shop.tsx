@@ -6,11 +6,11 @@ import {
   Eye,
   Grid3X3,
   List,
-  Heart,
   Sparkles,
   Check,
   X,
   Package,
+  Filter,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
@@ -18,9 +18,11 @@ import type { Product, Collection, ApiError } from "../types/api";
 import { getParsedDimensions } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import { useResponsive } from "../hooks/useResponsive";
+import ImageModal from "../components/ImageModal";
 
 type ViewMode = "grid" | "list";
 type ContentFilter = "collections" | "products";
+type AvailabilityFilter = "all" | "available";
 
 const Shop: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,14 +31,32 @@ const Shop: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [contentFilter, setContentFilter] = useState<ContentFilter>("products");
-  const [wishlist, setWishlist] = useState<Set<number>>(new Set());
+  const [availabilityFilter, setAvailabilityFilter] =
+    useState<AvailabilityFilter>("all");
   const [addedToCartItems, setAddedToCartItems] = useState<Set<number>>(
     new Set()
   );
+  const [imageModal, setImageModal] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    title: string;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    title: "",
+  });
 
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
   const { isMobile, isTablet } = useResponsive();
+
+  // Filter products based on availability
+  const filteredProducts = products.filter((product) => {
+    if (availabilityFilter === "available") {
+      return product.price > 0; // Only show available products
+    }
+    return true; // Show all products
+  });
 
   // Load initial data
   useEffect(() => {
@@ -64,15 +84,19 @@ const Shop: React.FC = () => {
     }
   };
 
-  const toggleWishlist = (productId: number) => {
-    setWishlist((prev) => {
-      const newWishlist = new Set(prev);
-      if (newWishlist.has(productId)) {
-        newWishlist.delete(productId);
-      } else {
-        newWishlist.add(productId);
-      }
-      return newWishlist;
+  const openImageModal = (imageUrl: string, title: string) => {
+    setImageModal({
+      isOpen: true,
+      imageUrl,
+      title,
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModal({
+      isOpen: false,
+      imageUrl: "",
+      title: "",
     });
   };
 
@@ -237,6 +261,8 @@ const Shop: React.FC = () => {
             >
               {contentFilter === "collections"
                 ? "Explore our curated collections of artistic themes"
+                : availabilityFilter === "available"
+                ? "Discover our available artworks and exclusive pieces ready for purchase"
                 : "Discover our complete range of unique artworks and exclusive pieces"}
             </motion.p>
           </motion.div>
@@ -329,20 +355,13 @@ const Shop: React.FC = () => {
               >
                 <button
                   onClick={() => setViewMode("grid")}
+                  className={`elegant-button ${
+                    viewMode === "grid" ? "" : "secondary"
+                  }`}
                   style={{
                     padding: "8px 12px",
-                    background:
-                      viewMode === "grid"
-                        ? "linear-gradient(135deg, #3b82f6, #8b5cf6)"
-                        : "transparent",
-                    color: viewMode === "grid" ? "white" : "#64748b",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
+                    fontSize: "0.85rem",
+                    minHeight: "32px",
                   }}
                 >
                   <Grid3X3 size={16} />
@@ -350,24 +369,60 @@ const Shop: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
+                  className={`elegant-button ${
+                    viewMode === "list" ? "" : "secondary"
+                  }`}
                   style={{
                     padding: "8px 12px",
-                    background:
-                      viewMode === "list"
-                        ? "linear-gradient(135deg, #3b82f6, #8b5cf6)"
-                        : "transparent",
-                    color: viewMode === "list" ? "white" : "#64748b",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
+                    fontSize: "0.85rem",
+                    minHeight: "32px",
                   }}
                 >
                   <List size={16} />
                   List
+                </button>
+              </div>
+            )}
+
+            {/* Availability Filter - Only show for products */}
+            {contentFilter === "products" && (
+              <div
+                style={{
+                  display: "flex",
+                  background: "rgba(255, 255, 255, 0.9)",
+                  borderRadius: "12px",
+                  padding: "4px",
+                  border: "2px solid #e2e8f0",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                <button
+                  onClick={() => setAvailabilityFilter("all")}
+                  className={`elegant-button ${
+                    availabilityFilter === "all" ? "success" : "secondary"
+                  }`}
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "0.8rem",
+                    minHeight: "28px",
+                  }}
+                >
+                  <Filter size={14} />
+                  All
+                </button>
+                <button
+                  onClick={() => setAvailabilityFilter("available")}
+                  className={`elegant-button ${
+                    availabilityFilter === "available" ? "success" : "secondary"
+                  }`}
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "0.8rem",
+                    minHeight: "28px",
+                  }}
+                >
+                  <Check size={14} />
+                  Available
                 </button>
               </div>
             )}
@@ -421,7 +476,7 @@ const Shop: React.FC = () => {
                     : isTablet
                     ? "repeat(auto-fill, minmax(280px, 1fr))"
                     : "repeat(auto-fill, minmax(320px, 1fr))",
-                  gap: isMobile ? "1.5rem" : "2rem",
+                  gap: isMobile ? "1rem" : "2rem",
                   padding: isMobile ? "0" : "0 0.5rem",
                 }}
               >
@@ -598,184 +653,155 @@ const Shop: React.FC = () => {
                   textAlign: "center",
                 }}
               >
-                All Products ({products.length})
+                {availabilityFilter === "available" ? "Available" : "All"}{" "}
+                Products ({filteredProducts.length})
               </h2>
 
-              {products.length > 0 ? (
+              {filteredProducts.length > 0 ? (
                 <div
+                  className="products-grid"
                   style={{
-                    display: "grid",
+                    display: viewMode === "list" ? "flex" : "grid",
+                    flexDirection: viewMode === "list" ? "column" : "row",
                     gridTemplateColumns:
                       viewMode === "grid"
                         ? isMobile
                           ? "1fr"
                           : isTablet
-                          ? "repeat(auto-fill, minmax(250px, 1fr))"
-                          : "repeat(auto-fill, minmax(280px, 1fr))"
-                        : "1fr",
+                          ? "repeat(auto-fill, minmax(280px, 1fr))"
+                          : "repeat(auto-fill, minmax(320px, 1fr))"
+                        : "none",
                     gap:
-                      viewMode === "grid"
-                        ? isMobile
-                          ? "1rem"
-                          : "1.5rem"
-                        : "1rem",
-                    padding: isMobile ? "0" : "0 0.5rem",
+                      viewMode === "list"
+                        ? "1rem"
+                        : isMobile
+                        ? "1rem"
+                        : "1.5rem",
+                    padding:
+                      viewMode === "list" ? "0" : isMobile ? "0" : "0 0.5rem",
                   }}
                 >
-                  {products.map((product, index) => {
+                  {filteredProducts.map((product, index) => {
                     const dimensions = getParsedDimensions(product);
-                    const isInWishlist = wishlist.has(product.id);
 
                     return (
                       <motion.div
                         key={product.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: index * 0.05 }}
-                        whileHover={{
-                          y: -12,
-                          scale: viewMode === "grid" ? 1.03 : 1.01,
-                          boxShadow: "0 25px 50px rgba(0, 0, 0, 0.12)",
+                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.08,
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 15,
                         }}
+                        whileHover={{
+                          y: -8,
+                          scale: 1.03,
+                          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.12)",
+                          transition: { duration: 0.3, ease: "easeOut" },
+                        }}
+                        whileTap={{
+                          scale: 0.98,
+                          transition: { duration: 0.1 },
+                        }}
+                        className="product-card"
                         style={{
-                          background:
-                            "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)",
-                          borderRadius:
-                            viewMode === "grid"
-                              ? isMobile
-                                ? "20px"
-                                : "24px"
-                              : "20px",
-                          overflow: "hidden",
-                          boxShadow:
-                            "0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.06)",
-                          border: "1px solid rgba(255, 255, 255, 0.4)",
-                          backdropFilter: "blur(20px)",
-                          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                           display: viewMode === "list" ? "flex" : "flex",
                           flexDirection: viewMode === "list" ? "row" : "column",
-                          alignItems:
-                            viewMode === "list" ? "stretch" : "stretch",
-                          height: viewMode === "list" ? "auto" : "100%",
-                          minHeight:
-                            viewMode === "grid"
+                          height:
+                            viewMode === "list"
                               ? isMobile
-                                ? "420px"
-                                : "480px"
-                              : "auto",
-                          maxWidth: viewMode === "grid" ? "none" : "100%",
+                                ? "200px"
+                                : "220px"
+                              : isMobile
+                              ? "420px"
+                              : "480px",
+                          minHeight:
+                            viewMode === "list"
+                              ? isMobile
+                                ? "200px"
+                                : "220px"
+                              : isMobile
+                              ? "420px"
+                              : "480px",
+                          width: viewMode === "list" ? "100%" : "100%",
+                          maxWidth: viewMode === "list" ? "100%" : "100%",
                           position: "relative",
+                          overflow: "hidden",
                         }}
                       >
+                        {/* Enhanced Background Gradient */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{
+                            duration: 0.8,
+                            delay: index * 0.08 + 0.2,
+                          }}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background:
+                              "linear-gradient(135deg, rgba(59, 130, 246, 0.02), rgba(139, 92, 246, 0.02))",
+                            borderRadius: "20px",
+                            pointerEvents: "none",
+                          }}
+                        />
+
                         {/* Product Image */}
-                        <div
+                        <motion.div
                           onClick={() => handleProductClick(product.id)}
+                          className="product-image-container"
                           style={{
                             height:
                               viewMode === "grid"
                                 ? isMobile
-                                  ? "280px"
-                                  : "320px"
-                                : "240px",
-                            width: viewMode === "list" ? "320px" : "100%",
+                                  ? "240px"
+                                  : "300px"
+                                : isMobile
+                                ? "200px"
+                                : "220px",
+                            width:
+                              viewMode === "list"
+                                ? isMobile
+                                  ? "100%"
+                                  : "220px"
+                                : "100%",
                             flexShrink: 0,
                             background: product.image
-                              ? `url(${product.image}) center/cover`
-                              : "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+                              ? `url(${product.image}) center/contain no-repeat`
+                              : "#f8f9fa",
                             position: "relative",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             cursor: "pointer",
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                             borderRadius:
                               viewMode === "grid"
-                                ? isMobile
-                                  ? "20px 20px 0 0"
-                                  : "24px 24px 0 0"
+                                ? "20px 20px 0 0"
+                                : isMobile
+                                ? "20px 20px 0 0"
                                 : "20px 0 0 20px",
                             overflow: "hidden",
-                            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
                           }}
-                          onMouseEnter={(e) => {
-                            if (product.image) {
-                              e.currentTarget.style.transform = "scale(1.02)";
-                              e.currentTarget.style.boxShadow =
-                                "0 12px 40px rgba(0, 0, 0, 0.15)";
-                            }
-                            // Show artistic overlay
-                            const overlay = e.currentTarget.querySelector(
-                              ".artistic-overlay"
-                            ) as HTMLElement;
-                            if (overlay) overlay.style.opacity = "1";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "scale(1)";
-                            e.currentTarget.style.boxShadow =
-                              "0 8px 32px rgba(0, 0, 0, 0.1)";
-                            // Hide artistic overlay
-                            const overlay = e.currentTarget.querySelector(
-                              ".artistic-overlay"
-                            ) as HTMLElement;
-                            if (overlay) overlay.style.opacity = "0";
+                          whileHover={{
+                            scale: 1.05,
+                            transition: { duration: 0.3, ease: "easeOut" },
                           }}
                         >
-                          {/* Artistic Overlay */}
-                          <div
-                            className="artistic-overlay"
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              background:
-                                "linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08), rgba(240, 147, 251, 0.05))",
-                              opacity: 0,
-                              transition: "opacity 0.3s ease",
-                            }}
-                          />
-
-                          {/* Floating Particles Effect */}
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "10%",
-                              left: "10%",
-                              width: "4px",
-                              height: "4px",
-                              background: "rgba(255, 255, 255, 0.8)",
-                              borderRadius: "50%",
-                              animation: "float 3s ease-in-out infinite",
-                            }}
-                          />
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "20%",
-                              right: "15%",
-                              width: "6px",
-                              height: "6px",
-                              background: "rgba(255, 255, 255, 0.6)",
-                              borderRadius: "50%",
-                              animation: "float 4s ease-in-out infinite 1s",
-                            }}
-                          />
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: "25%",
-                              left: "20%",
-                              width: "3px",
-                              height: "3px",
-                              background: "rgba(255, 255, 255, 0.7)",
-                              borderRadius: "50%",
-                              animation: "float 5s ease-in-out infinite 2s",
-                            }}
-                          />
-
                           {!product.image && (
-                            <div
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{
+                                duration: 0.5,
+                                delay: index * 0.08 + 0.3,
+                              }}
                               style={{
                                 display: "flex",
                                 flexDirection: "column",
@@ -785,7 +811,16 @@ const Shop: React.FC = () => {
                                 textAlign: "center",
                               }}
                             >
-                              <div
+                              <motion.div
+                                animate={{
+                                  rotate: [0, 5, -5, 0],
+                                  scale: [1, 1.1, 1],
+                                }}
+                                transition={{
+                                  duration: 2,
+                                  repeat: Infinity,
+                                  repeatType: "reverse",
+                                }}
                                 style={{
                                   width: "80px",
                                   height: "80px",
@@ -799,7 +834,7 @@ const Shop: React.FC = () => {
                                 }}
                               >
                                 <Eye size={40} />
-                              </div>
+                              </motion.div>
                               <span
                                 style={{
                                   fontSize: "1rem",
@@ -809,288 +844,137 @@ const Shop: React.FC = () => {
                               >
                                 No Image Available
                               </span>
-                            </div>
+                            </motion.div>
                           )}
 
-                          {/* Elegant Collection Badge */}
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: "20px",
-                              left: "20px",
-                              padding: "8px 16px",
-                              background:
-                                "linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95))",
-                              color: "white",
-                              borderRadius: "25px",
-                              fontSize: "0.8rem",
-                              fontWeight: "700",
-                              backdropFilter: "blur(20px)",
-                              boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
-                              border: "1px solid rgba(255, 255, 255, 0.3)",
-                              letterSpacing: "0.05em",
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {getCollectionName(product.collectionId)}
-                          </div>
+                          {/* Enhanced View Button */}
+                          {product.image && (
+                            <motion.button
+                              className="view-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openImageModal(product.image, product.title);
+                              }}
+                              whileHover={{
+                                scale: 1.1,
+                                backgroundColor: "rgba(59, 130, 246, 0.9)",
+                              }}
+                              whileTap={{
+                                scale: 0.95,
+                              }}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{
+                                duration: 0.3,
+                                delay: index * 0.08 + 0.4,
+                              }}
+                            >
+                              <Eye size={16} />
+                            </motion.button>
+                          )}
+                        </motion.div>
 
-                          {/* Artistic Wishlist Button */}
-                          <motion.button
-                            whileHover={{ scale: 1.15, rotate: 5 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleWishlist(product.id);
-                            }}
-                            style={{
-                              position: "absolute",
-                              top: "20px",
-                              right: "20px",
-                              padding: "12px",
-                              background: isInWishlist
-                                ? "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))"
-                                : "rgba(255, 255, 255, 0.95)",
-                              color: isInWishlist ? "white" : "#64748b",
-                              borderRadius: "50%",
-                              cursor: "pointer",
-                              backdropFilter: "blur(20px)",
-                              transition:
-                                "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-                              width: "48px",
-                              height: "48px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              border: "2px solid rgba(255, 255, 255, 0.3)",
-                            }}
-                          >
-                            <Heart
-                              size={20}
-                              fill={isInWishlist ? "currentColor" : "none"}
-                            />
-                          </motion.button>
-
-                          {/* Elegant View Details Overlay */}
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: "20px",
-                              right: "20px",
-                              padding: "14px 28px",
-                              background: "rgba(255, 255, 255, 0.98)",
-                              color: "#1e293b",
-                              borderRadius: "30px",
-                              fontSize: "0.9rem",
-                              fontWeight: "700",
-                              backdropFilter: "blur(20px)",
-                              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-                              border: "1px solid rgba(255, 255, 255, 0.6)",
-                              opacity: 0,
-                              transition:
-                                "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              letterSpacing: "0.05em",
-                              textTransform: "uppercase",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.opacity = "1";
-                              e.currentTarget.style.transform = "scale(1.05)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.opacity = "0";
-                              e.currentTarget.style.transform = "scale(1)";
-                            }}
-                          >
-                            <Eye size={18} />
-                            View Details
-                          </div>
-                        </div>
-
-                        {/* Elegant Product Info */}
-                        <div
+                        {/* Product Info */}
+                        <motion.div
+                          className="product-info"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: index * 0.08 + 0.5,
+                          }}
                           style={{
-                            padding: viewMode === "list" ? "2rem" : "1.5rem",
-                            flex: viewMode === "list" ? 1 : 1,
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            gap: "1.25rem",
-                            minHeight: viewMode === "grid" ? "180px" : "auto",
-                            background:
-                              "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)",
+                            flex: viewMode === "list" ? "1" : "auto",
+                            width: viewMode === "list" ? "auto" : "100%",
                           }}
                         >
-                          {/* Title and Price Section */}
-                          <div style={{ flex: 1 }}>
-                            <h3
-                              style={{
-                                fontSize:
-                                  viewMode === "grid" ? "1.35rem" : "1.6rem",
-                                fontWeight: "800",
-                                color: "#1e293b",
-                                margin: "0 0 1.25rem 0",
-                                lineHeight: "1.2",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                display: "-webkit-box",
-                                WebkitLineClamp: viewMode === "grid" ? 2 : 1,
-                                WebkitBoxOrient: "vertical",
-                                letterSpacing: "-0.02em",
-                              }}
-                            >
-                              {product.title}
-                            </h3>
-
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                marginBottom: "1rem",
-                                flexWrap: "wrap",
-                                gap: "0.75rem",
-                              }}
-                            >
-                              {dimensions &&
-                              (dimensions.width > 0 ||
-                                dimensions.height > 0) ? (
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "0.5rem",
-                                    padding: "6px 12px",
-                                    background:
-                                      "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))",
-                                    borderRadius: "12px",
-                                    border: "1px solid rgba(59, 130, 246, 0.2)",
-                                    backdropFilter: "blur(10px)",
-                                  }}
-                                >
-                                  <Package
-                                    size={14}
-                                    style={{ color: "#3b82f6" }}
-                                  />
-                                  <span
-                                    style={{
-                                      fontSize: "0.75rem",
-                                      fontWeight: "600",
-                                      color: "#3b82f6",
-                                      letterSpacing: "0.02em",
-                                    }}
-                                  >
-                                    {dimensions.width > 0 &&
-                                    dimensions.height > 0 ? (
-                                      <>
-                                        {dimensions.width}cm ×{" "}
-                                        {dimensions.height}cm
-                                        {dimensions.depth > 0 &&
-                                          ` × ${dimensions.depth}cm`}
-                                      </>
-                                    ) : (
-                                      <>
-                                        {dimensions.width > 0 &&
-                                          `${dimensions.width}cm width`}
-                                        {dimensions.height > 0 &&
-                                          `${dimensions.height}cm height`}
-                                        {dimensions.depth > 0 &&
-                                          `${dimensions.depth}cm depth`}
-                                      </>
-                                    )}
-                                  </span>
-                                </div>
-                              ) : (
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "0.5rem",
-                                    padding: "6px 12px",
-                                    background: "rgba(148, 163, 184, 0.1)",
-                                    borderRadius: "12px",
-                                    border:
-                                      "1px solid rgba(148, 163, 184, 0.2)",
-                                    backdropFilter: "blur(10px)",
-                                  }}
-                                >
-                                  <Package
-                                    size={14}
-                                    style={{ color: "#64748b" }}
-                                  />
-                                  <span
-                                    style={{
-                                      fontSize: "0.75rem",
-                                      fontWeight: "600",
-                                      color: "#64748b",
-                                      letterSpacing: "0.02em",
-                                    }}
-                                  >
-                                    No dimensions
-                                  </span>
-                                </div>
-                              )}
-
-                              {/* Artistic Price Status */}
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "0.5rem",
-                                  padding: "6px 12px",
-                                  background:
-                                    product.price > 0
-                                      ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1))"
-                                      : "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))",
-                                  borderRadius: "12px",
-                                  border: `1px solid ${
-                                    product.price > 0
-                                      ? "rgba(34, 197, 94, 0.2)"
-                                      : "rgba(239, 68, 68, 0.2)"
-                                  }`,
-                                  backdropFilter: "blur(10px)",
-                                }}
+                          {/* Product Details */}
+                          <motion.div
+                            className="product-details"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.4,
+                              delay: index * 0.08 + 0.7,
+                            }}
+                          >
+                            {/* Dimensions */}
+                            {dimensions &&
+                            (dimensions.width > 0 || dimensions.height > 0) ? (
+                              <motion.div
+                                className="detail-badge dimensions"
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ duration: 0.2 }}
                               >
-                                <Sparkles
-                                  size={14}
-                                  style={{
-                                    color:
-                                      product.price > 0 ? "#22c55e" : "#ef4444",
-                                  }}
-                                />
-                                <span
-                                  style={{
-                                    fontSize: "0.75rem",
-                                    fontWeight: "600",
-                                    color:
-                                      product.price > 0 ? "#22c55e" : "#ef4444",
-                                    letterSpacing: "0.02em",
-                                  }}
-                                >
-                                  {product.price > 0
-                                    ? "In Stock"
-                                    : "Out of Stock"}
+                                <Package size={14} />
+                                <span>
+                                  {dimensions.width > 0 &&
+                                  dimensions.height > 0 ? (
+                                    <>
+                                      {dimensions.width}cm × {dimensions.height}
+                                      cm
+                                      {dimensions.depth > 0 &&
+                                        ` × ${dimensions.depth}cm`}
+                                    </>
+                                  ) : (
+                                    <>
+                                      {dimensions.width > 0 &&
+                                        `${dimensions.width}cm width`}
+                                      {dimensions.height > 0 &&
+                                        `${dimensions.height}cm height`}
+                                      {dimensions.depth > 0 &&
+                                        `${dimensions.depth}cm depth`}
+                                    </>
+                                  )}
                                 </span>
-                              </div>
-                            </div>
-                          </div>
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                className="detail-badge"
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <Package size={14} />
+                                <span>Dimensions not available</span>
+                              </motion.div>
+                            )}
 
-                          {/* Artistic Add to Cart Button */}
-                          <motion.button
-                            whileHover={{
-                              scale: product.price > 0 ? 1.03 : 1,
-                              boxShadow:
+                            {/* Availability */}
+                            <motion.div
+                              className={`detail-badge ${
                                 product.price > 0
-                                  ? "0 12px 32px rgba(59, 130, 246, 0.4)"
-                                  : "none",
-                            }}
-                            whileTap={{
-                              scale: product.price > 0 ? 0.97 : 1,
-                            }}
+                                  ? "availability"
+                                  : "unavailable"
+                              }`}
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.2 }}
+                              animate={{
+                                scale: product.price > 0 ? [1, 1.05, 1] : 1,
+                              }}
+                              transition={{
+                                duration: 0.6,
+                                repeat: product.price > 0 ? 1 : 0,
+                                repeatDelay: 2,
+                              }}
+                            >
+                              <Check size={14} />
+                              <span>
+                                {product.price > 0 ? "In Stock" : "Sold Out"}
+                              </span>
+                            </motion.div>
+                          </motion.div>
+
+                          {/* Enhanced Add to Cart Button */}
+                          <motion.button
+                            className={`elegant-button ${
+                              product.price === 0
+                                ? "secondary"
+                                : addedToCartItems.has(product.id)
+                                ? "success"
+                                : isInCart(product.id)
+                                ? "warning"
+                                : ""
+                            }`}
                             onClick={() =>
                               product.price > 0 && handleAddToCart(product)
                             }
@@ -1099,96 +983,43 @@ const Shop: React.FC = () => {
                               isInCart(product.id) ||
                               product.price === 0
                             }
-                            style={{
-                              width: "100%",
-                              padding: "1.25rem 1.5rem",
-                              background:
-                                product.price === 0
-                                  ? "linear-gradient(135deg, #9ca3af, #6b7280)"
-                                  : addedToCartItems.has(product.id)
-                                  ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                                  : isInCart(product.id)
-                                  ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                                  : "linear-gradient(135deg, #667eea, #764ba2)",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "16px",
-                              cursor:
-                                product.price === 0 ||
-                                addedToCartItems.has(product.id) ||
-                                isInCart(product.id)
-                                  ? "not-allowed"
-                                  : "pointer",
-                              fontSize: "1rem",
-                              fontWeight: "700",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: "0.75rem",
-                              transition:
-                                "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                              height: "56px",
-                              boxShadow:
-                                product.price === 0
-                                  ? "none"
-                                  : "0 8px 24px rgba(102, 126, 234, 0.3)",
-                              opacity:
-                                product.price === 0
-                                  ? 0.6
-                                  : addedToCartItems.has(product.id) ||
-                                    isInCart(product.id)
-                                  ? 0.8
-                                  : 1,
-                              letterSpacing: "0.02em",
-                              textTransform: "uppercase",
-                              position: "relative",
-                              overflow: "hidden",
+                            whileHover={{
+                              scale: 1.02,
+                              boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
+                            }}
+                            whileTap={{
+                              scale: 0.98,
+                            }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.4,
+                              delay: index * 0.08 + 0.8,
                             }}
                           >
-                            {/* Button Background Pattern */}
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                background:
-                                  "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)",
-                                transform: "translateX(-100%)",
-                                transition: "transform 0.6s ease",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (product.price > 0) {
-                                  e.currentTarget.style.transform =
-                                    "translateX(100%)";
-                                }
-                              }}
-                            />
-
                             {product.price === 0 ? (
                               <>
-                                <X size={20} />
+                                <X size={18} />
                                 Cannot Add
                               </>
                             ) : addedToCartItems.has(product.id) ? (
                               <>
-                                <Check size={20} />
+                                <Check size={18} />
                                 Added to Cart!
                               </>
                             ) : isInCart(product.id) ? (
                               <>
-                                <ShoppingCart size={20} />
+                                <ShoppingCart size={18} />
                                 Already in Cart
                               </>
                             ) : (
                               <>
-                                <ShoppingCart size={20} />
+                                <ShoppingCart size={18} />
                                 Add to Cart
                               </>
                             )}
                           </motion.button>
-                        </div>
+                        </motion.div>
                       </motion.div>
                     );
                   })}
@@ -1205,10 +1036,22 @@ const Shop: React.FC = () => {
                     backdropFilter: "blur(10px)",
                   }}
                 >
-                  <Eye
-                    size={64}
-                    style={{ color: "#94a3b8", marginBottom: "1rem" }}
-                  />
+                  <motion.div
+                    animate={{
+                      rotate: [0, 5, -5, 0],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                    }}
+                  >
+                    <Eye
+                      size={64}
+                      style={{ color: "#94a3b8", marginBottom: "1rem" }}
+                    />
+                  </motion.div>
                   <h3
                     style={{
                       fontSize: "1.5rem",
@@ -1217,10 +1060,14 @@ const Shop: React.FC = () => {
                       marginBottom: "0.5rem",
                     }}
                   >
-                    No products found
+                    {availabilityFilter === "available"
+                      ? "No available products found"
+                      : "No products found"}
                   </h3>
                   <p style={{ color: "#94a3b8", margin: 0 }}>
-                    Our collection is being updated. Please check back soon!
+                    {availabilityFilter === "available"
+                      ? "All products are currently sold out. Please check back soon!"
+                      : "Our collection is being updated. Please check back soon!"}
                   </p>
                 </motion.div>
               )}
@@ -1228,6 +1075,14 @@ const Shop: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModal.isOpen}
+        onClose={closeImageModal}
+        imageUrl={imageModal.imageUrl}
+        title={imageModal.title}
+      />
     </div>
   );
 };

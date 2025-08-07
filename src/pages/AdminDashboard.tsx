@@ -203,7 +203,7 @@ const AdminDashboard: React.FC = () => {
       return "Product description is required";
     if (!productForm.image.trim()) return "Product image URL is required";
     if (productForm.price < 0 || productForm.price > 1)
-      return "Availability must be selected (Available or Not Available)";
+      return "Availability must be selected (Available or Sold Out)";
     if (productForm.collectionId <= 0) return "Please select a collection";
     if (
       productForm.dimensions.width <= 0 ||
@@ -699,7 +699,7 @@ const AdminDashboard: React.FC = () => {
                               display: "inline-block",
                             }}
                           >
-                            {product.price > 0 ? "Available" : "Not Available"}
+                            {product.price > 0 ? "Available" : "Sold Out"}
                           </p>
                           <p
                             style={{
@@ -1143,7 +1143,7 @@ const AdminDashboard: React.FC = () => {
                       }}
                     >
                       <option value={1}>Available</option>
-                      <option value={0}>Not Available</option>
+                      <option value={0}>Sold Out</option>
                     </select>
                   </div>
                   <div>
