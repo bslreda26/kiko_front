@@ -11,8 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
-import { getAllCollections } from "../services/collectionService";
-import type { Product, Collection, ApiError } from "../types/api";
+import type { Product, ApiError } from "../types/api";
 import { getParsedDimensions } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import ImageModal from "../components/ImageModal";
@@ -21,7 +20,7 @@ const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
-  const [collections, setCollections] = useState<Collection[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -46,10 +45,7 @@ const ProductDetail: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const [productsData, collectionsData] = await Promise.all([
-        getAllProducts(),
-        getAllCollections(),
-      ]);
+      const productsData = await getAllProducts();
 
       const foundProduct = productsData.find(
         (p) => p.id === parseInt(id || "0")
@@ -60,7 +56,6 @@ const ProductDetail: React.FC = () => {
       }
 
       setProduct(foundProduct);
-      setCollections(collectionsData);
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load product data");
@@ -68,11 +63,6 @@ const ProductDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getCollectionName = (collectionId: number) => {
-    const collection = collections.find((c) => c.id === collectionId);
-    return collection?.name || "Unknown Collection";
   };
 
   const handleAddToCart = () => {

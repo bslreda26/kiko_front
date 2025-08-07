@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Instagram,
   Mail,
-  Heart,
   ArrowUp,
   MessageCircle,
 } from "lucide-react";

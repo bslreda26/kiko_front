@@ -100,11 +100,6 @@ const Shop: React.FC = () => {
     });
   };
 
-  const getCollectionName = (collectionId: number) => {
-    const collection = collections.find((c) => c.id === collectionId);
-    return collection?.name || "Unknown Collection";
-  };
-
   const handleAddToCart = (product: Product) => {
     addToCart(product);
     setAddedToCartItems((prev) => new Set(prev).add(product.id));
@@ -947,7 +942,6 @@ const Shop: React.FC = () => {
                                   : "unavailable"
                               }`}
                               whileHover={{ scale: 1.05 }}
-                              transition={{ duration: 0.2 }}
                               animate={{
                                 scale: product.price > 0 ? [1, 1.05, 1] : 1,
                               }}
