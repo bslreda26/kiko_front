@@ -8,9 +8,9 @@ import {
   List,
   Sparkles,
   Check,
-  X,
   Package,
   Filter,
+  Clock,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
@@ -19,6 +19,7 @@ import { getParsedDimensions } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import { useResponsive } from "../hooks/useResponsive";
 import ImageModal from "../components/ImageModal";
+import PreorderModal from "../components/PreorderModal";
 
 type ViewMode = "grid" | "list";
 type ContentFilter = "collections" | "products";
@@ -45,8 +46,15 @@ const Shop: React.FC = () => {
     imageUrl: "",
     title: "",
   });
+  const [preorderModal, setPreorderModal] = useState<{
+    isOpen: boolean;
+    product: Product | null;
+  }>({
+    isOpen: false,
+    product: null,
+  });
 
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, addPreorderToCart, isInCart } = useCart();
   const navigate = useNavigate();
   const { isMobile, isTablet } = useResponsive();
 
@@ -100,8 +108,36 @@ const Shop: React.FC = () => {
     });
   };
 
+  const openPreorderModal = (product: Product) => {
+    setPreorderModal({
+      isOpen: true,
+      product,
+    });
+  };
+
+  const closePreorderModal = () => {
+    setPreorderModal({
+      isOpen: false,
+      product: null,
+    });
+  };
+
   const handleAddToCart = (product: Product) => {
     addToCart(product);
+    setAddedToCartItems((prev) => new Set(prev).add(product.id));
+
+    // Remove the "added" indicator after 2 seconds
+    setTimeout(() => {
+      setAddedToCartItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(product.id);
+        return newSet;
+      });
+    }, 2000);
+  };
+
+  const handlePreorderAddToCart = (product: Product, message: string) => {
+    addPreorderToCart(product, message);
     setAddedToCartItems((prev) => new Set(prev).add(product.id));
 
     // Remove the "added" indicator after 2 seconds
@@ -125,6 +161,16 @@ const Shop: React.FC = () => {
   const getProductCountInCollection = (collectionId: number) => {
     return products.filter((product) => product.collectionId === collectionId)
       .length;
+  };
+
+  // Check if product is available
+  const isProductAvailable = (product: Product) => {
+    return product.price > 0;
+  };
+
+  // Check if product is in cart (including preorders)
+  const isProductInCart = (product: Product) => {
+    return isInCart(product.id);
   };
 
   // Modern loading state
@@ -958,28 +1004,33 @@ const Shop: React.FC = () => {
                             </motion.div>
                           </motion.div>
 
-                          {/* Enhanced Add to Cart Button */}
+                          {/* Enhanced Add to Cart / Preorder Button */}
                           <motion.button
                             className={`elegant-button ${
-                              product.price === 0
+                              !isProductAvailable(product)
                                 ? "secondary"
                                 : addedToCartItems.has(product.id)
                                 ? "success"
-                                : isInCart(product.id)
+                                : isProductInCart(product)
                                 ? "warning"
                                 : ""
                             }`}
-                            onClick={() =>
-                              product.price > 0 && handleAddToCart(product)
-                            }
+                            onClick={() => {
+                              if (isProductAvailable(product)) {
+                                handleAddToCart(product);
+                              } else {
+                                openPreorderModal(product);
+                              }
+                            }}
                             disabled={
                               addedToCartItems.has(product.id) ||
-                              isInCart(product.id) ||
-                              product.price === 0
+                              isProductInCart(product)
                             }
                             whileHover={{
                               scale: 1.02,
-                              boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
+                              boxShadow: isProductAvailable(product)
+                                ? "0 8px 24px rgba(59, 130, 246, 0.3)"
+                                : "0 8px 24px rgba(245, 158, 11, 0.3)",
                             }}
                             whileTap={{
                               scale: 0.98,
@@ -991,17 +1042,29 @@ const Shop: React.FC = () => {
                               delay: index * 0.08 + 0.8,
                             }}
                           >
-                            {product.price === 0 ? (
-                              <>
-                                <X size={18} />
-                                Cannot Add
-                              </>
+                            {!isProductAvailable(product) ? (
+                              addedToCartItems.has(product.id) ? (
+                                <>
+                                  <Check size={18} />
+                                  Preorder Added!
+                                </>
+                              ) : isProductInCart(product) ? (
+                                <>
+                                  <Clock size={18} />
+                                  Preorder in Cart
+                                </>
+                              ) : (
+                                <>
+                                  <Clock size={18} />
+                                  Preorder
+                                </>
+                              )
                             ) : addedToCartItems.has(product.id) ? (
                               <>
                                 <Check size={18} />
                                 Added to Cart!
                               </>
-                            ) : isInCart(product.id) ? (
+                            ) : isProductInCart(product) ? (
                               <>
                                 <ShoppingCart size={18} />
                                 Already in Cart
@@ -1076,6 +1139,16 @@ const Shop: React.FC = () => {
         onClose={closeImageModal}
         imageUrl={imageModal.imageUrl}
         title={imageModal.title}
+      />
+
+      {/* Preorder Modal */}
+      <PreorderModal
+        isOpen={preorderModal.isOpen}
+        onClose={closePreorderModal}
+        product={preorderModal.product}
+        onAddToCart={(product, message) =>
+          handlePreorderAddToCart(product, message)
+        }
       />
     </div>
   );

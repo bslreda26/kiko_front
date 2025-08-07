@@ -5,12 +5,15 @@ import type { Product } from "../types/api";
 export interface CartItem extends Product {
   quantity: number;
   addedAt: Date;
+  isPreorder?: boolean;
+  preorderMessage?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
   totalItems: number;
   addToCart: (product: Product, quantity?: number) => void;
+  addPreorderToCart: (product: Product, message?: string, quantity?: number) => void;
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
@@ -60,6 +63,36 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   };
 
+  const addPreorderToCart = (product: Product, message: string = "", quantity: number = 1) => {
+    setItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
+
+      if (existingItem) {
+        // Update quantity if item already exists
+        return prevItems.map((item) =>
+          item.id === product.id
+            ? { 
+                ...item, 
+                quantity: item.quantity + quantity,
+                isPreorder: true,
+                preorderMessage: message || item.preorderMessage
+              }
+            : item
+        );
+      } else {
+        // Add new preorder item to cart
+        const newItem: CartItem = {
+          ...product,
+          quantity,
+          addedAt: new Date(),
+          isPreorder: true,
+          preorderMessage: message,
+        };
+        return [...prevItems, newItem];
+      }
+    });
+  };
+
   const removeFromCart = (productId: number) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   };
@@ -93,6 +126,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     items,
     totalItems,
     addToCart,
+    addPreorderToCart,
     removeFromCart,
     updateQuantity,
     clearCart,

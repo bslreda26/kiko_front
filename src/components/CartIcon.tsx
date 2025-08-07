@@ -24,7 +24,18 @@ const CartIcon: React.FC = () => {
     items.forEach((item, index) => {
       message += `${index + 1}. ${item.title}\n`;
       message += `   Quantity: ${item.quantity}\n`;
-      message += `   Status: ${item.price > 0 ? "Available" : "Sold Out"}\n\n`;
+
+      // Check if item is a preorder
+      if (item.isPreorder) {
+        message += `   Status: Preorder`;
+        if (item.preorderMessage) {
+          message += ` - ${item.preorderMessage}`;
+        }
+        message += `\n`;
+      } else {
+        message += `   Status: ${item.price > 0 ? "Available" : "Sold Out"}\n`;
+      }
+      message += `\n`;
     });
 
     // Add total
@@ -260,7 +271,12 @@ const CartIcon: React.FC = () => {
                   >
                     Shopping Cart ({totalItems})
                   </h2>
-                  <button
+                  <motion.button
+                    whileHover={{
+                      scale: 1.05,
+                      backgroundColor: "rgba(0, 0, 0, 0.1)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setIsOpen(false)}
                     style={{
                       background: "none",
@@ -271,15 +287,9 @@ const CartIcon: React.FC = () => {
                       borderRadius: "8px",
                       transition: "all 0.2s ease",
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "rgba(0, 0, 0, 0.1)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "none";
-                    }}
                   >
                     <X size={24} />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
@@ -350,28 +360,62 @@ const CartIcon: React.FC = () => {
 
                         {/* Product Info */}
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <h4
+                          <div
                             style={{
-                              fontSize: "1rem",
-                              fontWeight: "600",
-                              color: "#1e293b",
-                              margin: "0 0 0.25rem 0",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.5rem",
+                              marginBottom: "0.25rem",
                             }}
                           >
-                            {item.title}
-                          </h4>
+                            <h4
+                              style={{
+                                fontSize: "1rem",
+                                fontWeight: "600",
+                                color: "#1e293b",
+                                margin: 0,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                flex: 1,
+                              }}
+                            >
+                              {item.title}
+                            </h4>
+                            {item.isPreorder && (
+                              <span
+                                style={{
+                                  background:
+                                    "linear-gradient(135deg, #f59e0b, #d97706)",
+                                  color: "white",
+                                  padding: "0.25rem 0.5rem",
+                                  borderRadius: "8px",
+                                  fontSize: "0.75rem",
+                                  fontWeight: "600",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                PREORDER
+                              </span>
+                            )}
+                          </div>
                           <p
                             style={{
                               fontSize: "0.875rem",
-                              color: item.price > 0 ? "#22c55e" : "#ef4444",
+                              color: item.isPreorder
+                                ? "#f59e0b"
+                                : item.price > 0
+                                ? "#22c55e"
+                                : "#ef4444",
                               margin: 0,
                               fontWeight: "600",
                             }}
                           >
-                            {item.price > 0 ? "Available" : "Sold Out"}
+                            {item.isPreorder
+                              ? "Preorder"
+                              : item.price > 0
+                              ? "Available"
+                              : "Sold Out"}
                           </p>
                         </div>
 
@@ -494,7 +538,9 @@ const CartIcon: React.FC = () => {
                     >
                       Total Items: {totalItems}
                     </span>
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={clearCart}
                       style={{
                         background: "none",
@@ -506,7 +552,7 @@ const CartIcon: React.FC = () => {
                       }}
                     >
                       Clear Cart
-                    </button>
+                    </motion.button>
                   </div>
 
                   <motion.button
