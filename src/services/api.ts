@@ -20,7 +20,6 @@ api.interceptors.request.use(
   (config) => {
     // Add any request modifications here (e.g., auth tokens if needed)
     const fullUrl = `${config.baseURL}${config.url}`;
-    console.log(`🚀 Making request to: ${fullUrl}`);
     
     // Add timestamp for performance tracking
     (config as any).startTime = new Date();
@@ -28,7 +27,6 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('❌ Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -37,20 +35,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     const duration = new Date().getTime() - (response.config as any).startTime?.getTime();
-    console.log(`✅ Response received in ${duration}ms from: ${response.config.url}`);
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    
-    // Log error details
-    console.error('❌ Response error:', {
-      url: error.config?.url,
-      status: error.response?.status,
-      message: error.message,
-      duration: error.config?.startTime ? 
-        new Date().getTime() - error.config.startTime.getTime() : 'unknown'
-    });
 
     // Retry logic for network errors and 5xx server errors
     if (
@@ -65,8 +53,6 @@ api.interceptors.response.use(
       // Exponential backoff
       const retryDelay = Math.min(1000 * Math.pow(2, originalRequest._retryCount || 0), 10000);
       originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
-      
-      console.log(`🔄 Retrying request in ${retryDelay}ms (attempt ${originalRequest._retryCount})`);
       
       await new Promise(resolve => setTimeout(resolve, retryDelay));
       return api(originalRequest);

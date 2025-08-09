@@ -79,7 +79,6 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
         }
       } catch (err) {
         setError("Failed to upload image");
-        console.error("Upload error:", err);
       }
     }
 
@@ -290,7 +289,6 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
                       }}
                       onError={() => {
                         // Handle broken image
-                        console.error(`Failed to load image at index ${index}`);
                       }}
                     />
 

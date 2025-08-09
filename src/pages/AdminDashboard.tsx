@@ -13,10 +13,10 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
-  getAllProducts,
   createProduct,
   updateProduct,
   deleteProduct,
+  ProductService,
 } from "../services/productService";
 import {
   getAllCollections,
@@ -32,6 +32,7 @@ import type {
   UpdateProductRequest,
   CreateCollectionRequest,
   UpdateCollectionRequest,
+  PaginatedResponse,
 } from "../types/api";
 import { getParsedDimensions, getParsedImages } from "../types/api";
 import ImageUpload from "../components/ImageUpload";
@@ -66,6 +67,13 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationLoading, setPaginationLoading] = useState(false);
+  const [pagination, setPagination] = useState<
+    PaginatedResponse<Product>["pagination"] | null
+  >(null);
 
   // Modal states
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -113,19 +121,47 @@ const AdminDashboard: React.FC = () => {
       setError(null);
 
       const [productsData, collectionsData] = await Promise.all([
-        getAllProducts(),
+        ProductService.getProductByCriteriaPaged({ page: 1, limit: 6 }),
         getAllCollections(),
       ]);
 
-      setProducts(productsData);
+      setProducts(productsData.data);
+      setPagination(productsData.pagination);
+      setCurrentPage(1);
       setCollections(collectionsData);
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load data");
-      console.error("Error loading data:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadProducts = async (page: number = 1) => {
+    try {
+      setPaginationLoading(true);
+      setError(null);
+
+      const result: PaginatedResponse<Product> =
+        await ProductService.getProductByCriteriaPaged({
+          page,
+          limit: 6,
+        });
+
+      setProducts(result.data);
+      setPagination(result.pagination);
+      setCurrentPage(page);
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || "Failed to load products");
+    } finally {
+      setPaginationLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (paginationLoading) return;
+    loadProducts(newPage);
   };
 
   const handleLogout = () => {
@@ -165,18 +201,11 @@ const AdminDashboard: React.FC = () => {
           dimensions: { width: 0, height: 0, depth: 0 },
           collectionId: collections[0]?.id || 0,
         });
-        console.log("New product form initialized with price:", 1);
       }
     } else if (type === "collection") {
       if (item) {
         const collection = item as Collection;
         const images = getParsedImages(collection);
-        console.log(
-          "Editing collection images:",
-          images,
-          "raw images:",
-          collection.images
-        );
         setCollectionForm({
           name: collection.name,
           description: collection.description,
@@ -198,10 +227,15 @@ const AdminDashboard: React.FC = () => {
   };
 
   const validateProductForm = (productForm: ProductForm): string | null => {
-    if (!productForm.title.trim()) return "Product title is required";
-    if (!productForm.description.trim())
+    if (!productForm.title?.trim()) return "Product title is required";
+    if (!productForm.description?.trim())
       return "Product description is required";
-    if (!productForm.image.trim()) return "Product image URL is required";
+    if (
+      !productForm.image ||
+      typeof productForm.image !== "string" ||
+      !productForm.image.trim()
+    )
+      return "Product image URL is required";
     if (productForm.price < 0 || productForm.price > 1)
       return "Availability must be selected (Available or Sold Out)";
     if (productForm.collectionId <= 0) return "Please select a collection";
@@ -251,7 +285,10 @@ const AdminDashboard: React.FC = () => {
         const productData = {
           title: productForm.title.trim(),
           description: productForm.description.trim(),
-          image: productForm.image.trim(),
+          image:
+            typeof productForm.image === "string"
+              ? productForm.image.trim()
+              : "",
           price: Number(productForm.price), // Ensure it's a number
           dimensions: JSON.stringify({
             width: Number(productForm.dimensions.width),
@@ -278,12 +315,6 @@ const AdminDashboard: React.FC = () => {
         const validImages = collectionForm.images.filter(
           (img) => img.trim() !== ""
         );
-        console.log(
-          "Saving collection with images:",
-          validImages,
-          "JSON:",
-          JSON.stringify(validImages)
-        );
         const collectionData = {
           name: collectionForm.name.trim(),
           description: collectionForm.description.trim(),
@@ -305,7 +336,11 @@ const AdminDashboard: React.FC = () => {
       }
 
       // Success - reload data and close modal
-      await loadData();
+      if (modalType === "product") {
+        await loadProducts(currentPage);
+      } else {
+        await loadData();
+      }
       closeModal();
 
       // Clear success message after 3 seconds
@@ -313,7 +348,6 @@ const AdminDashboard: React.FC = () => {
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to save item");
-      console.error("Error saving item:", err);
     } finally {
       setModalLoading(false);
     }
@@ -339,14 +373,17 @@ const AdminDashboard: React.FC = () => {
       }
 
       // Success - reload data
-      await loadData();
+      if (type === "products") {
+        await loadProducts(currentPage);
+      } else {
+        await loadData();
+      }
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || `Failed to delete ${type.slice(0, -1)}`);
-      console.error(`Error deleting ${type.slice(0, -1)}:`, err);
     }
   };
 
@@ -796,6 +833,162 @@ const AdminDashboard: React.FC = () => {
                     </motion.div>
                   );
                 })}
+
+                {/* Pagination Info */}
+                {pagination && (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      marginBottom: "1rem",
+                      marginTop: "2rem",
+                    }}
+                  >
+                    <p style={{ color: "#64748b", margin: "0 0 0.5rem 0" }}>
+                      Page {pagination.page} of {pagination.totalPages} (
+                      {pagination.total} total products)
+                    </p>
+                    <p
+                      style={{
+                        color: "#64748b",
+                        margin: 0,
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                      {Math.min(
+                        pagination.page * pagination.limit,
+                        pagination.total
+                      )}{" "}
+                      of {pagination.total} products
+                    </p>
+                  </div>
+                )}
+
+                {/* Pagination Controls */}
+                {pagination && pagination.totalPages > 1 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      marginTop: "1rem",
+                      marginBottom: "2rem",
+                    }}
+                  >
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={pagination.page <= 1 || paginationLoading}
+                      style={{
+                        padding: "0.5rem 1rem",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        background:
+                          pagination.page > 1 && !paginationLoading
+                            ? "white"
+                            : "#f1f5f9",
+                        cursor:
+                          pagination.page > 1 && !paginationLoading
+                            ? "pointer"
+                            : "not-allowed",
+                        opacity:
+                          pagination.page > 1 && !paginationLoading ? 1 : 0.5,
+                        color: "#64748b",
+                        fontWeight: "500",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      Previous
+                    </button>
+
+                    {Array.from(
+                      { length: pagination.totalPages },
+                      (_, i) => i + 1
+                    ).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        disabled={paginationLoading}
+                        style={{
+                          padding: "0.5rem 1rem",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          background:
+                            page === currentPage ? "#3b82f6" : "white",
+                          color: page === currentPage ? "white" : "#64748b",
+                          cursor: paginationLoading ? "not-allowed" : "pointer",
+                          fontWeight: "500",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        {page}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={
+                        pagination.page >= pagination.totalPages ||
+                        paginationLoading
+                      }
+                      style={{
+                        padding: "0.5rem 1rem",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        background:
+                          pagination.page < pagination.totalPages &&
+                          !paginationLoading
+                            ? "white"
+                            : "#f1f5f9",
+                        cursor:
+                          pagination.page < pagination.totalPages &&
+                          !paginationLoading
+                            ? "pointer"
+                            : "not-allowed",
+                        opacity:
+                          pagination.page < pagination.totalPages &&
+                          !paginationLoading
+                            ? 1
+                            : 0.5,
+                        color: "#64748b",
+                        fontWeight: "500",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+
+                {/* Loading Overlay */}
+                {paginationLoading && (
+                  <div
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: "rgba(0, 0, 0, 0.5)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 1000,
+                    }}
+                  >
+                    <div
+                      style={{
+                        background: "white",
+                        padding: "2rem",
+                        borderRadius: "12px",
+                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                      }}
+                    >
+                      <p style={{ margin: 0, color: "#64748b" }}>
+                        Loading products...
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div
@@ -1090,12 +1283,12 @@ const AdminDashboard: React.FC = () => {
                   </label>
                   <ImageUpload
                     value={productForm.image}
-                    onChange={(url) =>
+                    onChange={(url) => {
                       setProductForm((prev) => ({
                         ...prev,
                         image: url,
-                      }))
-                    }
+                      }));
+                    }}
                     onFileUpload={uploadFile}
                     placeholder="Drop product image here or click to browse"
                     maxSize={5}

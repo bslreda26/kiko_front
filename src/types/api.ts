@@ -149,13 +149,11 @@ export const parseJsonString = <T>(jsonString: string, fallback: T): T => {
            
            // If dimensions is already an object, return it directly
            if (typeof product.dimensions === 'object' && product.dimensions !== null) {
-    console.log('Dimensions is object:', product.dimensions);
     return product.dimensions as ProductDimensions;
   }
   
   // If dimensions is a string, parse it
   if (typeof product.dimensions === 'string' && product.dimensions.trim() !== '') {
-    console.log('Dimensions is string:', product.dimensions);
                  try {
                const parsed = JSON.parse(product.dimensions);
                // Validate that parsed object has required properties
@@ -168,20 +166,17 @@ export const parseJsonString = <T>(jsonString: string, fallback: T): T => {
                    // Invalid parsed dimensions
                  }
                } catch (error) {
-      console.error('Failed to parse dimensions string:', product.dimensions, error);
+      // Failed to parse dimensions string
     }
     return parseJsonString(product.dimensions, { width: 0, height: 0, depth: 0 });
   }
   
   // Fallback
-  console.log('Dimensions fallback for product:', product.id, 'dimensions:', product.dimensions);
   return { width: 0, height: 0, depth: 0 };
 };
 
 // Helper function to get parsed images array
 export const getParsedImages = (collection: Collection): string[] => {
-  console.log(`Parsing images for collection ${collection.id}:`, collection.images, 'type:', typeof collection.images);
   const result = parseJsonString(collection.images, []);
-  console.log('Parsed images result:', result);
   return result;
 };

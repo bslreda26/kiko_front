@@ -59,7 +59,6 @@ const ProductDetail: React.FC = () => {
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load product data");
-      console.error("Error loading product data:", err);
     } finally {
       setLoading(false);
     }

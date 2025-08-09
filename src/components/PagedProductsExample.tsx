@@ -28,7 +28,6 @@ const PagedProductsExample: React.FC = () => {
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load products");
-      console.error("Error loading products:", err);
     } finally {
       setLoading(false);
     }

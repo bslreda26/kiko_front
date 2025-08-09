@@ -71,14 +71,12 @@ const Home: React.FC = () => {
       try {
         products = await getLatestProducts(6);
       } catch (funcError) {
-        console.log("Function import failed, trying class method:", funcError);
         products = await ProductService.getLatestProducts(6);
       }
       setLatestProducts(products);
     } catch (err) {
       const apiError = err as ApiError;
       setProductsError(apiError.message || "Failed to load latest products");
-      console.error("Error loading latest products:", err);
     } finally {
       setProductsLoading(false);
     }

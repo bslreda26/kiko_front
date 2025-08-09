@@ -120,7 +120,6 @@ const Shop: React.FC = () => {
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load products");
-      console.error("Error loading products:", err);
     } finally {
       setPaginationLoading(false);
     }
@@ -136,7 +135,6 @@ const Shop: React.FC = () => {
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load shop data");
-      console.error("Error loading shop data:", err);
     } finally {
       setLoading(false);
     }
@@ -213,7 +211,6 @@ const Shop: React.FC = () => {
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load collections");
-      console.error("Error loading collections:", err);
     } finally {
       setCollectionsLoading(false);
     }

@@ -123,7 +123,6 @@ const CollectionDetail: React.FC = () => {
         setRetryCount(0);
       } catch (err) {
         const apiError = err as ApiError;
-        console.error("Error loading collection data:", err);
 
         // Retry logic for network errors
         if (
@@ -135,7 +134,6 @@ const CollectionDetail: React.FC = () => {
             !apiError.message)
         ) {
           currentRetryCount++;
-          console.log(`Retrying... Attempt ${currentRetryCount}/${maxRetries}`);
 
           // Exponential backoff
           const delay = 1000 * currentRetryCount;

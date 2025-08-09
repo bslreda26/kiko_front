@@ -29,7 +29,7 @@ const PreorderModal: React.FC<PreorderModalProps> = ({
       setMessage("");
       onClose();
     } catch (error) {
-      console.error("Error adding preorder to cart:", error);
+      // Handle error silently
     } finally {
       setIsSubmitting(false);
     }

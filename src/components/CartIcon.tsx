@@ -88,7 +88,6 @@ const CartIcon: React.FC = () => {
           }, 2000);
         }
       } catch (error) {
-        console.log("WhatsApp opening failed, trying fallback method");
         // Method 4: Create a temporary link and click it
         const link = document.createElement("a");
         link.href = whatsappUrl;
