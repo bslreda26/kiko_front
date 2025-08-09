@@ -10,7 +10,7 @@ import {
   Grid3X3,
   List,
   Package,
-  X,
+  Clock,
 } from "lucide-react";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
@@ -18,6 +18,8 @@ import type { Product, Collection, ApiError } from "../types/api";
 import { getParsedDimensions, getParsedImages } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import ImageModal from "../components/ImageModal";
+import PreorderModal from "../components/PreorderModal";
+import "./Shop.css";
 
 type ViewMode = "grid" | "list";
 
@@ -42,10 +44,27 @@ const CollectionDetail: React.FC = () => {
     imageUrl: "",
     title: "",
   });
+  const [preorderModal, setPreorderModal] = useState<{
+    isOpen: boolean;
+    product: Product | null;
+  }>({
+    isOpen: false,
+    product: null,
+  });
   const [loadingMessage, setLoadingMessage] = useState("Loading collection...");
   const [retryCount, setRetryCount] = useState(0);
 
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, addPreorderToCart, isInCart } = useCart();
+
+  // Check if product is available
+  const isProductAvailable = (product: Product) => {
+    return product.price > 0;
+  };
+
+  // Check if product is in cart (including preorders)
+  const isProductInCart = (product: Product) => {
+    return isInCart(product.id);
+  };
 
   useEffect(() => {
     loadCollectionData();
@@ -178,6 +197,33 @@ const CollectionDetail: React.FC = () => {
       imageUrl: "",
       title: "",
     });
+  };
+
+  const openPreorderModal = (product: Product) => {
+    setPreorderModal({
+      isOpen: true,
+      product,
+    });
+  };
+
+  const closePreorderModal = () => {
+    setPreorderModal({
+      isOpen: false,
+      product: null,
+    });
+  };
+
+  const handlePreorderAddToCart = (product: Product, message: string) => {
+    addPreorderToCart(product, message);
+    setAddedToCartItems((prev) => new Set(prev).add(product.id));
+
+    setTimeout(() => {
+      setAddedToCartItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(product.id);
+        return newSet;
+      });
+    }, 2000);
   };
 
   if (loading) {
@@ -843,127 +889,121 @@ const CollectionDetail: React.FC = () => {
                   return (
                     <motion.div
                       key={product.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.05 }}
-                      whileHover={{ y: -12, scale: 1.03 }}
+                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.5,
+                        delay: index * 0.08,
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15,
+                      }}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.03,
+                        boxShadow: "0 12px 32px rgba(0, 0, 0, 0.12)",
+                        transition: { duration: 0.3, ease: "easeOut" },
+                      }}
+                      whileTap={{
+                        scale: 0.98,
+                        transition: { duration: 0.1 },
+                      }}
+                      className="product-card"
                       style={{
-                        background:
-                          "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)",
-                        borderRadius:
-                          window.innerWidth <= 768 ? "20px" : "24px",
-                        overflow: "hidden",
-                        boxShadow:
-                          "0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.06)",
-                        border: "1px solid rgba(255, 255, 255, 0.4)",
-                        backdropFilter: "blur(20px)",
-                        transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                        display: viewMode === "list" ? "flex" : "block",
-                        alignItems: viewMode === "list" ? "stretch" : "unset",
-                        height: viewMode === "list" ? "auto" : "100%",
+                        display: viewMode === "list" ? "flex" : "flex",
+                        flexDirection: viewMode === "list" ? "row" : "column",
+                        height:
+                          viewMode === "list"
+                            ? window.innerWidth <= 768
+                              ? "200px"
+                              : "220px"
+                            : window.innerWidth <= 768
+                            ? "420px"
+                            : "480px",
+                        minHeight:
+                          viewMode === "list"
+                            ? window.innerWidth <= 768
+                              ? "200px"
+                              : "220px"
+                            : window.innerWidth <= 768
+                            ? "420px"
+                            : "480px",
+                        width: viewMode === "list" ? "100%" : "100%",
+                        maxWidth: viewMode === "list" ? "100%" : "100%",
                         position: "relative",
-                        // Artistic border gradient
-                        backgroundClip: "padding-box",
+                        overflow: "hidden",
                       }}
                     >
-                      {/* Product Image Container */}
-                      <div
+                      {/* Enhanced Background Gradient */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{
+                          duration: 0.8,
+                          delay: index * 0.08 + 0.2,
+                        }}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background:
+                            "linear-gradient(135deg, rgba(59, 130, 246, 0.02), rgba(139, 92, 246, 0.02))",
+                          borderRadius: "20px",
+                          pointerEvents: "none",
+                        }}
+                      />
+
+                      {/* Product Image */}
+                      <motion.div
                         onClick={() => handleProductClick(product.id)}
+                        className="product-image-container"
                         style={{
                           height:
                             viewMode === "grid"
                               ? window.innerWidth <= 768
                                 ? "240px"
-                                : "320px"
+                                : "300px"
+                              : window.innerWidth <= 768
+                              ? "200px"
                               : "220px",
-                          width: viewMode === "list" ? "300px" : "100%",
+                          width:
+                            viewMode === "list"
+                              ? window.innerWidth <= 768
+                                ? "100%"
+                                : "220px"
+                              : "100%",
                           flexShrink: 0,
                           background: product.image
-                            ? `url(${product.image}) center/cover`
-                            : "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+                            ? `url(${product.image}) center/contain no-repeat`
+                            : "#f8f9fa",
                           position: "relative",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
-                          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                          borderRadius:
+                            viewMode === "grid"
+                              ? "20px 20px 0 0"
+                              : window.innerWidth <= 768
+                              ? "20px 20px 0 0"
+                              : "20px 0 0 20px",
                           overflow: "hidden",
                         }}
-                        onMouseEnter={(e) => {
-                          if (product.image) {
-                            e.currentTarget.style.transform = "scale(1.05)";
-                          }
-                          // Show artistic overlay
-                          const overlay = e.currentTarget.querySelector(
-                            ".artistic-overlay"
-                          ) as HTMLElement;
-                          if (overlay) overlay.style.opacity = "1";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "scale(1)";
-                          // Hide artistic overlay
-                          const overlay = e.currentTarget.querySelector(
-                            ".artistic-overlay"
-                          ) as HTMLElement;
-                          if (overlay) overlay.style.opacity = "0";
+                        whileHover={{
+                          scale: 1.05,
+                          transition: { duration: 0.3, ease: "easeOut" },
                         }}
                       >
-                        {/* Artistic Overlay */}
-                        <div
-                          className="artistic-overlay"
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background:
-                              "linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15), rgba(240, 147, 251, 0.1))",
-                            opacity: 0,
-                            transition: "opacity 0.4s ease",
-                          }}
-                        />
-
-                        {/* Floating Particles Effect */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "10%",
-                            left: "10%",
-                            width: "4px",
-                            height: "4px",
-                            background: "rgba(255, 255, 255, 0.8)",
-                            borderRadius: "50%",
-                            animation: "float 3s ease-in-out infinite",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "20%",
-                            right: "15%",
-                            width: "6px",
-                            height: "6px",
-                            background: "rgba(255, 255, 255, 0.6)",
-                            borderRadius: "50%",
-                            animation: "float 4s ease-in-out infinite 1s",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: "25%",
-                            left: "20%",
-                            width: "3px",
-                            height: "3px",
-                            background: "rgba(255, 255, 255, 0.7)",
-                            borderRadius: "50%",
-                            animation: "float 5s ease-in-out infinite 2s",
-                          }}
-                        />
-
                         {!product.image && (
-                          <div
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{
+                              duration: 0.5,
+                              delay: index * 0.08 + 0.3,
+                            }}
                             style={{
                               display: "flex",
                               flexDirection: "column",
@@ -973,7 +1013,16 @@ const CollectionDetail: React.FC = () => {
                               textAlign: "center",
                             }}
                           >
-                            <div
+                            <motion.div
+                              animate={{
+                                rotate: [0, 5, -5, 0],
+                                scale: [1, 1.1, 1],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                repeatType: "reverse",
+                              }}
                               style={{
                                 width: "80px",
                                 height: "80px",
@@ -987,7 +1036,7 @@ const CollectionDetail: React.FC = () => {
                               }}
                             >
                               <Eye size={40} />
-                            </div>
+                            </motion.div>
                             <span
                               style={{
                                 fontSize: "1rem",
@@ -997,353 +1046,196 @@ const CollectionDetail: React.FC = () => {
                             >
                               No Image Available
                             </span>
-                          </div>
+                          </motion.div>
                         )}
 
-                        {/* Elegant Status Badge */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "20px",
-                            left: "20px",
-                            padding: "8px 16px",
-                            background:
-                              product.price > 0
-                                ? "linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(22, 163, 74, 0.95))"
-                                : "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))",
-                            color: "white",
-                            borderRadius: "25px",
-                            fontSize: "0.8rem",
-                            fontWeight: "700",
-                            backdropFilter: "blur(20px)",
-                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-                            border: "1px solid rgba(255, 255, 255, 0.3)",
-                            letterSpacing: "0.05em",
-                            textTransform: "uppercase",
-                          }}
-                        >
-                          {product.price > 0 ? "Available" : "Sold Out"}
-                        </div>
-
-                        {/* Eye Button for Full Image View */}
+                        {/* Enhanced View Button */}
                         {product.image && (
                           <motion.button
-                            whileHover={{ scale: 1.15, rotate: 5 }}
-                            whileTap={{ scale: 0.9 }}
+                            className="view-button"
                             onClick={(e) => {
                               e.stopPropagation();
                               openImageModal(product.image, product.title);
                             }}
-                            style={{
-                              position: "absolute",
-                              top: "20px",
-                              right: "20px",
-                              padding: "12px",
-                              background: "rgba(255, 255, 255, 0.95)",
-                              color: "#64748b",
-                              borderRadius: "50%",
-                              cursor: "pointer",
-                              backdropFilter: "blur(20px)",
-                              transition:
-                                "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-                              width: "48px",
-                              height: "48px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              border: "2px solid rgba(255, 255, 255, 0.3)",
+                            whileHover={{
+                              scale: 1.1,
+                              backgroundColor: "rgba(59, 130, 246, 0.9)",
+                            }}
+                            whileTap={{
+                              scale: 0.95,
+                            }}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{
+                              duration: 0.3,
+                              delay: index * 0.08 + 0.4,
                             }}
                           >
-                            <Eye size={20} />
+                            <Eye size={16} />
                           </motion.button>
                         )}
+                      </motion.div>
 
-                        {/* Elegant View Details Overlay */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: "20px",
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            padding: "12px 24px",
-                            background: "rgba(255, 255, 255, 0.95)",
-                            color: "#1e293b",
-                            borderRadius: "30px",
-                            fontSize: "0.85rem",
-                            fontWeight: "600",
-                            backdropFilter: "blur(20px)",
-                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-                            border: "1px solid rgba(255, 255, 255, 0.4)",
-                            opacity: 0,
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            letterSpacing: "0.05em",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.opacity = "1";
-                            e.currentTarget.style.transform =
-                              "translateX(-50%) scale(1.05)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.opacity = "0";
-                            e.currentTarget.style.transform =
-                              "translateX(-50%) scale(1)";
-                          }}
-                        >
-                          <Eye size={16} />
-                          View Details
-                        </div>
-                      </div>
-
-                      {/* Elegant Product Info */}
-                      <div
+                      {/* Product Info */}
+                      <motion.div
+                        className="product-info"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.08 + 0.5,
+                        }}
                         style={{
-                          padding: viewMode === "list" ? "2.5rem" : "2rem",
-                          flex: viewMode === "list" ? 1 : "unset",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "space-between",
-                          height: viewMode === "list" ? "auto" : "100%",
-                          background:
-                            "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)",
+                          flex: viewMode === "list" ? "1" : "auto",
+                          width: viewMode === "list" ? "auto" : "100%",
                         }}
                       >
-                        {/* Title and Description Section */}
-                        <div style={{ marginBottom: "2rem" }}>
-                          <h3
-                            style={{
-                              fontSize:
-                                window.innerWidth <= 768 ? "1.25rem" : "1.5rem",
-                              fontWeight: "800",
-                              color: "#1e293b",
-                              margin: "0 0 1rem 0",
-                              lineHeight: "1.3",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              letterSpacing: "-0.02em",
-                            }}
-                          >
-                            {product.title}
-                          </h3>
-
-                          {product.description && (
-                            <p
-                              style={{
-                                color: "#64748b",
-                                lineHeight: "1.7",
-                                margin: "0 0 1.5rem 0",
-                                fontSize: "0.95rem",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                display: "-webkit-box",
-                                WebkitLineClamp: 3,
-                                WebkitBoxOrient: "vertical",
-                                fontWeight: "400",
-                              }}
-                            >
-                              {product.description}
-                            </p>
-                          )}
-
-                          {/* Elegant Product Details */}
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              flexWrap: "wrap",
-                              gap: "1rem",
-                            }}
-                          >
-                            {dimensions && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "0.75rem",
-                                  padding: "8px 16px",
-                                  background:
-                                    "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))",
-                                  borderRadius: "16px",
-                                  border: "1px solid rgba(59, 130, 246, 0.2)",
-                                  backdropFilter: "blur(10px)",
-                                }}
-                              >
-                                <Package
-                                  size={16}
-                                  style={{ color: "#3b82f6" }}
-                                />
-                                <span
-                                  style={{
-                                    fontSize: "0.8rem",
-                                    fontWeight: "600",
-                                    color: "#3b82f6",
-                                    letterSpacing: "0.02em",
-                                  }}
-                                >
-                                  {dimensions.width}cm × {dimensions.height}cm
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Artistic Price Status */}
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.75rem",
-                                padding: "8px 16px",
-                                background:
-                                  product.price > 0
-                                    ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1))"
-                                    : "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))",
-                                borderRadius: "16px",
-                                border: `1px solid ${
-                                  product.price > 0
-                                    ? "rgba(34, 197, 94, 0.2)"
-                                    : "rgba(239, 68, 68, 0.2)"
-                                }`,
-                                backdropFilter: "blur(10px)",
-                              }}
-                            >
-                              <Sparkles
-                                size={16}
-                                style={{
-                                  color:
-                                    product.price > 0 ? "#22c55e" : "#ef4444",
-                                }}
-                              />
-                              <span
-                                style={{
-                                  fontSize: "0.8rem",
-                                  fontWeight: "600",
-                                  color:
-                                    product.price > 0 ? "#22c55e" : "#ef4444",
-                                  letterSpacing: "0.02em",
-                                }}
-                              >
-                                {product.price > 0 ? "In Stock" : "Sold Out"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Artistic Add to Cart Button */}
-                        <motion.button
-                          whileHover={{
-                            scale: product.price > 0 ? 1.03 : 1,
-                            boxShadow:
-                              product.price > 0
-                                ? "0 12px 32px rgba(59, 130, 246, 0.4)"
-                                : "none",
-                          }}
-                          whileTap={{
-                            scale: product.price > 0 ? 0.97 : 1,
-                          }}
-                          onClick={() =>
-                            product.price > 0 && handleAddToCart(product)
-                          }
-                          disabled={
-                            addedToCartItems.has(product.id) ||
-                            isInCart(product.id) ||
-                            product.price === 0
-                          }
-                          style={{
-                            width: "100%",
-                            padding: "1.25rem 1.5rem",
-                            background:
-                              product.price === 0
-                                ? "linear-gradient(135deg, #9ca3af, #6b7280)"
-                                : addedToCartItems.has(product.id)
-                                ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                                : isInCart(product.id)
-                                ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                                : "linear-gradient(135deg, #667eea, #764ba2)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "16px",
-                            cursor:
-                              product.price === 0 ||
-                              addedToCartItems.has(product.id) ||
-                              isInCart(product.id)
-                                ? "not-allowed"
-                                : "pointer",
-                            fontSize: "1rem",
-                            fontWeight: "700",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "0.75rem",
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            height: "56px",
-                            boxShadow:
-                              product.price === 0
-                                ? "none"
-                                : "0 8px 24px rgba(102, 126, 234, 0.3)",
-                            opacity:
-                              product.price === 0
-                                ? 0.6
-                                : addedToCartItems.has(product.id) ||
-                                  isInCart(product.id)
-                                ? 0.8
-                                : 1,
-                            letterSpacing: "0.02em",
-                            textTransform: "uppercase",
-                            position: "relative",
-                            overflow: "hidden",
+                        {/* Product Details */}
+                        <motion.div
+                          className="product-details"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: index * 0.08 + 0.7,
                           }}
                         >
-                          {/* Button Background Pattern */}
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              background:
-                                "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)",
-                              transform: "translateX(-100%)",
-                              transition: "transform 0.6s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              if (product.price > 0) {
-                                e.currentTarget.style.transform =
-                                  "translateX(100%)";
-                              }
-                            }}
-                          />
+                          {/* Dimensions */}
+                          {dimensions &&
+                          (dimensions.width > 0 || dimensions.height > 0) ? (
+                            <motion.div
+                              className="detail-badge dimensions"
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Package size={14} />
+                              <span>
+                                {dimensions.width > 0 &&
+                                dimensions.height > 0 ? (
+                                  <>
+                                    {dimensions.width}cm × {dimensions.height}
+                                    cm
+                                    {dimensions.depth > 0 &&
+                                      ` × ${dimensions.depth}cm`}
+                                  </>
+                                ) : (
+                                  <>
+                                    {dimensions.width > 0 &&
+                                      `${dimensions.width}cm width`}
+                                    {dimensions.height > 0 &&
+                                      `${dimensions.height}cm height`}
+                                    {dimensions.depth > 0 &&
+                                      `${dimensions.depth}cm depth`}
+                                  </>
+                                )}
+                              </span>
+                            </motion.div>
+                          ) : (
+                            <motion.div
+                              className="detail-badge"
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Package size={14} />
+                              <span>Dimensions not available</span>
+                            </motion.div>
+                          )}
 
-                          {product.price === 0 ? (
-                            <>
-                              <X size={20} />
-                              Cannot Add
-                            </>
+                          {/* Availability */}
+                          <motion.div
+                            className={`detail-badge ${
+                              product.price > 0 ? "availability" : "unavailable"
+                            }`}
+                            whileHover={{ scale: 1.05 }}
+                            animate={{
+                              scale: product.price > 0 ? [1, 1.05, 1] : 1,
+                            }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: product.price > 0 ? 1 : 0,
+                              repeatDelay: 2,
+                            }}
+                          >
+                            <Check size={14} />
+                            <span>
+                              {product.price > 0 ? "In Stock" : "Sold Out"}
+                            </span>
+                          </motion.div>
+                        </motion.div>
+
+                        {/* Enhanced Add to Cart / Preorder Button */}
+                        <motion.button
+                          className={`elegant-button ${
+                            !isProductAvailable(product)
+                              ? "secondary"
+                              : addedToCartItems.has(product.id)
+                              ? "success"
+                              : isProductInCart(product)
+                              ? "warning"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            if (isProductAvailable(product)) {
+                              handleAddToCart(product);
+                            } else {
+                              openPreorderModal(product);
+                            }
+                          }}
+                          disabled={
+                            addedToCartItems.has(product.id) ||
+                            isProductInCart(product)
+                          }
+                          whileHover={{
+                            scale: 1.02,
+                            boxShadow: isProductAvailable(product)
+                              ? "0 8px 24px rgba(59, 130, 246, 0.3)"
+                              : "0 8px 24px rgba(245, 158, 11, 0.3)",
+                          }}
+                          whileTap={{
+                            scale: 0.98,
+                          }}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: index * 0.08 + 0.8,
+                          }}
+                        >
+                          {!isProductAvailable(product) ? (
+                            addedToCartItems.has(product.id) ? (
+                              <>
+                                <Check size={18} />
+                                Preorder Added!
+                              </>
+                            ) : isProductInCart(product) ? (
+                              <>
+                                <Clock size={18} />
+                                Preorder in Cart
+                              </>
+                            ) : (
+                              <>
+                                <Clock size={18} />
+                                Preorder
+                              </>
+                            )
                           ) : addedToCartItems.has(product.id) ? (
                             <>
-                              <Check size={20} />
+                              <Check size={18} />
                               Added to Cart!
                             </>
-                          ) : isInCart(product.id) ? (
+                          ) : isProductInCart(product) ? (
                             <>
-                              <ShoppingCart size={20} />
+                              <ShoppingCart size={18} />
                               Already in Cart
                             </>
                           ) : (
                             <>
-                              <ShoppingCart size={20} />
+                              <ShoppingCart size={18} />
                               Add to Cart
                             </>
                           )}
                         </motion.button>
-                      </div>
+                      </motion.div>
                     </motion.div>
                   );
                 })}
@@ -1391,6 +1283,16 @@ const CollectionDetail: React.FC = () => {
         onClose={closeImageModal}
         imageUrl={imageModal.imageUrl}
         title={imageModal.title}
+      />
+
+      {/* Preorder Modal */}
+      <PreorderModal
+        isOpen={preorderModal.isOpen}
+        onClose={closePreorderModal}
+        product={preorderModal.product}
+        onAddToCart={(product, message) =>
+          handlePreorderAddToCart(product, message)
+        }
       />
     </div>
   );

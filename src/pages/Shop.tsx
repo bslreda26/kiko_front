@@ -12,9 +12,14 @@ import {
   Filter,
   Clock,
 } from "lucide-react";
-import { getAllProducts } from "../services/productService";
+import { ProductService } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
-import type { Product, Collection, ApiError } from "../types/api";
+import type {
+  Product,
+  Collection,
+  ApiError,
+  PaginatedResponse,
+} from "../types/api";
 import { getParsedDimensions } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import { useResponsive } from "../hooks/useResponsive";
@@ -54,6 +59,19 @@ const Shop: React.FC = () => {
     product: null,
   });
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationLoading, setPaginationLoading] = useState(false);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [pagination, setPagination] = useState<{
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  } | null>(null);
+
   const { addToCart, addPreorderToCart, isInCart } = useCart();
   const navigate = useNavigate();
   const { isMobile, isTablet } = useResponsive();
@@ -71,18 +89,50 @@ const Shop: React.FC = () => {
     loadInitialData();
   }, []);
 
+  // Load products when page changes
+  useEffect(() => {
+    if (contentFilter === "products") {
+      loadProducts();
+    }
+  }, [currentPage, contentFilter]);
+
+  const loadProducts = async () => {
+    try {
+      setPaginationLoading(true);
+      setError(null);
+
+      const pagedResult: PaginatedResponse<Product> =
+        await ProductService.getProductByCriteriaPaged({
+          page: currentPage,
+          limit: 6, // Show 6 products per page
+        });
+
+      setProducts(pagedResult.data);
+      setPagination({
+        page: pagedResult.pagination.page,
+        limit: pagedResult.pagination.limit,
+        total: pagedResult.pagination.total,
+        totalPages: pagedResult.pagination.totalPages,
+        hasNext:
+          pagedResult.pagination.page < pagedResult.pagination.totalPages,
+        hasPrev: pagedResult.pagination.page > 1,
+      });
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || "Failed to load products");
+      console.error("Error loading products:", err);
+    } finally {
+      setPaginationLoading(false);
+    }
+  };
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const [productsData, collectionsData] = await Promise.all([
-        getAllProducts(),
-        getAllCollections(),
-      ]);
-
-      setProducts(productsData);
-      setCollections(collectionsData);
+      // Only load products initially, not collections
+      await loadProducts();
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.message || "Failed to load shop data");
@@ -154,13 +204,30 @@ const Shop: React.FC = () => {
     navigate(`/product/${productId}`);
   };
 
+  const loadCollections = async () => {
+    try {
+      setCollectionsLoading(true);
+      setError(null);
+      const collectionsData = await getAllCollections();
+      setCollections(collectionsData);
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || "Failed to load collections");
+      console.error("Error loading collections:", err);
+    } finally {
+      setCollectionsLoading(false);
+    }
+  };
+
   const handleCollectionClick = (collectionId: number) => {
     navigate(`/collection/${collectionId}`);
   };
 
-  const getProductCountInCollection = (collectionId: number) => {
-    return products.filter((product) => product.collectionId === collectionId)
-      .length;
+  const handlePageChange = (newPage: number) => {
+    if (paginationLoading) return; // Prevent page changes during loading
+    setCurrentPage(newPage);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Check if product is available
@@ -252,6 +319,9 @@ const Shop: React.FC = () => {
             margin: "0 auto",
             padding: "0 1rem",
             width: "100%",
+            pointerEvents: paginationLoading ? "none" : "auto",
+            opacity: paginationLoading ? 0.6 : 1,
+            transition: "opacity 0.3s ease",
           }}
         >
           {/* Modern Header */}
@@ -335,7 +405,16 @@ const Shop: React.FC = () => {
               }}
             >
               <button
-                onClick={() => setContentFilter("collections")}
+                onClick={async () => {
+                  if (!paginationLoading) {
+                    setContentFilter("collections");
+                    // Load collections when user clicks on collections filter
+                    if (collections.length === 0) {
+                      await loadCollections();
+                    }
+                  }
+                }}
+                disabled={paginationLoading}
                 style={{
                   padding: "8px 16px",
                   background:
@@ -345,20 +424,24 @@ const Shop: React.FC = () => {
                   color: contentFilter === "collections" ? "white" : "#64748b",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: "pointer",
+                  cursor: paginationLoading ? "not-allowed" : "pointer",
                   transition: "all 0.3s ease",
                   display: "flex",
                   alignItems: "center",
                   gap: "0.25rem",
                   fontSize: "0.9rem",
                   fontWeight: "500",
+                  opacity: paginationLoading ? 0.6 : 1,
                 }}
               >
                 <Sparkles size={16} />
                 Collections
               </button>
               <button
-                onClick={() => setContentFilter("products")}
+                onClick={() =>
+                  !paginationLoading && setContentFilter("products")
+                }
+                disabled={paginationLoading}
                 style={{
                   padding: "8px 16px",
                   background:
@@ -368,13 +451,14 @@ const Shop: React.FC = () => {
                   color: contentFilter === "products" ? "white" : "#64748b",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: "pointer",
+                  cursor: paginationLoading ? "not-allowed" : "pointer",
                   transition: "all 0.3s ease",
                   display: "flex",
                   alignItems: "center",
                   gap: "0.25rem",
                   fontSize: "0.9rem",
                   fontWeight: "500",
+                  opacity: paginationLoading ? 0.6 : 1,
                 }}
               >
                 <ShoppingCart size={16} />
@@ -395,7 +479,8 @@ const Shop: React.FC = () => {
                 }}
               >
                 <button
-                  onClick={() => setViewMode("grid")}
+                  onClick={() => !paginationLoading && setViewMode("grid")}
+                  disabled={paginationLoading}
                   className={`elegant-button ${
                     viewMode === "grid" ? "" : "secondary"
                   }`}
@@ -403,13 +488,16 @@ const Shop: React.FC = () => {
                     padding: "8px 12px",
                     fontSize: "0.85rem",
                     minHeight: "32px",
+                    cursor: paginationLoading ? "not-allowed" : "pointer",
+                    opacity: paginationLoading ? 0.6 : 1,
                   }}
                 >
                   <Grid3X3 size={16} />
                   Grid
                 </button>
                 <button
-                  onClick={() => setViewMode("list")}
+                  onClick={() => !paginationLoading && setViewMode("list")}
+                  disabled={paginationLoading}
                   className={`elegant-button ${
                     viewMode === "list" ? "" : "secondary"
                   }`}
@@ -417,6 +505,8 @@ const Shop: React.FC = () => {
                     padding: "8px 12px",
                     fontSize: "0.85rem",
                     minHeight: "32px",
+                    cursor: paginationLoading ? "not-allowed" : "pointer",
+                    opacity: paginationLoading ? 0.6 : 1,
                   }}
                 >
                   <List size={16} />
@@ -438,7 +528,10 @@ const Shop: React.FC = () => {
                 }}
               >
                 <button
-                  onClick={() => setAvailabilityFilter("all")}
+                  onClick={() =>
+                    !paginationLoading && setAvailabilityFilter("all")
+                  }
+                  disabled={paginationLoading}
                   className={`elegant-button ${
                     availabilityFilter === "all" ? "success" : "secondary"
                   }`}
@@ -446,13 +539,18 @@ const Shop: React.FC = () => {
                     padding: "6px 12px",
                     fontSize: "0.8rem",
                     minHeight: "28px",
+                    cursor: paginationLoading ? "not-allowed" : "pointer",
+                    opacity: paginationLoading ? 0.6 : 1,
                   }}
                 >
                   <Filter size={14} />
                   All
                 </button>
                 <button
-                  onClick={() => setAvailabilityFilter("available")}
+                  onClick={() =>
+                    !paginationLoading && setAvailabilityFilter("available")
+                  }
+                  disabled={paginationLoading}
                   className={`elegant-button ${
                     availabilityFilter === "available" ? "success" : "secondary"
                   }`}
@@ -460,6 +558,8 @@ const Shop: React.FC = () => {
                     padding: "6px 12px",
                     fontSize: "0.8rem",
                     minHeight: "28px",
+                    cursor: paginationLoading ? "not-allowed" : "pointer",
+                    opacity: paginationLoading ? 0.6 : 1,
                   }}
                 >
                   <Check size={14} />
@@ -491,191 +591,217 @@ const Shop: React.FC = () => {
           )}
 
           {/* Collections Section */}
-          {contentFilter === "collections" && collections.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              style={{ marginBottom: "4rem" }}
-            >
-              <h2
-                style={{
-                  fontSize: "2rem",
-                  fontWeight: "700",
-                  color: "#1e293b",
-                  marginBottom: "2rem",
-                  textAlign: "center",
-                }}
-              >
-                Our Collections ({collections.length})
-              </h2>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: isMobile
-                    ? "1fr"
-                    : isTablet
-                    ? "repeat(auto-fill, minmax(280px, 1fr))"
-                    : "repeat(auto-fill, minmax(320px, 1fr))",
-                  gap: isMobile ? "1rem" : "2rem",
-                  padding: isMobile ? "0" : "0 0.5rem",
-                }}
-              >
-                {collections.map((collection, index) => {
-                  const productCount = getProductCountInCollection(
-                    collection.id
-                  );
-
-                  return (
-                    <motion.div
-                      key={collection.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      whileHover={{
-                        y: -8,
-                        scale: 1.02,
-                        transition: { duration: 0.3, ease: "easeOut" },
-                      }}
-                      onClick={() => handleCollectionClick(collection.id)}
-                      style={{
-                        background: "rgba(255, 255, 255, 0.98)",
-                        borderRadius: "16px",
-                        overflow: "hidden",
-                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
-                        border: "1px solid rgba(226, 232, 240, 0.4)",
-                        backdropFilter: "blur(20px)",
-                        cursor: "pointer",
-                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                        position: "relative",
-                        height: "200px",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        textAlign: "center",
-                        padding: "2rem",
-                      }}
-                    >
-                      {/* Modern Gradient Background */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background:
-                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                          opacity: 0.05,
-                          transition: "opacity 0.3s ease",
-                        }}
-                      />
-
-                      {/* Collection Title */}
-                      <h3
-                        style={{
-                          fontSize: "1.75rem",
-                          fontWeight: "800",
-                          color: "#1e293b",
-                          margin: "0 0 1rem 0",
-                          lineHeight: "1.2",
-                          letterSpacing: "-0.025em",
-                          position: "relative",
-                          zIndex: 1,
-                        }}
-                      >
-                        {collection.name}
-                      </h3>
-
-                      {/* Product Count */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          padding: "0.75rem 1.25rem",
-                          background: "rgba(255, 255, 255, 0.9)",
-                          borderRadius: "25px",
-                          border: "1px solid rgba(255, 255, 255, 0.3)",
-                          backdropFilter: "blur(10px)",
-                          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
-                          position: "relative",
-                          zIndex: 1,
-                        }}
-                      >
-                        <span
+          {contentFilter === "collections" && (
+            <>
+              {collectionsLoading ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{
+                    textAlign: "center",
+                    padding: "4rem 2rem",
+                    background: "rgba(255, 255, 255, 0.8)",
+                    borderRadius: "20px",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    style={{
+                      display: "inline-block",
+                      marginBottom: "1rem",
+                      color: "#3b82f6",
+                    }}
+                  >
+                    <Sparkles size={48} />
+                  </motion.div>
+                  <motion.h3
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    style={{
+                      fontSize: "1.25rem",
+                      fontWeight: "600",
+                      color: "#1e293b",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    Loading Collections...
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    style={{
+                      fontSize: "1rem",
+                      color: "#64748b",
+                    }}
+                  >
+                    Please wait while we fetch the collections
+                  </motion.p>
+                </motion.div>
+              ) : collections.length > 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  style={{ marginBottom: "4rem" }}
+                >
+                  <h2
+                    style={{
+                      fontSize: "2rem",
+                      fontWeight: "700",
+                      color: "#1e293b",
+                      marginBottom: "2rem",
+                      textAlign: "center",
+                    }}
+                  >
+                    Our Collections ({collections.length})
+                  </h2>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: isMobile
+                        ? "1fr"
+                        : isTablet
+                        ? "repeat(auto-fill, minmax(280px, 1fr))"
+                        : "repeat(auto-fill, minmax(320px, 1fr))",
+                      gap: isMobile ? "1rem" : "2rem",
+                      padding: isMobile ? "0" : "0 0.5rem",
+                    }}
+                  >
+                    {collections.map((collection, index) => {
+                      return (
+                        <motion.div
+                          key={collection.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                          whileHover={{
+                            y: -8,
+                            scale: 1.02,
+                            transition: { duration: 0.3, ease: "easeOut" },
+                          }}
+                          onClick={() =>
+                            !paginationLoading &&
+                            handleCollectionClick(collection.id)
+                          }
                           style={{
-                            fontSize: "0.9rem",
-                            fontWeight: "600",
-                            color: "#667eea",
-                            letterSpacing: "0.025em",
+                            background: "rgba(255, 255, 255, 0.98)",
+                            borderRadius: "16px",
+                            overflow: "hidden",
+                            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+                            border: "1px solid rgba(226, 232, 240, 0.4)",
+                            backdropFilter: "blur(20px)",
+                            cursor: "pointer",
+                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                            position: "relative",
+                            height: "200px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            textAlign: "center",
+                            padding: "2rem",
                           }}
                         >
-                          {productCount}{" "}
-                          {productCount === 1 ? "Product" : "Products"}
-                        </span>
-                      </div>
+                          {/* Modern Gradient Background */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background:
+                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                              opacity: 0.05,
+                              transition: "opacity 0.3s ease",
+                            }}
+                          />
 
-                      {/* Hover Effect */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background:
-                            "linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08))",
-                          opacity: 0,
-                          transition: "opacity 0.3s ease",
-                          pointerEvents: "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.opacity = "1";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.opacity = "0";
-                        }}
-                      />
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
+                          {/* Collection Title */}
+                          <h3
+                            style={{
+                              fontSize: "1.75rem",
+                              fontWeight: "800",
+                              color: "#1e293b",
+                              margin: "0 0 1rem 0",
+                              lineHeight: "1.2",
+                              letterSpacing: "-0.025em",
+                              position: "relative",
+                              zIndex: 1,
+                            }}
+                          >
+                            {collection.name}
+                          </h3>
 
-          {/* Empty Collections State */}
-          {contentFilter === "collections" && collections.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                textAlign: "center",
-                padding: "4rem 2rem",
-                background: "rgba(255, 255, 255, 0.8)",
-                borderRadius: "20px",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <Sparkles
-                size={64}
-                style={{ color: "#94a3b8", marginBottom: "1rem" }}
-              />
-              <h3
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "600",
-                  color: "#64748b",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                No collections found
-              </h3>
-              <p style={{ color: "#94a3b8", margin: 0 }}>
-                Our collections are being curated. Please check back soon!
-              </p>
-            </motion.div>
+                          {/* Hover Effect */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background:
+                                "linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08))",
+                              opacity: 0,
+                              transition: "opacity 0.3s ease",
+                              pointerEvents: "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.opacity = "1";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.opacity = "0";
+                            }}
+                          />
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{
+                    textAlign: "center",
+                    padding: "4rem 2rem",
+                    background: "rgba(255, 255, 255, 0.8)",
+                    borderRadius: "20px",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <Sparkles
+                    size={64}
+                    style={{ color: "#94a3b8", marginBottom: "1rem" }}
+                  />
+                  <h3
+                    style={{
+                      fontSize: "1.5rem",
+                      fontWeight: "600",
+                      color: "#64748b",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    No collections found
+                  </h3>
+                  <p style={{ color: "#94a3b8", margin: 0 }}>
+                    Our collections are being curated. Please check back soon!
+                  </p>
+                </motion.div>
+              )}
+            </>
           )}
 
           {/* Products Section */}
@@ -685,6 +811,69 @@ const Shop: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
+              {paginationLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(255, 255, 255, 0.9)",
+                    backdropFilter: "blur(10px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 1000,
+                    flexDirection: "column",
+                  }}
+                >
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    style={{
+                      display: "inline-block",
+                      marginBottom: "1rem",
+                      color: "#3b82f6",
+                    }}
+                  >
+                    <Sparkles size={48} />
+                  </motion.div>
+                  <motion.h3
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    style={{
+                      fontSize: "1.25rem",
+                      fontWeight: "600",
+                      color: "#1e293b",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    Loading Products...
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    style={{
+                      fontSize: "1rem",
+                      color: "#64748b",
+                    }}
+                  >
+                    Please wait while we fetch the latest products
+                  </motion.p>
+                </motion.div>
+              )}
               <h2
                 style={{
                   fontSize: "2rem",
@@ -796,7 +985,9 @@ const Shop: React.FC = () => {
 
                         {/* Product Image */}
                         <motion.div
-                          onClick={() => handleProductClick(product.id)}
+                          onClick={() =>
+                            !paginationLoading && handleProductClick(product.id)
+                          }
                           className="product-image-container"
                           style={{
                             height:
@@ -893,6 +1084,7 @@ const Shop: React.FC = () => {
                             <motion.button
                               className="view-button"
                               onClick={(e) => {
+                                if (paginationLoading) return;
                                 e.stopPropagation();
                                 openImageModal(product.image, product.title);
                               }}
@@ -1016,6 +1208,7 @@ const Shop: React.FC = () => {
                                 : ""
                             }`}
                             onClick={() => {
+                              if (paginationLoading) return;
                               if (isProductAvailable(product)) {
                                 handleAddToCart(product);
                               } else {
@@ -1024,7 +1217,8 @@ const Shop: React.FC = () => {
                             }}
                             disabled={
                               addedToCartItems.has(product.id) ||
-                              isProductInCart(product)
+                              isProductInCart(product) ||
+                              paginationLoading
                             }
                             whileHover={{
                               scale: 1.02,
@@ -1126,6 +1320,179 @@ const Shop: React.FC = () => {
                       ? "All products are currently sold out. Please check back soon!"
                       : "Our collection is being updated. Please check back soon!"}
                   </p>
+                </motion.div>
+              )}
+
+              {/* Pagination Controls */}
+              {pagination && pagination.totalPages > 1 && (
+                <motion.div
+                  className="pagination-container"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "1rem",
+                    marginTop: "3rem",
+                    padding: "2rem",
+                    background: "rgba(255, 255, 255, 0.9)",
+                    borderRadius: "20px",
+                    backdropFilter: "blur(10px)",
+                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  {/* Previous Page Button */}
+                  <motion.button
+                    className="pagination-button"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={!pagination.hasPrev || paginationLoading}
+                    whileHover={{
+                      scale:
+                        pagination.hasPrev && !paginationLoading ? 1.05 : 1,
+                    }}
+                    whileTap={{
+                      scale:
+                        pagination.hasPrev && !paginationLoading ? 0.95 : 1,
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      padding: "0.75rem 1.5rem",
+                      border: "none",
+                      borderRadius: "12px",
+                      background: pagination.hasPrev
+                        ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                        : "#e2e8f0",
+                      color: pagination.hasPrev ? "white" : "#94a3b8",
+                      cursor: pagination.hasPrev ? "pointer" : "not-allowed",
+                      fontSize: "0.875rem",
+                      fontWeight: "600",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    ← Previous
+                  </motion.button>
+
+                  {/* Page Numbers */}
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    {Array.from(
+                      { length: pagination.totalPages },
+                      (_, i) => i + 1
+                    )
+                      .filter((page) => {
+                        // Show first page, last page, current page, and pages around current
+                        return (
+                          page === 1 ||
+                          page === pagination.totalPages ||
+                          Math.abs(page - currentPage) <= 1
+                        );
+                      })
+                      .map((page, index, array) => {
+                        // Add ellipsis if there's a gap
+                        const showEllipsis =
+                          index > 0 && page - array[index - 1] > 1;
+
+                        return (
+                          <React.Fragment key={page}>
+                            {showEllipsis && (
+                              <span
+                                style={{
+                                  padding: "0.75rem",
+                                  color: "#94a3b8",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                ...
+                              </span>
+                            )}
+                            <motion.button
+                              className="page-number-button"
+                              onClick={() => handlePageChange(page)}
+                              whileHover={{
+                                scale: page !== currentPage ? 1.05 : 1,
+                              }}
+                              whileTap={{
+                                scale: page !== currentPage ? 0.95 : 1,
+                              }}
+                              style={{
+                                padding: "0.75rem 1rem",
+                                border: "none",
+                                borderRadius: "12px",
+                                background:
+                                  page === currentPage
+                                    ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                    : "rgba(255, 255, 255, 0.8)",
+                                color:
+                                  page === currentPage ? "white" : "#374151",
+                                cursor: "pointer",
+                                fontSize: "0.875rem",
+                                fontWeight: "600",
+                                minWidth: "2.5rem",
+                                transition: "all 0.3s ease",
+                              }}
+                            >
+                              {page}
+                            </motion.button>
+                          </React.Fragment>
+                        );
+                      })}
+                  </div>
+
+                  {/* Next Page Button */}
+                  <motion.button
+                    className="pagination-button"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!pagination.hasNext || paginationLoading}
+                    whileHover={{
+                      scale:
+                        pagination.hasNext && !paginationLoading ? 1.05 : 1,
+                    }}
+                    whileTap={{
+                      scale:
+                        pagination.hasNext && !paginationLoading ? 0.95 : 1,
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      padding: "0.75rem 1.5rem",
+                      border: "none",
+                      borderRadius: "12px",
+                      background: pagination.hasNext
+                        ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                        : "#e2e8f0",
+                      color: pagination.hasNext ? "white" : "#94a3b8",
+                      cursor: pagination.hasNext ? "pointer" : "not-allowed",
+                      fontSize: "0.875rem",
+                      fontWeight: "600",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Next →
+                  </motion.button>
+                </motion.div>
+              )}
+
+              {/* Page Info */}
+              {pagination && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  style={{
+                    textAlign: "center",
+                    marginTop: "1rem",
+                    color: "#64748b",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  Showing {(currentPage - 1) * pagination.limit + 1} to{" "}
+                  {Math.min(currentPage * pagination.limit, pagination.total)}{" "}
+                  of {pagination.total} products
                 </motion.div>
               )}
             </motion.div>

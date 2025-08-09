@@ -5,6 +5,7 @@ import type {
   CreateProductRequest,
   UpdateProductRequest,
   ProductSearchParams,
+  PaginatedResponse,
   ApiError
 } from '../types/api';
 
@@ -18,7 +19,7 @@ export class ProductService {
            try {
              const response = await api.post<Product>(ProductService.BASE_PATH, data);
              return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -30,7 +31,32 @@ export class ProductService {
            try {
              const response = await api.get<Product[]>(ProductService.BASE_PATH);
              return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      throw ProductService.handleError(error);
+    }
+  }
+
+  /**
+   * Get products with pagination
+   */
+  static async getProductByCriteriaPaged(
+    paginationOptions: { page?: number; limit?: number } = {}
+  ): Promise<PaginatedResponse<Product>> {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (paginationOptions.page) {
+        queryParams.append('page', paginationOptions.page.toString());
+      }
+      if (paginationOptions.limit) {
+        queryParams.append('limit', paginationOptions.limit.toString());
+      }
+
+      const response = await api.get<PaginatedResponse<Product>>(
+        `${ProductService.BASE_PATH}/search-paged?${queryParams.toString()}`
+      );
+      return response.data;
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -53,7 +79,7 @@ export class ProductService {
         `${ProductService.BASE_PATH}/search?${queryParams.toString()}`
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -69,7 +95,7 @@ export class ProductService {
         `${ProductService.BASE_PATH}/by-collection/${collectionId}`
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -81,7 +107,7 @@ export class ProductService {
     try {
       const response = await api.get<ProductWithCollection>(`${ProductService.BASE_PATH}/${id}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -93,7 +119,7 @@ export class ProductService {
     try {
       const response = await api.put<Product>(`${ProductService.BASE_PATH}/${id}`, data);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -104,7 +130,7 @@ export class ProductService {
   static async deleteProduct(id: number): Promise<void> {
     try {
       await api.delete(`${ProductService.BASE_PATH}/${id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -118,7 +144,7 @@ export class ProductService {
       // You might want to add a specific featured endpoint to your backend
       const products = await ProductService.getAllProducts();
       return products.slice(0, limit);
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -136,7 +162,7 @@ export class ProductService {
         return dateB.getTime() - dateA.getTime();
       });
       return sortedProducts.slice(0, limit);
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw ProductService.handleError(error);
     }
   }
@@ -153,14 +179,15 @@ export class ProductService {
   /**
    * Handle API errors consistently
    */
-  private static handleError(error: any): ApiError {
-    if (error.response) {
+  private static handleError(error: unknown): ApiError {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const apiError = error as { response: { data?: { message?: string; error?: string }; status: number } };
       return {
-        message: error.response.data?.message || 'An error occurred',
-        error: error.response.data?.error || error.message,
-        status: error.response.status
+        message: apiError.response.data?.message || 'An error occurred',
+        error: apiError.response.data?.error || 'API Error',
+        status: apiError.response.status
       };
-    } else if (error.request) {
+    } else if (error && typeof error === 'object' && 'request' in error) {
       return {
         message: 'Network error - please check your connection',
         error: 'Network error',
@@ -168,8 +195,8 @@ export class ProductService {
       };
     } else {
       return {
-        message: error.message || 'An unexpected error occurred',
-        error: error.message,
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        error: error instanceof Error ? error.message : 'Unknown error',
         status: 0
       };
     }
@@ -182,6 +209,7 @@ export default ProductService;
 // Export individual functions for easier imports
 export const createProduct = ProductService.createProduct;
 export const getAllProducts = ProductService.getAllProducts;
+export const getProductByCriteriaPaged = ProductService.getProductByCriteriaPaged;
 export const searchProducts = ProductService.searchProducts;
 export const getProductsByCollection = ProductService.getProductsByCollection;
 export const getProductById = ProductService.getProductById;
