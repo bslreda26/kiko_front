@@ -175,11 +175,18 @@ const AdminDashboard: React.FC = () => {
     if (type === "product") {
       if (item) {
         const product = item as Product;
+        console.log("Product from API:", product);
+        console.log(
+          "Product image from API:",
+          product.image,
+          "Type:",
+          typeof product.image
+        );
         const dimensions = getParsedDimensions(product);
         setProductForm({
           title: product.title,
           description: product.description,
-          image: product.image,
+          image: product.image || "", // Ensure image is always a string
           price: Number(product.price), // Ensure it's a number
           dimensions: {
             width: dimensions?.width || 0,
@@ -218,18 +225,39 @@ const AdminDashboard: React.FC = () => {
   const closeModal = () => {
     setModalType(null);
     setEditingItem(null);
+    // Reset form states
+    setProductForm({
+      title: "",
+      description: "",
+      image: "",
+      price: 1,
+      dimensions: { width: 0, height: 0, depth: 0 },
+      collectionId: collections[0]?.id || 0,
+    });
+    setCollectionForm({
+      name: "",
+      description: "",
+    });
   };
 
-  const validateProductForm = (productForm: ProductForm): string | null => {
+  const validateProductForm = (
+    productForm: ProductForm,
+    isEditing: boolean = false
+  ): string | null => {
     if (!productForm.title?.trim()) return "Product title is required";
     if (!productForm.description?.trim())
       return "Product description is required";
+
+    // Image URL is only required for new products, not for updates
     if (
-      !productForm.image ||
-      typeof productForm.image !== "string" ||
-      !productForm.image.trim()
-    )
+      !isEditing &&
+      (!productForm.image ||
+        typeof productForm.image !== "string" ||
+        !productForm.image.trim())
+    ) {
       return "Product image URL is required";
+    }
+
     if (productForm.price < 0 || productForm.price > 1)
       return "Availability must be selected (Available or Sold Out)";
     if (productForm.collectionId <= 0) return "Please select a collection";
@@ -259,7 +287,7 @@ const AdminDashboard: React.FC = () => {
       // Validate form data
       let validationError: string | null = null;
       if (modalType === "product") {
-        validationError = validateProductForm(productForm);
+        validationError = validateProductForm(productForm, !!editingItem);
       } else if (modalType === "collection") {
         validationError = validateCollectionForm();
       }
@@ -272,13 +300,16 @@ const AdminDashboard: React.FC = () => {
 
       if (modalType === "product") {
         // Prepare product data
-        const productData = {
+        console.log(
+          "Product form image value:",
+          productForm.image,
+          "Type:",
+          typeof productForm.image
+        );
+        // For updates, only include fields that have been changed
+        const productData: any = {
           title: productForm.title.trim(),
           description: productForm.description.trim(),
-          image:
-            typeof productForm.image === "string"
-              ? productForm.image.trim()
-              : "",
           price: Number(productForm.price), // Ensure it's a number
           dimensions: JSON.stringify({
             width: Number(productForm.dimensions.width),
@@ -288,8 +319,18 @@ const AdminDashboard: React.FC = () => {
           collectionId: productForm.collectionId,
         };
 
+        // Only include image if it's provided (for new products) or changed (for updates)
+        if (
+          productForm.image &&
+          typeof productForm.image === "string" &&
+          productForm.image.trim()
+        ) {
+          productData.image = productForm.image.trim();
+        }
+
         if (editingItem) {
           // Update existing product
+          console.log("Updating product with data:", productData);
           await updateProduct(
             (editingItem as Product).id,
             productData as UpdateProductRequest
@@ -297,6 +338,7 @@ const AdminDashboard: React.FC = () => {
           setSuccessMessage("Product updated successfully!");
         } else {
           // Create new product
+          console.log("Creating product with data:", productData);
           await createProduct(productData as CreateProductRequest);
           setSuccessMessage("Product created successfully!");
         }

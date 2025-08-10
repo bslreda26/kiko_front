@@ -216,5 +216,7 @@ export const getProductById = ProductService.getProductById;
 export const updateProduct = ProductService.updateProduct;
 export const deleteProduct = ProductService.deleteProduct;
 export const getFeaturedProducts = ProductService.getFeaturedProducts;
+
+
 export const getLatestProducts = ProductService.getLatestProducts;
 export const searchProductsByTitle = ProductService.searchProductsByTitle;
