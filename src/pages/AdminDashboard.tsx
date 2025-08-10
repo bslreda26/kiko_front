@@ -34,9 +34,8 @@ import type {
   UpdateCollectionRequest,
   PaginatedResponse,
 } from "../types/api";
-import { getParsedDimensions, getParsedImages } from "../types/api";
+import { getParsedDimensions } from "../types/api";
 import ImageUpload from "../components/ImageUpload";
-import MultipleImageUpload from "../components/MultipleImageUpload";
 import { uploadFile } from "../services/uploadService";
 
 type TabType = "products" | "collections";
@@ -54,7 +53,6 @@ interface ProductForm {
 interface CollectionForm {
   name: string;
   description: string;
-  images: string[];
 }
 
 const AdminDashboard: React.FC = () => {
@@ -95,7 +93,6 @@ const AdminDashboard: React.FC = () => {
   const [collectionForm, setCollectionForm] = useState<CollectionForm>({
     name: "",
     description: "",
-    images: [""],
   });
 
   useEffect(() => {
@@ -205,17 +202,14 @@ const AdminDashboard: React.FC = () => {
     } else if (type === "collection") {
       if (item) {
         const collection = item as Collection;
-        const images = getParsedImages(collection);
         setCollectionForm({
           name: collection.name,
           description: collection.description,
-          images: images.length > 0 ? images : [""],
         });
       } else {
         setCollectionForm({
           name: "",
           description: "",
-          images: [""],
         });
       }
     }
@@ -253,10 +247,6 @@ const AdminDashboard: React.FC = () => {
     if (!collectionForm.name.trim()) return "Collection name is required";
     if (!collectionForm.description.trim())
       return "Collection description is required";
-    const validImages = collectionForm.images.filter(
-      (img) => img.trim() !== ""
-    );
-    if (validImages.length === 0) return "At least one image URL is required";
     return null;
   };
 
@@ -312,13 +302,10 @@ const AdminDashboard: React.FC = () => {
         }
       } else if (modalType === "collection") {
         // Prepare collection data
-        const validImages = collectionForm.images.filter(
-          (img) => img.trim() !== ""
-        );
         const collectionData = {
           name: collectionForm.name.trim(),
           description: collectionForm.description.trim(),
-          images: JSON.stringify(validImages),
+          images: JSON.stringify([]),
         };
 
         if (editingItem) {
@@ -1004,7 +991,6 @@ const AdminDashboard: React.FC = () => {
                 }}
               >
                 {collections.map((collection) => {
-                  const images = getParsedImages(collection);
                   const productCount = products.filter(
                     (p) => p.collectionId === collection.id
                   ).length;
@@ -1060,7 +1046,7 @@ const AdminDashboard: React.FC = () => {
                               margin: "0 0 0.5rem 0",
                             }}
                           >
-                            {productCount} products • {images.length} images
+                            {productCount} products
                           </p>
                         </div>
                         <div
@@ -1103,17 +1089,6 @@ const AdminDashboard: React.FC = () => {
                           </button>
                         </div>
                       </div>
-
-                      {images.length > 0 && (
-                        <div
-                          style={{
-                            height: "120px",
-                            borderRadius: "12px",
-                            background: `url(${images[0]}) center/cover`,
-                            marginBottom: "1rem",
-                          }}
-                        />
-                      )}
 
                       <p
                         style={{
@@ -1524,31 +1499,6 @@ const AdminDashboard: React.FC = () => {
                       resize: "vertical",
                     }}
                     placeholder="Enter collection description"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "0.5rem",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Collection Images
-                  </label>
-                  <MultipleImageUpload
-                    values={collectionForm.images}
-                    onChange={(urls) =>
-                      setCollectionForm((prev) => ({
-                        ...prev,
-                        images: urls,
-                      }))
-                    }
-                    onFileUpload={uploadFile}
-                    placeholder="Drop collection images here or click to browse"
-                    maxSize={5}
-                    maxImages={10}
                   />
                 </div>
               </div>

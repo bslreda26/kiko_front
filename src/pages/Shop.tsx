@@ -1331,13 +1331,16 @@ const Shop: React.FC = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    gap: "1rem",
+                    gap: isMobile ? "0.5rem" : "1rem",
                     marginTop: "3rem",
-                    padding: "2rem",
+                    padding: isMobile ? "1.5rem 1rem" : "2rem",
                     background: "rgba(255, 255, 255, 0.9)",
-                    borderRadius: "20px",
+                    borderRadius: isMobile ? "16px" : "20px",
                     backdropFilter: "blur(10px)",
                     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+                    flexDirection: isMobile ? "column" : "row",
+                    width: "100%",
+                    maxWidth: isMobile ? "100%" : "auto",
                   }}
                 >
                   {/* Previous Page Button */}
@@ -1356,58 +1359,96 @@ const Shop: React.FC = () => {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "0.5rem",
-                      padding: "0.75rem 1.5rem",
+                      padding: isMobile ? "1rem 1.5rem" : "0.75rem 1.5rem",
                       border: "none",
-                      borderRadius: "12px",
+                      borderRadius: isMobile ? "16px" : "12px",
                       background: pagination.hasPrev
                         ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
                         : "#e2e8f0",
                       color: pagination.hasPrev ? "white" : "#94a3b8",
                       cursor: pagination.hasPrev ? "pointer" : "not-allowed",
-                      fontSize: "0.875rem",
+                      fontSize: isMobile ? "1rem" : "0.875rem",
                       fontWeight: "600",
                       transition: "all 0.3s ease",
+                      minHeight: isMobile ? "48px" : "auto",
+                      minWidth: isMobile ? "120px" : "auto",
+                      width: isMobile ? "100%" : "auto",
+                      boxShadow: pagination.hasPrev
+                        ? "0 4px 16px rgba(102, 126, 234, 0.3)"
+                        : "none",
                     }}
                   >
                     ← Previous
                   </motion.button>
 
-                  {/* Page Numbers */}
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    {Array.from(
-                      { length: pagination.totalPages },
-                      (_, i) => i + 1
-                    )
-                      .filter((page) => {
-                        // Show first page, last page, current page, and pages around current
-                        return (
-                          page === 1 ||
-                          page === pagination.totalPages ||
-                          Math.abs(page - currentPage) <= 1
-                        );
-                      })
-                      .map((page, index, array) => {
-                        // Add ellipsis if there's a gap
-                        const showEllipsis =
-                          index > 0 && page - array[index - 1] > 1;
+                  {/* Page Numbers - Mobile Optimized */}
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: isMobile ? "0.25rem" : "0.5rem",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: isMobile ? "100%" : "auto",
+                    }}
+                  >
+                    {(() => {
+                      const pages = Array.from(
+                        { length: pagination.totalPages },
+                        (_, i) => i + 1
+                      );
 
-                        return (
-                          <React.Fragment key={page}>
-                            {showEllipsis && (
+                      // Mobile: Show fewer pages with smart ellipsis
+                      if (isMobile) {
+                        const mobilePages = [];
+                        const totalPages = pagination.totalPages;
+                        const current = currentPage;
+
+                        // Always show first page
+                        mobilePages.push(1);
+
+                        // Show pages around current page
+                        if (current > 1) {
+                          if (current > 2) {
+                            mobilePages.push("...");
+                          }
+                          mobilePages.push(current);
+                        }
+
+                        // Show last page if different from current
+                        if (current < totalPages) {
+                          if (current < totalPages - 1) {
+                            mobilePages.push("...");
+                          }
+                          mobilePages.push(totalPages);
+                        }
+
+                        return mobilePages.map((page, index) => {
+                          if (page === "...") {
+                            return (
                               <span
+                                key={`ellipsis-${index}`}
                                 style={{
-                                  padding: "0.75rem",
+                                  padding: isMobile
+                                    ? "0.75rem 0.5rem"
+                                    : "0.75rem",
                                   color: "#94a3b8",
                                   fontWeight: "600",
+                                  fontSize: isMobile ? "0.875rem" : "1rem",
                                 }}
                               >
                                 ...
                               </span>
-                            )}
+                            );
+                          }
+
+                          return (
                             <motion.button
+                              key={page}
                               className="page-number-button"
-                              onClick={() => handlePageChange(page)}
+                              onClick={() => handlePageChange(page as number)}
                               whileHover={{
                                 scale: page !== currentPage ? 1.05 : 1,
                               }}
@@ -1415,9 +1456,10 @@ const Shop: React.FC = () => {
                                 scale: page !== currentPage ? 0.95 : 1,
                               }}
                               style={{
-                                padding: "0.75rem 1rem",
-                                border: "none",
-                                borderRadius: "12px",
+                                padding: isMobile
+                                  ? "0.875rem 1.25rem"
+                                  : "0.75rem 1rem",
+                                borderRadius: isMobile ? "16px" : "12px",
                                 background:
                                   page === currentPage
                                     ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -1425,17 +1467,87 @@ const Shop: React.FC = () => {
                                 color:
                                   page === currentPage ? "white" : "#374151",
                                 cursor: "pointer",
-                                fontSize: "0.875rem",
+                                fontSize: isMobile ? "1rem" : "0.875rem",
                                 fontWeight: "600",
-                                minWidth: "2.5rem",
+                                minWidth: isMobile ? "3rem" : "2.5rem",
+                                minHeight: isMobile ? "48px" : "auto",
                                 transition: "all 0.3s ease",
+                                boxShadow:
+                                  page === currentPage
+                                    ? "0 4px 16px rgba(102, 126, 234, 0.3)"
+                                    : "0 2px 8px rgba(0, 0, 0, 0.1)",
+                                border:
+                                  page === currentPage
+                                    ? "none"
+                                    : "1px solid rgba(226, 232, 240, 0.6)",
                               }}
                             >
                               {page}
                             </motion.button>
-                          </React.Fragment>
-                        );
-                      })}
+                          );
+                        });
+                      }
+
+                      // Desktop: Show more pages with smart ellipsis
+                      return pages
+                        .filter((page) => {
+                          // Show first page, last page, current page, and pages around current
+                          return (
+                            page === 1 ||
+                            page === pagination.totalPages ||
+                            Math.abs(page - currentPage) <= 1
+                          );
+                        })
+                        .map((page, index, array) => {
+                          // Add ellipsis if there's a gap
+                          const showEllipsis =
+                            index > 0 && page - array[index - 1] > 1;
+
+                          return (
+                            <React.Fragment key={page}>
+                              {showEllipsis && (
+                                <span
+                                  style={{
+                                    padding: "0.75rem",
+                                    color: "#94a3b8",
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  ...
+                                </span>
+                              )}
+                              <motion.button
+                                className="page-number-button"
+                                onClick={() => handlePageChange(page)}
+                                whileHover={{
+                                  scale: page !== currentPage ? 1.05 : 1,
+                                }}
+                                whileTap={{
+                                  scale: page !== currentPage ? 0.95 : 1,
+                                }}
+                                style={{
+                                  padding: "0.75rem 1rem",
+                                  border: "none",
+                                  borderRadius: "12px",
+                                  background:
+                                    page === currentPage
+                                      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                      : "rgba(255, 255, 255, 0.8)",
+                                  color:
+                                    page === currentPage ? "white" : "#374151",
+                                  cursor: "pointer",
+                                  fontSize: "0.875rem",
+                                  fontWeight: "600",
+                                  minWidth: "2.5rem",
+                                  transition: "all 0.3s ease",
+                                }}
+                              >
+                                {page}
+                              </motion.button>
+                            </React.Fragment>
+                          );
+                        });
+                    })()}
                   </div>
 
                   {/* Next Page Button */}
@@ -1454,18 +1566,25 @@ const Shop: React.FC = () => {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "0.5rem",
-                      padding: "0.75rem 1.5rem",
+                      padding: isMobile ? "1rem 1.5rem" : "0.75rem 1.5rem",
                       border: "none",
-                      borderRadius: "12px",
+                      borderRadius: isMobile ? "16px" : "12px",
                       background: pagination.hasNext
                         ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
                         : "#e2e8f0",
                       color: pagination.hasNext ? "white" : "#94a3b8",
                       cursor: pagination.hasNext ? "pointer" : "not-allowed",
-                      fontSize: "0.875rem",
+                      fontSize: isMobile ? "1rem" : "0.875rem",
                       fontWeight: "600",
                       transition: "all 0.3s ease",
+                      minHeight: isMobile ? "48px" : "auto",
+                      minWidth: isMobile ? "120px" : "auto",
+                      width: isMobile ? "100%" : "auto",
+                      boxShadow: pagination.hasNext
+                        ? "0 4px 16px rgba(102, 126, 234, 0.3)"
+                        : "none",
                     }}
                   >
                     Next →
@@ -1473,7 +1592,7 @@ const Shop: React.FC = () => {
                 </motion.div>
               )}
 
-              {/* Page Info */}
+              {/* Page Info - Mobile Optimized */}
               {pagination && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -1481,15 +1600,44 @@ const Shop: React.FC = () => {
                   transition={{ duration: 0.5, delay: 0.3 }}
                   style={{
                     textAlign: "center",
-                    marginTop: "1rem",
+                    marginTop: isMobile ? "1.5rem" : "1rem",
                     color: "#64748b",
-                    fontSize: "0.875rem",
+                    fontSize: isMobile ? "1rem" : "0.875rem",
                     fontWeight: "500",
+                    padding: isMobile ? "0 1rem" : "0",
+                    lineHeight: isMobile ? "1.5" : "1.4",
                   }}
                 >
-                  Showing {(currentPage - 1) * pagination.limit + 1} to{" "}
-                  {Math.min(currentPage * pagination.limit, pagination.total)}{" "}
-                  of {pagination.total} products
+                  {isMobile ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <span>
+                        Page {currentPage} of {pagination.totalPages}
+                      </span>
+                      <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>
+                        Showing {(currentPage - 1) * pagination.limit + 1} to{" "}
+                        {Math.min(
+                          currentPage * pagination.limit,
+                          pagination.total
+                        )}{" "}
+                        of {pagination.total} products
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      Showing {(currentPage - 1) * pagination.limit + 1} to{" "}
+                      {Math.min(
+                        currentPage * pagination.limit,
+                        pagination.total
+                      )}{" "}
+                      of {pagination.total} products
+                    </>
+                  )}
                 </motion.div>
               )}
             </motion.div>

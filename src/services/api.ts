@@ -19,7 +19,6 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add any request modifications here (e.g., auth tokens if needed)
-    const fullUrl = `${config.baseURL}${config.url}`;
     
     // Add timestamp for performance tracking
     (config as any).startTime = new Date();
@@ -34,7 +33,8 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    const duration = new Date().getTime() - (response.config as any).startTime?.getTime();
+    // Performance tracking - duration calculated but not used in this version
+    // const duration = new Date().getTime() - (response.config as any).startTime?.getTime();
     return response;
   },
   async (error) => {
