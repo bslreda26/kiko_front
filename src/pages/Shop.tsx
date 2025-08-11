@@ -352,7 +352,7 @@ const Shop: React.FC = () => {
                 lineHeight: "1.1",
               }}
             >
-              Kiko Plume Shop
+              KIKOPLUME Art Shop
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -368,10 +368,10 @@ const Shop: React.FC = () => {
               }}
             >
               {contentFilter === "collections"
-                ? "Explore our curated collections of artistic themes"
+                ? "Look through the collections, and purchase the pieces that speak to you"
                 : availabilityFilter === "available"
                 ? "Discover our available artworks and exclusive pieces ready for purchase"
-                : "Discover our complete range of unique artworks and exclusive pieces"}
+                : "Look through the collections, and purchase the pieces that speak to you"}
             </motion.p>
           </motion.div>
 
