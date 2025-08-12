@@ -272,7 +272,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Kikoplume's Latest Creations
+            KIKOPLUME Latest Creations
           </motion.h2>
           <motion.p
             className="section-subtitle"
