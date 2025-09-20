@@ -11,9 +11,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import ProductService, { getLatestProducts } from "../services/productService";
 import type { Product, ApiError } from "../types/api";
+import LogoSpinner from "../components/LogoSpinner";
 
 // Import header background images
-import headerImage1 from "../assets/home/06h.jpg";
 import headerImage2 from "../assets/home/12h.jpg";
 import headerImage3 from "../assets/home/14h.jpg";
 
@@ -28,7 +28,7 @@ import workImage3 from "../assets/work/6.jpg";
 import workImage4 from "../assets/work/7.jpg";
 
 // Header background images
-const headerImages = [headerImage1, headerImage2, headerImage3];
+const headerImages = [headerImage2, headerImage3];
 
 // Artist story images
 const artistImages = [artistImage1, artistImage2];
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
       let products;
       try {
         products = await getLatestProducts(6);
-      } catch (funcError) {
+      } catch {
         products = await ProductService.getLatestProducts(6);
       }
       setLatestProducts(products);
@@ -83,10 +83,10 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    // Header background image carousel - longer intervals for better performance
+    // Header background image carousel - smooth transitions with elegant timing
     const headerInterval = setInterval(() => {
       setCurrentHeaderImage((prev) => (prev + 1) % headerImages.length);
-    }, 15000);
+    }, 8000);
 
     // Artist image carousel - smooth, elegant timing
     const artistInterval = setInterval(() => {
@@ -133,7 +133,8 @@ const Home: React.FC = () => {
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
-              transition: "opacity 1.5s ease-in-out",
+              transition: "all 2s cubic-bezier(0.4, 0.0, 0.2, 1)",
+              opacity: 1,
             }}
           />
         </div>
@@ -165,7 +166,7 @@ const Home: React.FC = () => {
               <span className="title-word">E</span>
             </div>
             <motion.p
-              className="hero-subtitle italian-style"
+              className="hero-subtitle"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.8 }}
@@ -186,7 +187,7 @@ const Home: React.FC = () => {
               whileTap={{ scale: 0.98 }}
               onClick={() => scrollToSection(artistRef)}
             >
-              Discover Art
+              Artist's Journey
               <ArrowRight size={18} />
             </motion.button>
 
@@ -280,9 +281,7 @@ const Home: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
-          >
-            Discover our most recent artworks - fresh from the studio
-          </motion.p>
+          ></motion.p>
 
           <motion.div
             className="work-gallery"
@@ -293,27 +292,7 @@ const Home: React.FC = () => {
           >
             {productsLoading ? (
               <div className="gallery-loading">
-                <div
-                  className="loading-spinner"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    border: "3px solid rgba(59, 130, 246, 0.3)",
-                    borderTop: "3px solid #3b82f6",
-                    borderRadius: "50%",
-                    margin: "2rem auto",
-                    animation: "spin 1s linear infinite",
-                  }}
-                />
-                <p
-                  style={{
-                    textAlign: "center",
-                    color: "#64748b",
-                    marginTop: "1rem",
-                  }}
-                >
-                  Loading latest artworks...
-                </p>
+                <LogoSpinner size={50} text="Loading latest artworks..." />
               </div>
             ) : productsError ? (
               <div

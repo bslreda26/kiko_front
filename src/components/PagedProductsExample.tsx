@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getProductByCriteriaPaged } from "../services/productService";
 import type { Product, PaginatedResponse, ApiError } from "../types/api";
+import LogoSpinner from "./LogoSpinner";
 
 const PagedProductsExample: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -44,7 +45,7 @@ const PagedProductsExample: React.FC = () => {
   if (loading) {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
-        <div>Loading products...</div>
+        <LogoSpinner size={48} text="Loading products..." />
       </div>
     );
   }

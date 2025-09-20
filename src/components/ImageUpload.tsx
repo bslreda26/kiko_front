@@ -7,6 +7,7 @@ import {
   AlertCircle,
   Check,
 } from "lucide-react";
+import LogoSpinner from "./LogoSpinner";
 
 interface ImageUploadProps {
   value: string;
@@ -198,15 +199,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 color: "#3b82f6",
               }}
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              >
-                <Upload size={48} />
-              </motion.div>
-              <p style={{ margin: 0, fontSize: "1rem", fontWeight: "500" }}>
-                Uploading...
-              </p>
+              <LogoSpinner size={48} text="Uploading..." />
             </motion.div>
           ) : preview ? (
             <motion.div

@@ -1,8 +1,8 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Lock } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import LogoSpinner from "./LogoSpinner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -38,32 +38,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
               boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              style={{
-                display: "inline-block",
-                marginBottom: "1rem",
-                color: "#3b82f6",
-              }}
-            >
-              <Lock size={48} />
-            </motion.div>
-            <h2
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "600",
-                color: "#1e293b",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Checking Authentication
-            </h2>
+            <LogoSpinner 
+              size={48} 
+              text="Checking Authentication" 
+            />
             <p
               style={{
                 fontSize: "1rem",
                 color: "#64748b",
-                margin: 0,
+                margin: "1rem 0 0 0",
               }}
             >
               Please wait...

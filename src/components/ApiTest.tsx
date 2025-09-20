@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { testConnection } from "../services/authService";
 import { getAllProducts } from "../services/productService";
 import { getAllCollections } from "../services/collectionService";
+import LogoSpinner from "./LogoSpinner";
 
 const ApiTest: React.FC = () => {
   const [testResults, setTestResults] = useState<any>({});
@@ -79,7 +80,14 @@ const ApiTest: React.FC = () => {
               marginBottom: "5px",
             }}
           >
-            {loading ? "Testing..." : `Test ${test.name}`}
+            {loading ? (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                <LogoSpinner size={16} text="" />
+                Testing...
+              </div>
+            ) : (
+              `Test ${test.name}`
+            )}
           </motion.button>
 
           <p style={{ fontSize: "12px", color: "#666", marginBottom: "5px" }}>

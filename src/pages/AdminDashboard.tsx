@@ -37,6 +37,7 @@ import type {
 import { getParsedDimensions } from "../types/api";
 import ImageUpload from "../components/ImageUpload";
 import { uploadFile } from "../services/uploadService";
+import LogoSpinner from "../components/LogoSpinner";
 
 type TabType = "products" | "collections";
 type ModalType = "product" | "collection" | null;
@@ -429,13 +430,10 @@ const AdminDashboard: React.FC = () => {
             justifyContent: "center",
           }}
         >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            style={{ color: "#3b82f6" }}
-          >
-            <Package size={48} />
-          </motion.div>
+          <LogoSpinner 
+            size={48} 
+            text="Loading Dashboard..." 
+          />
         </div>
       </div>
     );

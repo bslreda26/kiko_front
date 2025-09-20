@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X, Image as ImageIcon, AlertCircle, Plus } from "lucide-react";
+import { X, Image as ImageIcon, AlertCircle, Plus } from "lucide-react";
+import LogoSpinner from "./LogoSpinner";
 
 interface MultipleImageUploadProps {
   values: string[];
@@ -308,16 +309,7 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
                           color: "white",
                         }}
                       >
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                        >
-                          <Upload size={24} />
-                        </motion.div>
+                        <LogoSpinner size={24} text="" />
                       </div>
                     )}
 

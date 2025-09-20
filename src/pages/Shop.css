@@ -171,14 +171,21 @@
 }
 
 .filter-button.active {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.5);
 }
 
 .filter-button:hover:not(.active) {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+  transform: translateY(-1px);
+}
+
+.filter-button.active:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
   transform: translateY(-1px);
 }
 
@@ -307,14 +314,14 @@
 }
 
 .collection-card:hover {
-  transform: translateY(-4px);
+  transform: scale(1.02);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border-color: rgba(102, 126, 234, 0.2);
 }
 
 @media (min-width: 768px) {
   .collection-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: scale(1.02);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   }
 }
@@ -426,7 +433,7 @@
 }
 
 .collection-card:hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: scale(1.02);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   border-color: rgba(102, 126, 234, 0.2);
 }
@@ -484,14 +491,14 @@
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
+  transform: scale(1.02);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border-color: rgba(59, 130, 246, 0.2);
 }
 
 @media (min-width: 768px) {
   .product-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: scale(1.02);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   }
 }
@@ -1119,7 +1126,7 @@
   right: 12px;
   width: 40px;
   height: 40px;
-  background: rgba(0, 0, 0, 0.6);
+  background: linear-gradient(135deg, #64748b, #475569);
   color: white;
   border: none;
   border-radius: 50%;
@@ -1139,8 +1146,9 @@
 }
 
 .view-button:hover {
-  background: rgba(59, 130, 246, 0.9);
+  background: linear-gradient(135deg, #475569, #334155);
   transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
 }
 
 /* Modal */

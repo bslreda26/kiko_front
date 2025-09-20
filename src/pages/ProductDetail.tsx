@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ShoppingCart,
-  Sparkles,
   Check,
   Eye,
   Package,
@@ -15,6 +14,7 @@ import type { Product, ApiError } from "../types/api";
 import { getParsedDimensions } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import ImageModal from "../components/ImageModal";
+import LogoSpinner from "../components/LogoSpinner";
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -101,13 +101,10 @@ const ProductDetail: React.FC = () => {
             justifyContent: "center",
           }}
         >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            style={{ color: "#3b82f6" }}
-          >
-            <Sparkles size={48} />
-          </motion.div>
+          <LogoSpinner 
+            size={48} 
+            text="Loading Product..." 
+          />
         </div>
       </div>
     );
@@ -205,7 +202,7 @@ const ProductDetail: React.FC = () => {
             whileHover={{
               scale: 1.02,
               x: -5,
-              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.2)",
+              boxShadow: "0 4px 12px rgba(100, 116, 139, 0.2)",
             }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/shop")}
@@ -559,7 +556,7 @@ const ProductDetail: React.FC = () => {
                 transition={{ duration: 0.5, delay: 0.5 }}
                 whileHover={{
                   scale: 1.02,
-                  boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
+                  boxShadow: "0 8px 24px rgba(100, 116, 139, 0.3)",
                 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAddToCart}
@@ -571,7 +568,7 @@ const ProductDetail: React.FC = () => {
                   background:
                     product.price === 0 || isInCart(product.id)
                       ? "linear-gradient(135deg, #94a3b8, #64748b)"
-                      : "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                      : "linear-gradient(135deg, #64748b, #475569)",
                   color: "white",
                   border: "none",
                   borderRadius: window.innerWidth <= 480 ? "10px" : "12px",
@@ -586,7 +583,7 @@ const ProductDetail: React.FC = () => {
                   justifyContent: "center",
                   gap: "0.5rem",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+                  boxShadow: "0 4px 16px rgba(100, 116, 139, 0.3)",
                   letterSpacing: "0.025em",
                 }}
               >

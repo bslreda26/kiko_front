@@ -25,6 +25,7 @@ import { useCart } from "../contexts/CartContext";
 import { useResponsive } from "../hooks/useResponsive";
 import ImageModal from "../components/ImageModal";
 import PreorderModal from "../components/PreorderModal";
+import LogoSpinner from "../components/LogoSpinner";
 
 type ViewMode = "grid" | "list";
 type ContentFilter = "collections" | "products";
@@ -252,37 +253,7 @@ const Shop: React.FC = () => {
           }}
         >
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
-            <motion.div
-              animate={{
-                scale: [1, 1.1, 1],
-                opacity: [0.7, 1, 0.7],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              style={{
-                display: "inline-block",
-                marginBottom: "1rem",
-                color: "#3b82f6",
-              }}
-            >
-              <Sparkles size={48} />
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "600",
-                color: "#1e293b",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Loading Our Collection
-            </motion.h2>
+            <LogoSpinner size={80} text="Loading Our Collection" />
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -290,6 +261,7 @@ const Shop: React.FC = () => {
               style={{
                 fontSize: "1rem",
                 color: "#64748b",
+                marginTop: "1rem",
               }}
             >
               Discovering unique artworks and collections...
@@ -591,9 +563,7 @@ const Shop: React.FC = () => {
           {contentFilter === "collections" && (
             <>
               {collectionsLoading ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <div
                   style={{
                     textAlign: "center",
                     padding: "4rem 2rem",
@@ -602,49 +572,17 @@ const Shop: React.FC = () => {
                     backdropFilter: "blur(10px)",
                   }}
                 >
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      opacity: [0.7, 1, 0.7],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    style={{
-                      display: "inline-block",
-                      marginBottom: "1rem",
-                      color: "#3b82f6",
-                    }}
-                  >
-                    <Sparkles size={48} />
-                  </motion.div>
-                  <motion.h3
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    style={{
-                      fontSize: "1.25rem",
-                      fontWeight: "600",
-                      color: "#1e293b",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    Loading Collections...
-                  </motion.h3>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                  <LogoSpinner size={48} text="Loading Collections..." />
+                  <p
                     style={{
                       fontSize: "1rem",
                       color: "#64748b",
+                      marginTop: "1rem",
                     }}
                   >
                     Please wait while we fetch the collections
-                  </motion.p>
-                </motion.div>
+                  </p>
+                </div>
               ) : collections.length > 0 ? (
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -827,48 +765,16 @@ const Shop: React.FC = () => {
                     flexDirection: "column",
                   }}
                 >
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      opacity: [0.7, 1, 0.7],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    style={{
-                      display: "inline-block",
-                      marginBottom: "1rem",
-                      color: "#3b82f6",
-                    }}
-                  >
-                    <Sparkles size={48} />
-                  </motion.div>
-                  <motion.h3
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    style={{
-                      fontSize: "1.25rem",
-                      fontWeight: "600",
-                      color: "#1e293b",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    Loading Products...
-                  </motion.h3>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                  <LogoSpinner size={48} text="Loading Products..." />
+                  <p
                     style={{
                       fontSize: "1rem",
                       color: "#64748b",
+                      marginTop: "1rem",
                     }}
                   >
                     Please wait while we fetch the latest products
-                  </motion.p>
+                  </p>
                 </motion.div>
               )}
               <h2
@@ -1351,6 +1257,7 @@ const Shop: React.FC = () => {
                     whileHover={{
                       scale:
                         pagination.hasPrev && !paginationLoading ? 1.05 : 1,
+                      y: pagination.hasPrev && !paginationLoading ? -1 : 0,
                     }}
                     whileTap={{
                       scale:
@@ -1365,7 +1272,7 @@ const Shop: React.FC = () => {
                       border: "none",
                       borderRadius: isMobile ? "16px" : "12px",
                       background: pagination.hasPrev
-                        ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                        ? "linear-gradient(135deg, #64748b 0%, #475569 100%)"
                         : "#e2e8f0",
                       color: pagination.hasPrev ? "white" : "#94a3b8",
                       cursor: pagination.hasPrev ? "pointer" : "not-allowed",
@@ -1376,7 +1283,7 @@ const Shop: React.FC = () => {
                       minWidth: isMobile ? "120px" : "auto",
                       width: isMobile ? "100%" : "auto",
                       boxShadow: pagination.hasPrev
-                        ? "0 4px 16px rgba(102, 126, 234, 0.3)"
+                        ? "0 4px 16px rgba(100, 116, 139, 0.3)"
                         : "none",
                     }}
                   >
@@ -1451,6 +1358,7 @@ const Shop: React.FC = () => {
                               onClick={() => handlePageChange(page as number)}
                               whileHover={{
                                 scale: page !== currentPage ? 1.05 : 1,
+                                y: page !== currentPage ? -1 : 0,
                               }}
                               whileTap={{
                                 scale: page !== currentPage ? 0.95 : 1,
@@ -1462,7 +1370,7 @@ const Shop: React.FC = () => {
                                 borderRadius: isMobile ? "16px" : "12px",
                                 background:
                                   page === currentPage
-                                    ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                    ? "linear-gradient(135deg, #64748b 0%, #475569 100%)"
                                     : "rgba(255, 255, 255, 0.8)",
                                 color:
                                   page === currentPage ? "white" : "#374151",
@@ -1474,7 +1382,7 @@ const Shop: React.FC = () => {
                                 transition: "all 0.3s ease",
                                 boxShadow:
                                   page === currentPage
-                                    ? "0 4px 16px rgba(102, 126, 234, 0.3)"
+                                    ? "0 4px 16px rgba(100, 116, 139, 0.3)"
                                     : "0 2px 8px rgba(0, 0, 0, 0.1)",
                                 border:
                                   page === currentPage
@@ -1521,6 +1429,7 @@ const Shop: React.FC = () => {
                                 onClick={() => handlePageChange(page)}
                                 whileHover={{
                                   scale: page !== currentPage ? 1.05 : 1,
+                                  y: page !== currentPage ? -1 : 0,
                                 }}
                                 whileTap={{
                                   scale: page !== currentPage ? 0.95 : 1,
@@ -1531,7 +1440,7 @@ const Shop: React.FC = () => {
                                   borderRadius: "12px",
                                   background:
                                     page === currentPage
-                                      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                      ? "linear-gradient(135deg, #64748b 0%, #475569 100%)"
                                       : "rgba(255, 255, 255, 0.8)",
                                   color:
                                     page === currentPage ? "white" : "#374151",
@@ -1558,6 +1467,7 @@ const Shop: React.FC = () => {
                     whileHover={{
                       scale:
                         pagination.hasNext && !paginationLoading ? 1.05 : 1,
+                      y: pagination.hasNext && !paginationLoading ? -1 : 0,
                     }}
                     whileTap={{
                       scale:
@@ -1572,7 +1482,7 @@ const Shop: React.FC = () => {
                       border: "none",
                       borderRadius: isMobile ? "16px" : "12px",
                       background: pagination.hasNext
-                        ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                        ? "linear-gradient(135deg, #64748b 0%, #475569 100%)"
                         : "#e2e8f0",
                       color: pagination.hasNext ? "white" : "#94a3b8",
                       cursor: pagination.hasNext ? "pointer" : "not-allowed",
@@ -1583,7 +1493,7 @@ const Shop: React.FC = () => {
                       minWidth: isMobile ? "120px" : "auto",
                       width: isMobile ? "100%" : "auto",
                       boxShadow: pagination.hasNext
-                        ? "0 4px 16px rgba(102, 126, 234, 0.3)"
+                        ? "0 4px 16px rgba(100, 116, 139, 0.3)"
                         : "none",
                     }}
                   >

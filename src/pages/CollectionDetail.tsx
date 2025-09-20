@@ -19,6 +19,7 @@ import { getParsedDimensions, getParsedImages } from "../types/api";
 import { useCart } from "../contexts/CartContext";
 import ImageModal from "../components/ImageModal";
 import PreorderModal from "../components/PreorderModal";
+import LogoSpinner from "../components/LogoSpinner";
 import "./Shop.css";
 
 type ViewMode = "grid" | "list";
@@ -249,23 +250,10 @@ const CollectionDetail: React.FC = () => {
               maxWidth: "400px",
             }}
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              style={{ color: "#3b82f6", marginBottom: "1rem" }}
-            >
-              <Sparkles size={48} />
-            </motion.div>
-            <h3
-              style={{
-                fontSize: "1.25rem",
-                fontWeight: "600",
-                color: "#1e293b",
-                marginBottom: "0.5rem",
-              }}
-            >
-              {loadingMessage}
-            </h3>
+            <LogoSpinner 
+              size={48} 
+              text={loadingMessage}
+            />
             {retryCount > 0 && (
               <p
                 style={{
@@ -358,7 +346,7 @@ const CollectionDetail: React.FC = () => {
                 onClick={() => loadCollectionData()}
                 style={{
                   padding: "0.75rem 1.5rem",
-                  background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  background: "linear-gradient(135deg, #64748b, #475569)",
                   color: "white",
                   border: "none",
                   borderRadius: "12px",

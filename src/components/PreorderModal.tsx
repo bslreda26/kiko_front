@@ -196,7 +196,7 @@ const PreorderModal: React.FC<PreorderModalProps> = ({
                   <span
                     style={{
                       padding: "0.25rem 0.75rem",
-                      background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                      background: "linear-gradient(135deg, #64748b, #475569)",
                       color: "white",
                       borderRadius: "12px",
                       fontSize: "0.75rem",
@@ -302,7 +302,7 @@ const PreorderModal: React.FC<PreorderModalProps> = ({
                   style={{
                     padding: "0.75rem 1.5rem",
                     border: "none",
-                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                    background: "linear-gradient(135deg, #64748b, #475569)",
                     color: "white",
                     borderRadius: "12px",
                     fontSize: "0.9rem",

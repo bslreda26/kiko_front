@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import LogoSpinner from "../components/LogoSpinner";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -86,7 +87,7 @@ const Login: React.FC = () => {
                 justifyContent: "center",
                 width: "60px",
                 height: "60px",
-                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                background: "linear-gradient(135deg, #64748b, #475569)",
                 borderRadius: "50%",
                 marginBottom: "1rem",
               }}
@@ -279,7 +280,7 @@ const Login: React.FC = () => {
                 padding: "0.875rem",
                 background: isLoading
                   ? "#9ca3af"
-                  : "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  : "linear-gradient(135deg, #64748b, #475569)",
                 color: "white",
                 border: "none",
                 borderRadius: "12px",
@@ -291,16 +292,11 @@ const Login: React.FC = () => {
                 justifyContent: "center",
                 gap: "0.5rem",
                 transition: "all 0.3s ease",
-                boxShadow: "0 2px 8px rgba(59, 130, 246, 0.3)",
+                boxShadow: "0 2px 8px rgba(100, 116, 139, 0.3)",
               }}
             >
               {isLoading ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  <LogIn size={18} />
-                </motion.div>
+                <LogoSpinner size={18} text="" />
               ) : (
                 <LogIn size={18} />
               )}
