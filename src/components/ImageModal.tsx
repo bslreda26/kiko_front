@@ -119,7 +119,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "2rem",
+            padding: window.innerWidth <= 768 ? "1rem" : "2rem",
+            overflow: "hidden",
           }}
           onClick={handleBackdropClick}
           onKeyDown={handleKeyDown}
@@ -132,10 +133,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
             transition={{ duration: 0.3, ease: "easeOut" }}
             style={{
               position: "relative",
-              maxWidth: "90vw",
-              maxHeight: "90vh",
+              maxWidth: window.innerWidth <= 768 ? "95vw" : "90vw",
+              maxHeight: window.innerWidth <= 768 ? "95vh" : "90vh",
+              width: window.innerWidth <= 768 ? "100%" : "auto",
+              height: window.innerWidth <= 768 ? "100%" : "auto",
               background: "rgba(255, 255, 255, 0.95)",
-              borderRadius: "16px",
+              borderRadius: window.innerWidth <= 768 ? "8px" : "16px",
               overflow: "hidden",
               boxShadow: "0 25px 50px rgba(0, 0, 0, 0.3)",
               border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -146,22 +149,28 @@ const ImageModal: React.FC<ImageModalProps> = ({
             <div
               style={{
                 position: "absolute",
-                top: "16px",
-                right: "16px",
+                top: window.innerWidth <= 768 ? "8px" : "16px",
+                right: window.innerWidth <= 768 ? "8px" : "16px",
+                left: window.innerWidth <= 768 ? "8px" : "auto",
                 display: "flex",
-                gap: "8px",
+                gap: window.innerWidth <= 768 ? "8px" : "12px",
                 zIndex: 10,
+                alignItems: "center",
+                justifyContent:
+                  window.innerWidth <= 768 ? "space-between" : "flex-end",
+                flexWrap: "wrap",
+                maxWidth: "calc(100% - 32px)",
               }}
             >
               {/* Zoom Controls */}
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleZoomOut}
                 disabled={zoom <= 0.5}
                 style={{
                   padding: "12px",
-                  background: "rgba(0, 0, 0, 0.7)",
+                  background: "rgba(0, 0, 0, 0.75)",
                   color: "white",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
@@ -170,22 +179,25 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
+                  width: window.innerWidth <= 768 ? "48px" : "44px",
+                  height: window.innerWidth <= 768 ? "48px" : "44px",
                   opacity: zoom <= 0.5 ? 0.5 : 1,
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                  touchAction: "manipulation",
                 }}
               >
-                <ZoomOut size={20} />
+                <ZoomOut size={18} />
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleZoomIn}
                 disabled={zoom >= 5}
                 style={{
                   padding: "12px",
-                  background: "rgba(0, 0, 0, 0.7)",
+                  background: "rgba(0, 0, 0, 0.75)",
                   color: "white",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
@@ -194,21 +206,24 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
+                  width: window.innerWidth <= 768 ? "48px" : "44px",
+                  height: window.innerWidth <= 768 ? "48px" : "44px",
                   opacity: zoom >= 5 ? 0.5 : 1,
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                  touchAction: "manipulation",
                 }}
               >
-                <ZoomIn size={20} />
+                <ZoomIn size={18} />
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleRotate}
                 style={{
                   padding: "12px",
-                  background: "rgba(0, 0, 0, 0.7)",
+                  background: "rgba(0, 0, 0, 0.75)",
                   color: "white",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
@@ -217,20 +232,23 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
+                  width: window.innerWidth <= 768 ? "48px" : "44px",
+                  height: window.innerWidth <= 768 ? "48px" : "44px",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                  touchAction: "manipulation",
                 }}
               >
-                <RotateCcw size={20} />
+                <RotateCcw size={18} />
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleDownload}
                 style={{
                   padding: "12px",
-                  background: "rgba(0, 0, 0, 0.7)",
+                  background: "rgba(0, 0, 0, 0.75)",
                   color: "white",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
@@ -239,20 +257,23 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
+                  width: window.innerWidth <= 768 ? "48px" : "44px",
+                  height: window.innerWidth <= 768 ? "48px" : "44px",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                  touchAction: "manipulation",
                 }}
               >
-                <Download size={20} />
+                <Download size={18} />
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleReset}
                 style={{
                   padding: "12px",
-                  background: "rgba(0, 0, 0, 0.7)",
+                  background: "rgba(0, 0, 0, 0.75)",
                   color: "white",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
@@ -261,8 +282,13 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
+                  width: window.innerWidth <= 768 ? "48px" : "44px",
+                  height: window.innerWidth <= 768 ? "48px" : "44px",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  touchAction: "manipulation",
                 }}
                 title="Reset zoom and rotation"
               >
@@ -270,12 +296,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onClose}
                 style={{
                   padding: "12px",
-                  background: "rgba(220, 38, 38, 0.8)",
+                  background: "rgba(220, 38, 38, 0.85)",
                   color: "white",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                   borderRadius: "50%",
@@ -284,11 +310,14 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
+                  width: window.innerWidth <= 768 ? "48px" : "44px",
+                  height: window.innerWidth <= 768 ? "48px" : "44px",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(220, 38, 38, 0.4)",
+                  touchAction: "manipulation",
                 }}
               >
-                <X size={20} />
+                <X size={18} />
               </motion.button>
             </div>
 
@@ -296,32 +325,48 @@ const ImageModal: React.FC<ImageModalProps> = ({
             {title && (
               <div
                 style={{
-                  padding: "1rem 2rem",
+                  padding:
+                    window.innerWidth <= 768 ? "1rem 1.5rem" : "1.5rem 2rem",
                   background: "rgba(255, 255, 255, 0.95)",
                   width: "100%",
                   textAlign: "center",
                   borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: window.innerWidth <= 768 ? "60px" : "80px",
                 }}
               >
                 <h3
                   style={{
                     margin: 0,
-                    fontSize: "1.25rem",
+                    fontSize: window.innerWidth <= 768 ? "1.1rem" : "1.25rem",
                     fontWeight: "600",
                     color: "#1e293b",
+                    lineHeight: "1.3",
+                    marginBottom: "0.5rem",
                   }}
                 >
                   {title}
                 </h3>
                 <p
                   style={{
-                    margin: "0.5rem 0 0 0",
-                    fontSize: "0.875rem",
+                    margin: 0,
+                    fontSize: window.innerWidth <= 768 ? "0.75rem" : "0.875rem",
                     color: "#64748b",
+                    lineHeight: "1.4",
+                    maxWidth: window.innerWidth <= 768 ? "280px" : "600px",
                   }}
                 >
-                  Zoom: {Math.round(zoom * 100)}% • Use mouse wheel to zoom •
-                  Drag to pan when zoomed
+                  {window.innerWidth <= 768
+                    ? `Zoom: ${Math.round(
+                        zoom * 100
+                      )}% • Pinch to zoom • Drag to pan`
+                    : `Zoom: ${Math.round(
+                        zoom * 100
+                      )}% • Use mouse wheel to zoom • Drag to pan when zoomed`}
                 </p>
               </div>
             )}
@@ -331,7 +376,10 @@ const ImageModal: React.FC<ImageModalProps> = ({
               style={{
                 position: "relative",
                 width: "100%",
-                height: "calc(90vh - 80px)",
+                height:
+                  window.innerWidth <= 768
+                    ? "calc(95vh - 60px)"
+                    : "calc(90vh - 80px)",
                 overflow: "hidden",
                 cursor:
                   zoom > 1 ? (isDragging ? "grabbing" : "grab") : "default",
@@ -341,6 +389,60 @@ const ImageModal: React.FC<ImageModalProps> = ({
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
               onWheel={handleWheel}
+              onTouchStart={(e) => {
+                if (e.touches.length === 2) {
+                  // Handle pinch zoom
+                  const touch1 = e.touches[0];
+                  const touch2 = e.touches[1];
+                  const distance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                      Math.pow(touch2.clientY - touch1.clientY, 2)
+                  );
+                  e.currentTarget.setAttribute(
+                    "data-initial-distance",
+                    distance.toString()
+                  );
+                } else if (zoom > 1) {
+                  // Handle drag
+                  const touch = e.touches[0];
+                  setIsDragging(true);
+                  setDragStart({
+                    x: touch.clientX - position.x,
+                    y: touch.clientY - position.y,
+                  });
+                }
+              }}
+              onTouchMove={(e) => {
+                e.preventDefault();
+                if (e.touches.length === 2) {
+                  // Handle pinch zoom
+                  const touch1 = e.touches[0];
+                  const touch2 = e.touches[1];
+                  const distance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                      Math.pow(touch2.clientY - touch1.clientY, 2)
+                  );
+                  const initialDistance = parseFloat(
+                    e.currentTarget.getAttribute("data-initial-distance") || "0"
+                  );
+                  if (initialDistance > 0) {
+                    const scale = distance / initialDistance;
+                    const newZoom = Math.max(0.5, Math.min(5, zoom * scale));
+                    setZoom(newZoom);
+                  }
+                } else if (isDragging && zoom > 1) {
+                  // Handle drag
+                  const touch = e.touches[0];
+                  setPosition({
+                    x: touch.clientX - dragStart.x,
+                    y: touch.clientY - dragStart.y,
+                  });
+                }
+              }}
+              onTouchEnd={(e) => {
+                setIsDragging(false);
+                e.currentTarget.removeAttribute("data-initial-distance");
+              }}
             >
               <div
                 style={{
@@ -357,8 +459,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   alt={title || "Product image"}
                   style={{
                     transform: `scale(${zoom}) rotate(${rotation}deg)`,
-                    maxWidth: "80vw",
-                    maxHeight: "80vh",
+                    maxWidth: window.innerWidth <= 768 ? "85vw" : "80vw",
+                    maxHeight: window.innerWidth <= 768 ? "85vh" : "80vh",
                     objectFit: "contain",
                     borderRadius: "8px",
                     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
