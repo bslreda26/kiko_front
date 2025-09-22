@@ -338,12 +338,12 @@ const Shop: React.FC = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: isMobile ? "center" : "space-between",
               alignItems: "center",
               marginBottom: "2rem",
               flexWrap: "wrap",
-              gap: "1rem",
-              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? "0.5rem" : "1rem",
+              flexDirection: "row",
             }}
           >
             {/* Content Filter Toggle */}
@@ -351,8 +351,8 @@ const Shop: React.FC = () => {
               style={{
                 display: "flex",
                 background: "rgba(255, 255, 255, 0.9)",
-                borderRadius: "12px",
-                padding: "4px",
+                borderRadius: isMobile ? "8px" : "12px",
+                padding: isMobile ? "2px" : "4px",
                 border: "2px solid #e2e8f0",
                 backdropFilter: "blur(10px)",
               }}
@@ -369,7 +369,7 @@ const Shop: React.FC = () => {
                 }}
                 disabled={paginationLoading}
                 style={{
-                  padding: "8px 16px",
+                  padding: isMobile ? "6px 12px" : "8px 16px",
                   background:
                     contentFilter === "collections"
                       ? "linear-gradient(135deg, #10b981, #059669)"
@@ -382,7 +382,7 @@ const Shop: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "0.25rem",
-                  fontSize: "0.9rem",
+                  fontSize: isMobile ? "0.8rem" : "0.9rem",
                   fontWeight: "500",
                   opacity: paginationLoading ? 0.6 : 1,
                 }}
@@ -396,7 +396,7 @@ const Shop: React.FC = () => {
                 }
                 disabled={paginationLoading}
                 style={{
-                  padding: "8px 16px",
+                  padding: isMobile ? "6px 12px" : "8px 16px",
                   background:
                     contentFilter === "products"
                       ? "linear-gradient(135deg, #3b82f6, #8b5cf6)"
@@ -409,7 +409,7 @@ const Shop: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "0.25rem",
-                  fontSize: "0.9rem",
+                  fontSize: isMobile ? "0.8rem" : "0.9rem",
                   fontWeight: "500",
                   opacity: paginationLoading ? 0.6 : 1,
                 }}
@@ -438,9 +438,9 @@ const Shop: React.FC = () => {
                     viewMode === "grid" ? "" : "secondary"
                   }`}
                   style={{
-                    padding: "8px 12px",
-                    fontSize: "0.85rem",
-                    minHeight: "32px",
+                    padding: isMobile ? "6px 10px" : "8px 12px",
+                    fontSize: isMobile ? "0.75rem" : "0.85rem",
+                    minHeight: isMobile ? "28px" : "32px",
                     cursor: paginationLoading ? "not-allowed" : "pointer",
                     opacity: paginationLoading ? 0.6 : 1,
                   }}
@@ -455,9 +455,9 @@ const Shop: React.FC = () => {
                     viewMode === "list" ? "" : "secondary"
                   }`}
                   style={{
-                    padding: "8px 12px",
-                    fontSize: "0.85rem",
-                    minHeight: "32px",
+                    padding: isMobile ? "6px 10px" : "8px 12px",
+                    fontSize: isMobile ? "0.75rem" : "0.85rem",
+                    minHeight: isMobile ? "28px" : "32px",
                     cursor: paginationLoading ? "not-allowed" : "pointer",
                     opacity: paginationLoading ? 0.6 : 1,
                   }}
@@ -489,9 +489,9 @@ const Shop: React.FC = () => {
                     availabilityFilter === "all" ? "success" : "secondary"
                   }`}
                   style={{
-                    padding: "6px 12px",
-                    fontSize: "0.8rem",
-                    minHeight: "28px",
+                    padding: isMobile ? "4px 10px" : "6px 12px",
+                    fontSize: isMobile ? "0.75rem" : "0.8rem",
+                    minHeight: isMobile ? "24px" : "28px",
                     cursor: paginationLoading ? "not-allowed" : "pointer",
                     opacity: paginationLoading ? 0.6 : 1,
                   }}
@@ -508,9 +508,9 @@ const Shop: React.FC = () => {
                     availabilityFilter === "available" ? "success" : "secondary"
                   }`}
                   style={{
-                    padding: "6px 12px",
-                    fontSize: "0.8rem",
-                    minHeight: "28px",
+                    padding: isMobile ? "4px 10px" : "6px 12px",
+                    fontSize: isMobile ? "0.75rem" : "0.8rem",
+                    minHeight: isMobile ? "24px" : "28px",
                     cursor: paginationLoading ? "not-allowed" : "pointer",
                     opacity: paginationLoading ? 0.6 : 1,
                   }}
@@ -1083,14 +1083,14 @@ const Shop: React.FC = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    gap: isMobile ? "0.5rem" : "1rem",
+                    gap: isMobile ? "0.75rem" : "1rem",
                     marginTop: "3rem",
-                    padding: isMobile ? "1.5rem 1rem" : "2rem",
+                    padding: isMobile ? "1rem 1rem" : "2rem",
                     background: "rgba(255, 255, 255, 0.9)",
                     borderRadius: isMobile ? "16px" : "20px",
                     backdropFilter: "blur(10px)",
                     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-                    flexDirection: isMobile ? "column" : "row",
+                    flexDirection: isMobile ? "row" : "row",
                     width: "100%",
                     maxWidth: isMobile ? "100%" : "auto",
                   }}
@@ -1105,26 +1105,26 @@ const Shop: React.FC = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "0.5rem",
-                      padding: isMobile ? "1rem 1.5rem" : "0.75rem 1.5rem",
+                      padding: isMobile ? "0.5rem 0.75rem" : "0.75rem 1.5rem",
                       border: "none",
-                      borderRadius: isMobile ? "16px" : "12px",
+                      borderRadius: isMobile ? "12px" : "12px",
                       background: pagination.hasPrev
                         ? "linear-gradient(135deg, #64748b 0%, #475569 100%)"
                         : "#e2e8f0",
                       color: pagination.hasPrev ? "white" : "#94a3b8",
                       cursor: pagination.hasPrev ? "pointer" : "not-allowed",
-                      fontSize: isMobile ? "1rem" : "0.875rem",
+                      fontSize: isMobile ? "0.875rem" : "0.875rem",
                       fontWeight: "600",
                       transition: "all 0.3s ease",
-                      minHeight: isMobile ? "48px" : "auto",
-                      minWidth: isMobile ? "120px" : "auto",
-                      width: isMobile ? "100%" : "auto",
+                      minHeight: isMobile ? "36px" : "auto",
+                      minWidth: isMobile ? "80px" : "auto",
+                      width: isMobile ? "auto" : "auto",
                       boxShadow: pagination.hasPrev
                         ? "0 4px 16px rgba(100, 116, 139, 0.3)"
                         : "none",
                     }}
                   >
-                    ← Previous
+                    {isMobile ? "← Prev" : "← Previous"}
                   </button>
 
                   {/* Page Numbers - Mobile Optimized */}
@@ -1292,20 +1292,20 @@ const Shop: React.FC = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "0.5rem",
-                      padding: isMobile ? "1rem 1.5rem" : "0.75rem 1.5rem",
+                      padding: isMobile ? "0.5rem 0.75rem" : "0.75rem 1.5rem",
                       border: "none",
-                      borderRadius: isMobile ? "16px" : "12px",
+                      borderRadius: isMobile ? "12px" : "12px",
                       background: pagination.hasNext
                         ? "linear-gradient(135deg, #64748b 0%, #475569 100%)"
                         : "#e2e8f0",
                       color: pagination.hasNext ? "white" : "#94a3b8",
                       cursor: pagination.hasNext ? "pointer" : "not-allowed",
-                      fontSize: isMobile ? "1rem" : "0.875rem",
+                      fontSize: isMobile ? "0.875rem" : "0.875rem",
                       fontWeight: "600",
                       transition: "all 0.3s ease",
-                      minHeight: isMobile ? "48px" : "auto",
-                      minWidth: isMobile ? "120px" : "auto",
-                      width: isMobile ? "100%" : "auto",
+                      minHeight: isMobile ? "36px" : "auto",
+                      minWidth: isMobile ? "80px" : "auto",
+                      width: isMobile ? "auto" : "auto",
                       boxShadow: pagination.hasNext
                         ? "0 4px 16px rgba(100, 116, 139, 0.3)"
                         : "none",
