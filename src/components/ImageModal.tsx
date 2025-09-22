@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ZoomIn, ZoomOut, RotateCcw, Download } from "lucide-react";
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -15,6 +15,13 @@ const ImageModal: React.FC<ImageModalProps> = ({
   imageUrl,
   title,
 }) => {
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const imageRef = useRef<HTMLImageElement>(null);
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -26,6 +33,71 @@ const ImageModal: React.FC<ImageModalProps> = ({
       onClose();
     }
   };
+
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(prev + 0.5, 5));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(prev - 0.5, 0.5));
+  };
+
+  const handleReset = () => {
+    setZoom(1);
+    setRotation(0);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360);
+  };
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = imageUrl;
+    link.download = title ? `${title}.jpg` : "image.jpg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && zoom > 1) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      handleZoomIn();
+    } else {
+      handleZoomOut();
+    }
+  };
+
+  // Reset zoom and position when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setZoom(1);
+      setRotation(0);
+      setPosition({ x: 0, y: 0 });
+    }
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
@@ -70,91 +142,230 @@ const ImageModal: React.FC<ImageModalProps> = ({
               backdropFilter: "blur(20px)",
             }}
           >
-            {/* Close Button */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={onClose}
+            {/* Control Buttons */}
+            <div
               style={{
                 position: "absolute",
                 top: "16px",
                 right: "16px",
-                padding: "12px",
-                background: "rgba(0, 0, 0, 0.7)",
-                color: "white",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                borderRadius: "50%",
-                cursor: "pointer",
-                zIndex: 10,
-                backdropFilter: "blur(10px)",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "48px",
-                height: "48px",
+                gap: "8px",
+                zIndex: 10,
               }}
             >
-              <X size={20} />
-            </motion.button>
+              {/* Zoom Controls */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleZoomOut}
+                disabled={zoom <= 0.5}
+                style={{
+                  padding: "12px",
+                  background: "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "50%",
+                  cursor: zoom <= 0.5 ? "not-allowed" : "pointer",
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                  opacity: zoom <= 0.5 ? 0.5 : 1,
+                }}
+              >
+                <ZoomOut size={20} />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleZoomIn}
+                disabled={zoom >= 5}
+                style={{
+                  padding: "12px",
+                  background: "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "50%",
+                  cursor: zoom >= 5 ? "not-allowed" : "pointer",
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                  opacity: zoom >= 5 ? 0.5 : 1,
+                }}
+              >
+                <ZoomIn size={20} />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleRotate}
+                style={{
+                  padding: "12px",
+                  background: "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                }}
+              >
+                <RotateCcw size={20} />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleDownload}
+                style={{
+                  padding: "12px",
+                  background: "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                }}
+              >
+                <Download size={20} />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleReset}
+                style={{
+                  padding: "12px",
+                  background: "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                }}
+                title="Reset zoom and rotation"
+              >
+                ↺
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={onClose}
+                style={{
+                  padding: "12px",
+                  background: "rgba(220, 38, 38, 0.8)",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                }}
+              >
+                <X size={20} />
+              </motion.button>
+            </div>
+
+            {/* Title */}
+            {title && (
+              <div
+                style={{
+                  padding: "1rem 2rem",
+                  background: "rgba(255, 255, 255, 0.95)",
+                  width: "100%",
+                  textAlign: "center",
+                  borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "1.25rem",
+                    fontWeight: "600",
+                    color: "#1e293b",
+                  }}
+                >
+                  {title}
+                </h3>
+                <p
+                  style={{
+                    margin: "0.5rem 0 0 0",
+                    fontSize: "0.875rem",
+                    color: "#64748b",
+                  }}
+                >
+                  Zoom: {Math.round(zoom * 100)}% • Use mouse wheel to zoom •
+                  Drag to pan when zoomed
+                </p>
+              </div>
+            )}
 
             {/* Image Container */}
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "200px",
-                maxHeight: "90vh",
+                position: "relative",
+                width: "100%",
+                height: "calc(90vh - 80px)",
                 overflow: "hidden",
+                cursor:
+                  zoom > 1 ? (isDragging ? "grabbing" : "grab") : "default",
               }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onWheel={handleWheel}
             >
-              {/* Title */}
-              {title && (
-                <div
-                  style={{
-                    padding: "1rem 2rem",
-                    background: "rgba(255, 255, 255, 0.95)",
-                    width: "100%",
-                    textAlign: "center",
-                    borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "1.25rem",
-                      fontWeight: "600",
-                      color: "#1e293b",
-                    }}
-                  >
-                    {title}
-                  </h3>
-                </div>
-              )}
-
-              {/* Image */}
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "2rem",
-                  maxWidth: "100%",
-                  maxHeight: "calc(90vh - 80px)",
-                  overflow: "auto",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px)`,
+                  transition: isDragging ? "none" : "transform 0.1s ease",
                 }}
               >
                 <img
+                  ref={imageRef}
                   src={imageUrl}
                   alt={title || "Product image"}
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
+                    transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                    maxWidth: "80vw",
+                    maxHeight: "80vh",
                     objectFit: "contain",
                     borderRadius: "8px",
                     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+                    transition: isDragging ? "none" : "transform 0.2s ease",
+                    userSelect: "none",
                   }}
+                  draggable={false}
                 />
               </div>
             </div>

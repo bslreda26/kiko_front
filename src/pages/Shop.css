@@ -129,7 +129,7 @@
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -140,6 +140,7 @@
   position: relative;
   overflow: hidden;
   min-height: 44px;
+  /* Transition removed for smooth, non-animated experience */
 }
 
 @media (min-width: 768px) {
@@ -180,13 +181,13 @@
 .filter-button:hover:not(.active) {
   background: rgba(100, 116, 139, 0.1);
   color: #64748b;
-  transform: translateY(-1px);
+  /* Transform removed for smooth, non-animated experience */
 }
 
 .filter-button.active:hover {
   background: linear-gradient(135deg, #d97706, #b45309);
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-  transform: translateY(-1px);
+  /* Transform removed for smooth, non-animated experience */
 }
 
 /* Error Message */
@@ -291,7 +292,7 @@
   border: 1px solid rgba(226, 232, 240, 0.4);
   backdrop-filter: blur(20px);
   cursor: pointer;
-  transition: all 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
   position: relative;
   height: 160px;
   display: flex;
@@ -309,28 +310,24 @@
     height: 200px;
     padding: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Transition removed for smooth, non-animated experience */
   }
 }
 
 .collection-card:hover {
-  transform: scale(1.02);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border-color: rgba(102, 126, 234, 0.2);
 }
 
 @media (min-width: 768px) {
   .collection-card:hover {
-    transform: scale(1.02);
+    /* Transform removed for smooth, non-animated experience */
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   }
 }
 
-@media (max-width: 480px) {
-  .collection-card:hover {
-    transform: none;
-  }
-}
+/* Collection card hover effects removed for smooth experience */
 
 .collection-title {
   font-size: 1.25rem;
@@ -446,7 +443,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(226, 232, 240, 0.4);
   backdrop-filter: blur(20px);
-  transition: all 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -477,7 +474,7 @@
     width: 100%;
     max-width: 100%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Transition removed for smooth, non-animated experience */
   }
 }
 
@@ -491,23 +488,19 @@
 }
 
 .product-card:hover {
-  transform: scale(1.02);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border-color: rgba(59, 130, 246, 0.2);
 }
 
 @media (min-width: 768px) {
   .product-card:hover {
-    transform: scale(1.02);
+    /* Transform removed for smooth, non-animated experience */
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   }
 }
 
-@media (max-width: 480px) {
-  .product-card:hover {
-    transform: none;
-  }
-}
+/* Product card hover effects removed for smooth experience */
 
 .product-card.list {
   flex-direction: row;
@@ -534,7 +527,7 @@
   cursor: pointer;
   border-radius: 16px 16px 0 0;
   overflow: hidden;
-  transition: all 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
 }
 
 @media (min-width: 768px) {
@@ -626,25 +619,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Transition removed for smooth, non-animated experience */
 }
 
-/* Enhanced List View Product Image */
+/* List View Product Image - Simplified for smooth experience */
 .product-card.list .product-image {
   background-size: cover;
   background-position: center;
-  transform: scale(1.05);
+  /* Transform removed for smooth, non-animated experience */
   filter: brightness(1.05) contrast(1.1);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .product-card.list .product-image:hover {
-  transform: scale(1.08);
+  /* Transform removed for smooth, non-animated experience */
   filter: brightness(1.1) contrast(1.15);
 }
 
 .product-image:hover {
-  transform: scale(1.02);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
@@ -893,7 +886,7 @@
   border-radius: 8px;
   border: 1px solid rgba(226, 232, 240, 0.6);
   backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
   font-size: 0.75rem;
   font-weight: 500;
   color: #64748b;
@@ -910,7 +903,7 @@
 .detail-badge:hover {
   background: rgba(255, 255, 255, 0.95);
   border-color: rgba(59, 130, 246, 0.2);
-  transform: translateY(-1px);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -1004,7 +997,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1016,6 +1009,7 @@
   box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
   height: 44px;
   min-height: 44px;
+  /* Transition removed for smooth, non-animated experience */
 }
 
 @media (min-width: 768px) {
@@ -1035,13 +1029,13 @@
 }
 
 .add-to-cart-button:hover:not(.disabled) {
-  transform: translateY(-2px);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
 
 .add-to-cart-button:active:not(.disabled) {
-  transform: translateY(0);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
 }
 
@@ -1049,7 +1043,7 @@
   background: #94a3b8;
   cursor: not-allowed;
   box-shadow: none;
-  transform: none;
+  /* Transform removed for smooth, non-animated experience */
 }
 
 .add-to-cart-button.added {
@@ -1109,12 +1103,12 @@
   }
 
   .product-card.list .product-image {
-    transform: scale(1.06);
+    /* Transform removed for smooth, non-animated experience */
     filter: brightness(1.06) contrast(1.12);
   }
 
   .product-card.list .product-image:hover {
-    transform: scale(1.1);
+    /* Transform removed for smooth, non-animated experience */
     filter: brightness(1.12) contrast(1.18);
   }
 }
@@ -1135,9 +1129,9 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  opacity: 0;
-  transform: scale(0.8);
+  /* Transition removed for smooth, non-animated experience */
+  opacity: 1;
+  transform: scale(1);
 }
 
 .product-image-container:hover .view-button {
@@ -1147,7 +1141,7 @@
 
 .view-button:hover {
   background: linear-gradient(135deg, #475569, #334155);
-  transform: scale(1.1);
+  /* Transform removed for smooth, non-animated experience */
   box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
 }
 
@@ -1472,164 +1466,38 @@
   }
 }
 
-/* Enhanced Animation Keyframes */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* Animation keyframes removed for smooth, non-animated experience */
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+/* Product Card - Animations removed for smooth, non-animated experience */
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Enhanced Product Card Animations */
-.product-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.product-card:hover {
-  animation: float 2s ease-in-out infinite;
-}
-
-/* Enhanced Button Interactions */
+/* Button Interactions - Simplified for smooth experience */
 .elegant-button {
   position: relative;
   overflow: hidden;
 }
 
-.elegant-button::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.elegant-button:hover::before {
-  left: 100%;
-}
-
-/* Enhanced Detail Badge Animations */
+/* Detail Badge - Simplified for smooth experience */
 .detail-badge {
   position: relative;
   overflow: hidden;
 }
 
-.detail-badge::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.6s;
-}
+/* Collection Card - Animations removed for smooth, non-animated experience */
 
-.detail-badge:hover::after {
-  left: 100%;
-}
-
-/* Enhanced Collection Card Animations */
-.collection-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.collection-card:hover {
-  animation: float 2s ease-in-out infinite;
-}
-
-/* Enhanced Filter Button Animations */
+/* Filter Button - Simplified for smooth experience */
 .filter-button {
   position: relative;
   overflow: hidden;
 }
 
-.filter-button::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.filter-button:hover::before {
-  left: 100%;
-}
-
-/* Enhanced Loading States */
+/* Loading States - Simplified for smooth experience */
 .loading-shimmer {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
+  /* Animation removed for smooth, non-animated experience */
 }
 
-/* Enhanced Empty States */
+/* Empty States - Simplified for smooth experience */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -1637,14 +1505,14 @@
   border-radius: 20px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(226, 232, 240, 0.4);
-  animation: fadeInUp 0.8s ease-out;
+  /* Animation removed for smooth, non-animated experience */
 }
 
 .empty-state svg {
   color: #94a3b8;
   margin-bottom: 1rem;
   opacity: 0.7;
-  animation: pulse 2s ease-in-out infinite;
+  /* Animation removed for smooth, non-animated experience */
 }
 
 .empty-state h3 {
@@ -1724,38 +1592,9 @@
   outline-offset: 2px;
 }
 
-/* Enhanced Mobile Optimizations */
-@media (max-width: 480px) {
-  .product-card:hover,
-  .collection-card:hover {
-    transform: none;
-  }
+/* Mobile Optimizations - Animations removed for smooth, non-animated experience */
 
-  .product-card:active,
-  .collection-card:active {
-    transform: scale(0.98);
-  }
-}
-
-/* Modern Touch Interactions */
-@media (hover: none) and (pointer: coarse) {
-  .product-card:hover,
-  .collection-card:hover,
-  .filter-button:hover,
-  .add-to-cart-button:hover {
-    transform: none;
-  }
-
-  .product-card:active,
-  .collection-card:active {
-    transform: scale(0.98);
-  }
-
-  .filter-button:active,
-  .add-to-cart-button:active {
-    transform: scale(0.95);
-  }
-}
+/* Modern Touch Interactions - Animations removed for smooth, non-animated experience */
 
 /* Improved Touch Targets */
 @media (max-width: 768px) {
@@ -1774,16 +1613,7 @@
   }
 }
 
-/* Enhanced Visual Feedback */
-.product-card:active {
-  transform: scale(0.98);
-  transition: transform 0.1s ease;
-}
-
-.collection-card:active {
-  transform: scale(0.98);
-  transition: transform 0.1s ease;
-}
+/* Visual Feedback - Animations removed for smooth, non-animated experience */
 
 /* Modern Glassmorphism Effects */
 .glass-effect {
@@ -1801,10 +1631,10 @@
   border-radius: 8px;
 }
 
-/* Modern Card Shadows */
+/* Modern Card Shadows - Simplified for smooth experience */
 .modern-shadow {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: box-shadow 0.3s ease;
+  /* Transition removed for smooth, non-animated experience */
 }
 
 .modern-shadow:hover {
@@ -1826,80 +1656,19 @@
   --border-color: rgba(226, 232, 240, 0.4);
 }
 
-/* Enhanced Success States */
-.add-to-cart-button.success {
-  animation: pulse 0.6s ease-in-out;
-}
+/* Success States - Animations removed for smooth, non-animated experience */
 
-/* Enhanced Error States */
-.add-to-cart-button.error {
-  animation: shake 0.5s ease-in-out;
-}
+/* Error States - Animations removed for smooth, non-animated experience */
 
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
+/* Loading Animations - Removed for smooth, non-animated experience */
 
-/* Enhanced Loading Animations */
-.loading-spinner {
-  animation: spin 1s linear infinite;
-}
+/* Hover Effects - Animations removed for smooth, non-animated experience */
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Grid Layout - Animations removed for smooth, non-animated experience */
 
-/* Enhanced Hover Effects */
-.product-image-container:hover {
-  transform: scale(1.02);
-  transition: transform 0.3s ease;
-}
+/* Filter - Animations removed for smooth, non-animated experience */
 
-.view-button:hover {
-  transform: scale(1.1) rotate(5deg);
-  transition: all 0.3s ease;
-}
-
-/* Enhanced Grid Layout Animations */
-.products-grid {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.collections-grid {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-/* Enhanced Filter Animations */
-.filter-group {
-  animation: slideInLeft 0.6s ease-out;
-}
-
-/* Enhanced Header Animations */
-.shop-header {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.shop-header h1 {
-  animation: slideInLeft 0.8s ease-out;
-}
-
-.shop-header p {
-  animation: slideInRight 0.8s ease-out;
-}
+/* Header - Animations removed for smooth, non-animated experience */
 
 /* Modern Mobile Enhancements */
 @media (max-width: 480px) {
@@ -1966,12 +1735,12 @@
   .product-card.list .product-image {
     background-size: cover;
     background-position: center;
-    transform: scale(1.02);
+    /* Transform removed for smooth, non-animated experience */
     filter: brightness(1.03) contrast(1.05);
   }
 
   .product-card.list .product-image:hover {
-    transform: scale(1.05);
+    /* Transform removed for smooth, non-animated experience */
     filter: brightness(1.08) contrast(1.1);
   }
 
@@ -2018,9 +1787,10 @@
   transform: translateZ(0);
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling - Enhanced for better performance */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 120px; /* Account for fixed header */
 }
 
 /* Better focus indicators */

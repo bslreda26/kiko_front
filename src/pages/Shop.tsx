@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
@@ -254,10 +253,7 @@ const Shop: React.FC = () => {
         >
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
             <LogoSpinner size={80} text="Loading Our Collection" />
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+            <p
               style={{
                 fontSize: "1rem",
                 color: "#64748b",
@@ -265,7 +261,7 @@ const Shop: React.FC = () => {
               }}
             >
               Discovering unique artworks and collections...
-            </motion.p>
+            </p>
           </div>
         </div>
       </div>
@@ -294,10 +290,7 @@ const Shop: React.FC = () => {
           }}
         >
           {/* Modern Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+          <div
             style={{
               textAlign: "center",
               marginBottom: "2rem",
@@ -310,10 +303,7 @@ const Shop: React.FC = () => {
               margin: "0 0.5rem 2rem",
             }}
           >
-            <motion.h1
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+            <h1
               style={{
                 fontSize: "clamp(2rem, 5vw, 2.75rem)",
                 fontWeight: "700",
@@ -325,11 +315,8 @@ const Shop: React.FC = () => {
               }}
             >
               KIKOPLUME Art Shop
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+            </h1>
+            <p
               style={{
                 fontSize: "1.125rem",
                 color: "#64748b",
@@ -344,14 +331,11 @@ const Shop: React.FC = () => {
                 : availabilityFilter === "available"
                 ? "Discover our available artworks and exclusive pieces ready for purchase"
                 : "Look through the collections, and purchase the pieces that speak to you"}
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
 
           {/* Filter and View Controls */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
+          <div
             style={{
               display: "flex",
               justifyContent: "space-between",
@@ -536,14 +520,11 @@ const Shop: React.FC = () => {
                 </button>
               </div>
             )}
-          </motion.div>
+          </div>
 
           {/* Error Message */}
           {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.4, type: "spring" }}
+            <div
               style={{
                 background: "linear-gradient(135deg, #fef2f2, #fee2e2)",
                 color: "#dc2626",
@@ -556,7 +537,7 @@ const Shop: React.FC = () => {
               }}
             >
               <p style={{ margin: 0, fontWeight: "500" }}>{error}</p>
-            </motion.div>
+            </div>
           )}
 
           {/* Collections Section */}
@@ -584,12 +565,7 @@ const Shop: React.FC = () => {
                   </p>
                 </div>
               ) : collections.length > 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  style={{ marginBottom: "4rem" }}
-                >
+                <div style={{ marginBottom: "4rem" }}>
                   <h2
                     style={{
                       fontSize: "2rem",
@@ -613,18 +589,10 @@ const Shop: React.FC = () => {
                       padding: isMobile ? "0" : "0 0.5rem",
                     }}
                   >
-                    {collections.map((collection, index) => {
+                    {collections.map((collection) => {
                       return (
-                        <motion.div
+                        <div
                           key={collection.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: index * 0.1 }}
-                          whileHover={{
-                            y: -8,
-                            scale: 1.02,
-                            transition: { duration: 0.3, ease: "easeOut" },
-                          }}
                           onClick={() =>
                             !paginationLoading &&
                             handleCollectionClick(collection.id)
@@ -700,15 +668,13 @@ const Shop: React.FC = () => {
                               e.currentTarget.style.opacity = "0";
                             }}
                           />
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </div>
-                </motion.div>
+                </div>
               ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <div
                   style={{
                     textAlign: "center",
                     padding: "4rem 2rem",
@@ -734,22 +700,16 @@ const Shop: React.FC = () => {
                   <p style={{ color: "#94a3b8", margin: 0 }}>
                     Our collections are being curated. Please check back soon!
                   </p>
-                </motion.div>
+                </div>
               )}
             </>
           )}
 
           {/* Products Section */}
           {contentFilter === "products" && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
+            <div>
               {paginationLoading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                <div
                   style={{
                     position: "fixed",
                     top: 0,
@@ -775,7 +735,7 @@ const Shop: React.FC = () => {
                   >
                     Please wait while we fetch the latest products
                   </p>
-                </motion.div>
+                </div>
               )}
               <h2
                 style={{
@@ -814,31 +774,12 @@ const Shop: React.FC = () => {
                       viewMode === "list" ? "0" : isMobile ? "0" : "0 0.5rem",
                   }}
                 >
-                  {filteredProducts.map((product, index) => {
+                  {filteredProducts.map((product) => {
                     const dimensions = getParsedDimensions(product);
 
                     return (
-                      <motion.div
+                      <div
                         key={product.id}
-                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{
-                          duration: 0.5,
-                          delay: index * 0.08,
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 15,
-                        }}
-                        whileHover={{
-                          y: -8,
-                          scale: 1.03,
-                          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.12)",
-                          transition: { duration: 0.3, ease: "easeOut" },
-                        }}
-                        whileTap={{
-                          scale: 0.98,
-                          transition: { duration: 0.1 },
-                        }}
                         className="product-card"
                         style={{
                           display: viewMode === "list" ? "flex" : "flex",
@@ -866,13 +807,7 @@ const Shop: React.FC = () => {
                         }}
                       >
                         {/* Enhanced Background Gradient */}
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{
-                            duration: 0.8,
-                            delay: index * 0.08 + 0.2,
-                          }}
+                        <div
                           style={{
                             position: "absolute",
                             top: 0,
@@ -887,7 +822,7 @@ const Shop: React.FC = () => {
                         />
 
                         {/* Product Image */}
-                        <motion.div
+                        <div
                           onClick={() =>
                             !paginationLoading && handleProductClick(product.id)
                           }
@@ -924,19 +859,9 @@ const Shop: React.FC = () => {
                                 : "20px 0 0 20px",
                             overflow: "hidden",
                           }}
-                          whileHover={{
-                            scale: 1.05,
-                            transition: { duration: 0.3, ease: "easeOut" },
-                          }}
                         >
                           {!product.image && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{
-                                duration: 0.5,
-                                delay: index * 0.08 + 0.3,
-                              }}
+                            <div
                               style={{
                                 display: "flex",
                                 flexDirection: "column",
@@ -946,16 +871,7 @@ const Shop: React.FC = () => {
                                 textAlign: "center",
                               }}
                             >
-                              <motion.div
-                                animate={{
-                                  rotate: [0, 5, -5, 0],
-                                  scale: [1, 1.1, 1],
-                                }}
-                                transition={{
-                                  duration: 2,
-                                  repeat: Infinity,
-                                  repeatType: "reverse",
-                                }}
+                              <div
                                 style={{
                                   width: "80px",
                                   height: "80px",
@@ -969,7 +885,7 @@ const Shop: React.FC = () => {
                                 }}
                               >
                                 <Eye size={40} />
-                              </motion.div>
+                              </div>
                               <span
                                 style={{
                                   fontSize: "1rem",
@@ -979,69 +895,42 @@ const Shop: React.FC = () => {
                               >
                                 No Image Available
                               </span>
-                            </motion.div>
+                            </div>
                           )}
 
                           {/* Enhanced View Button */}
                           {product.image && (
-                            <motion.button
+                            <button
                               className="view-button"
                               onClick={(e) => {
                                 if (paginationLoading) return;
                                 e.stopPropagation();
                                 openImageModal(product.image, product.title);
                               }}
-                              whileHover={{
-                                scale: 1.1,
-                                backgroundColor: "rgba(59, 130, 246, 0.9)",
-                              }}
-                              whileTap={{
-                                scale: 0.95,
-                              }}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{
-                                duration: 0.3,
-                                delay: index * 0.08 + 0.4,
+                              style={{
+                                opacity: 1,
+                                transform: "scale(1)",
                               }}
                             >
                               <Eye size={16} />
-                            </motion.button>
+                            </button>
                           )}
-                        </motion.div>
+                        </div>
 
                         {/* Product Info */}
-                        <motion.div
+                        <div
                           className="product-info"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: 0.5,
-                            delay: index * 0.08 + 0.5,
-                          }}
                           style={{
                             flex: viewMode === "list" ? "1" : "auto",
                             width: viewMode === "list" ? "auto" : "100%",
                           }}
                         >
                           {/* Product Details */}
-                          <motion.div
-                            className="product-details"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              duration: 0.4,
-                              delay: index * 0.08 + 0.7,
-                            }}
-                          >
+                          <div className="product-details">
                             {/* Dimensions */}
                             {dimensions &&
                             (dimensions.width > 0 || dimensions.height > 0) ? (
-                              <motion.div
-                                className="detail-badge dimensions"
-                                whileHover={{ scale: 1.05 }}
-                                transition={{ duration: 0.2 }}
-                              >
+                              <div className="detail-badge dimensions">
                                 <Package size={14} />
                                 <span>
                                   {dimensions.width > 0 &&
@@ -1063,44 +952,31 @@ const Shop: React.FC = () => {
                                     </>
                                   )}
                                 </span>
-                              </motion.div>
+                              </div>
                             ) : (
-                              <motion.div
-                                className="detail-badge"
-                                whileHover={{ scale: 1.05 }}
-                                transition={{ duration: 0.2 }}
-                              >
+                              <div className="detail-badge">
                                 <Package size={14} />
                                 <span>Dimensions not available</span>
-                              </motion.div>
+                              </div>
                             )}
 
                             {/* Availability */}
-                            <motion.div
+                            <div
                               className={`detail-badge ${
                                 product.price > 0
                                   ? "availability"
                                   : "unavailable"
                               }`}
-                              whileHover={{ scale: 1.05 }}
-                              animate={{
-                                scale: product.price > 0 ? [1, 1.05, 1] : 1,
-                              }}
-                              transition={{
-                                duration: 0.6,
-                                repeat: product.price > 0 ? 1 : 0,
-                                repeatDelay: 2,
-                              }}
                             >
                               <Check size={14} />
                               <span>
                                 {product.price > 0 ? "In Stock" : "Sold Out"}
                               </span>
-                            </motion.div>
-                          </motion.div>
+                            </div>
+                          </div>
 
                           {/* Enhanced Add to Cart / Preorder Button */}
-                          <motion.button
+                          <button
                             className={`elegant-button ${
                               !isProductAvailable(product)
                                 ? "secondary"
@@ -1123,21 +999,6 @@ const Shop: React.FC = () => {
                               isProductInCart(product) ||
                               paginationLoading
                             }
-                            whileHover={{
-                              scale: 1.02,
-                              boxShadow: isProductAvailable(product)
-                                ? "0 8px 24px rgba(59, 130, 246, 0.3)"
-                                : "0 8px 24px rgba(245, 158, 11, 0.3)",
-                            }}
-                            whileTap={{
-                              scale: 0.98,
-                            }}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              duration: 0.4,
-                              delay: index * 0.08 + 0.8,
-                            }}
                           >
                             {!isProductAvailable(product) ? (
                               addedToCartItems.has(product.id) ? (
@@ -1172,16 +1033,14 @@ const Shop: React.FC = () => {
                                 Add to Cart
                               </>
                             )}
-                          </motion.button>
-                        </motion.div>
-                      </motion.div>
+                          </button>
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
               ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <div
                   style={{
                     textAlign: "center",
                     padding: "4rem 2rem",
@@ -1190,22 +1049,12 @@ const Shop: React.FC = () => {
                     backdropFilter: "blur(10px)",
                   }}
                 >
-                  <motion.div
-                    animate={{
-                      rotate: [0, 5, -5, 0],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      repeatType: "reverse",
-                    }}
-                  >
+                  <div>
                     <Eye
                       size={64}
                       style={{ color: "#94a3b8", marginBottom: "1rem" }}
                     />
-                  </motion.div>
+                  </div>
                   <h3
                     style={{
                       fontSize: "1.5rem",
@@ -1223,16 +1072,13 @@ const Shop: React.FC = () => {
                       ? "All products are currently sold out. Please check back soon!"
                       : "Our collection is being updated. Please check back soon!"}
                   </p>
-                </motion.div>
+                </div>
               )}
 
               {/* Pagination Controls */}
               {pagination && pagination.totalPages > 1 && (
-                <motion.div
+                <div
                   className="pagination-container"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
                   style={{
                     display: "flex",
                     justifyContent: "center",
@@ -1250,19 +1096,10 @@ const Shop: React.FC = () => {
                   }}
                 >
                   {/* Previous Page Button */}
-                  <motion.button
+                  <button
                     className="pagination-button"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={!pagination.hasPrev || paginationLoading}
-                    whileHover={{
-                      scale:
-                        pagination.hasPrev && !paginationLoading ? 1.05 : 1,
-                      y: pagination.hasPrev && !paginationLoading ? -1 : 0,
-                    }}
-                    whileTap={{
-                      scale:
-                        pagination.hasPrev && !paginationLoading ? 0.95 : 1,
-                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -1288,7 +1125,7 @@ const Shop: React.FC = () => {
                     }}
                   >
                     ← Previous
-                  </motion.button>
+                  </button>
 
                   {/* Page Numbers - Mobile Optimized */}
                   <div
@@ -1352,17 +1189,10 @@ const Shop: React.FC = () => {
                           }
 
                           return (
-                            <motion.button
+                            <button
                               key={page}
                               className="page-number-button"
                               onClick={() => handlePageChange(page as number)}
-                              whileHover={{
-                                scale: page !== currentPage ? 1.05 : 1,
-                                y: page !== currentPage ? -1 : 0,
-                              }}
-                              whileTap={{
-                                scale: page !== currentPage ? 0.95 : 1,
-                              }}
                               style={{
                                 padding: isMobile
                                   ? "0.875rem 1.25rem"
@@ -1391,7 +1221,7 @@ const Shop: React.FC = () => {
                               }}
                             >
                               {page}
-                            </motion.button>
+                            </button>
                           );
                         });
                       }
@@ -1424,16 +1254,9 @@ const Shop: React.FC = () => {
                                   ...
                                 </span>
                               )}
-                              <motion.button
+                              <button
                                 className="page-number-button"
                                 onClick={() => handlePageChange(page)}
-                                whileHover={{
-                                  scale: page !== currentPage ? 1.05 : 1,
-                                  y: page !== currentPage ? -1 : 0,
-                                }}
-                                whileTap={{
-                                  scale: page !== currentPage ? 0.95 : 1,
-                                }}
                                 style={{
                                   padding: "0.75rem 1rem",
                                   border: "none",
@@ -1452,7 +1275,7 @@ const Shop: React.FC = () => {
                                 }}
                               >
                                 {page}
-                              </motion.button>
+                              </button>
                             </React.Fragment>
                           );
                         });
@@ -1460,19 +1283,10 @@ const Shop: React.FC = () => {
                   </div>
 
                   {/* Next Page Button */}
-                  <motion.button
+                  <button
                     className="pagination-button"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={!pagination.hasNext || paginationLoading}
-                    whileHover={{
-                      scale:
-                        pagination.hasNext && !paginationLoading ? 1.05 : 1,
-                      y: pagination.hasNext && !paginationLoading ? -1 : 0,
-                    }}
-                    whileTap={{
-                      scale:
-                        pagination.hasNext && !paginationLoading ? 0.95 : 1,
-                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -1498,16 +1312,13 @@ const Shop: React.FC = () => {
                     }}
                   >
                     Next →
-                  </motion.button>
-                </motion.div>
+                  </button>
+                </div>
               )}
 
               {/* Page Info - Mobile Optimized */}
               {pagination && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
+                <div
                   style={{
                     textAlign: "center",
                     marginTop: isMobile ? "1.5rem" : "1rem",
@@ -1548,9 +1359,9 @@ const Shop: React.FC = () => {
                       of {pagination.total} products
                     </>
                   )}
-                </motion.div>
+                </div>
               )}
-            </motion.div>
+            </div>
           )}
         </div>
       </div>

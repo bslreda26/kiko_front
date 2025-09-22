@@ -391,17 +391,6 @@ const Home: React.FC = () => {
                         >
                           {product.price > 0 ? "Available" : "Sold Out"}
                         </p>
-                        <motion.button
-                          className="view-button"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/product/${product.id}`);
-                          }}
-                        >
-                          View Details
-                        </motion.button>
                       </div>
                     </div>
                   </motion.div>
