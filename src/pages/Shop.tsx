@@ -970,7 +970,7 @@ const Shop: React.FC = () => {
                             >
                               <Check size={14} />
                               <span>
-                                {product.price > 0 ? "In Stock" : "Sold Out"}
+                                {product.price > 0 ? "In Stock" : "Preorder"}
                               </span>
                             </div>
                           </div>
