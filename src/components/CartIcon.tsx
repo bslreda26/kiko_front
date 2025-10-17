@@ -414,7 +414,7 @@ const CartIcon: React.FC = () => {
                               ? "Preorder"
                               : item.price > 0
                               ? "Available"
-                              : "Sold Out"}
+                              : "Preorder"}
                           </p>
                         </div>
 

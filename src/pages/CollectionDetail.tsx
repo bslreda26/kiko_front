@@ -250,10 +250,7 @@ const CollectionDetail: React.FC = () => {
               maxWidth: "400px",
             }}
           >
-            <LogoSpinner 
-              size={48} 
-              text={loadingMessage}
-            />
+            <LogoSpinner size={48} text={loadingMessage} />
             {retryCount > 0 && (
               <p
                 style={{
@@ -1144,7 +1141,7 @@ const CollectionDetail: React.FC = () => {
                           >
                             <Check size={14} />
                             <span>
-                              {product.price > 0 ? "In Stock" : "Sold Out"}
+                              {product.price > 0 ? "In Stock" : "Preorder"}
                             </span>
                           </motion.div>
                         </motion.div>

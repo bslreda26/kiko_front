@@ -430,10 +430,7 @@ const AdminDashboard: React.FC = () => {
             justifyContent: "center",
           }}
         >
-          <LogoSpinner 
-            size={48} 
-            text="Loading Dashboard..." 
-          />
+          <LogoSpinner size={48} text="Loading Dashboard..." />
         </div>
       </div>
     );
@@ -763,7 +760,7 @@ const AdminDashboard: React.FC = () => {
                               display: "inline-block",
                             }}
                           >
-                            {product.price > 0 ? "Available" : "Sold Out"}
+                            {product.price > 0 ? "Available" : "Preorder"}
                           </p>
                           <p
                             style={{

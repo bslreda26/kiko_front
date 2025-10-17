@@ -389,7 +389,7 @@ const Home: React.FC = () => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          {product.price > 0 ? "Available" : "Sold Out"}
+                          {product.price > 0 ? "Available" : "Preorder"}
                         </p>
                       </div>
                     </div>
