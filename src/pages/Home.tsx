@@ -18,8 +18,8 @@ import headerImage2 from "../assets/home/12h.jpg";
 import headerImage3 from "../assets/home/14h.jpg";
 
 // Import artist story images
-import artistImage1 from "../assets/karen/1k.jpg";
-import artistImage2 from "../assets/karen/2k.jpg";
+import artistImage1 from "../assets/x1.jpeg";
+import artistImage2 from "../assets/x2.jpeg";
 
 // Import work images for static gallery
 import workImage1 from "../assets/work/4.jpg";
